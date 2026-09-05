@@ -1,0 +1,7 @@
+{
+  "name": "Preferente Fantasy",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
