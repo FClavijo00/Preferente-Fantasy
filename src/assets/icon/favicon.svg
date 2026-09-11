@@ -1,0 +1,54 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+	<defs>
+		<linearGradient id="g1" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(460,460,-460,460,20,20)">
+			<stop offset="0" stop-color="#0b2317"/>
+			<stop offset="1" stop-color="#030e08"/>
+		</linearGradient>
+		<linearGradient id="g2" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(460,460,-460,460,20,20)">
+			<stop offset="0" stop-color="#00ff87"/>
+			<stop offset="1" stop-color="#00c853"/>
+		</linearGradient>
+		<linearGradient id="g3" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(40,38,-37.723,39.708,230,351)">
+			<stop offset="0" stop-color="#00ff87"/>
+			<stop offset="1" stop-color="#00c853"/>
+		</linearGradient>
+		<linearGradient id="g4" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(105,177.318,-216.39,128.137,266,111.861)">
+			<stop offset="0" stop-color="#00ff87"/>
+			<stop offset="1" stop-color="#00c853"/>
+		</linearGradient>
+		<linearGradient id="g5" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(NaN,NaN,NaN,NaN,NaN,NaN)">
+			<stop offset="0" stop-color="#00ff87"/>
+			<stop offset="1" stop-color="#00c853"/>
+		</linearGradient>
+		<linearGradient id="g6" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(NaN,NaN,NaN,NaN,NaN,NaN)">
+			<stop offset="0" stop-color="#00ff87"/>
+			<stop offset="1" stop-color="#00c853"/>
+		</linearGradient>
+	</defs>
+	<style>
+		.s0 { fill: url(#g1);stroke: url(#g2);stroke-width: 6 } 
+		.s1 { opacity: .1;fill: #000000;stroke: #ffffff;stroke-width: 2 } 
+		.s2 { fill: #0a1d13;stroke: #ffffff;stroke-width: 4 } 
+		.s3 { fill: url(#g3) } 
+		.s4 { fill: #000000;stroke: #ffffff;stroke-linecap: round;stroke-width: 3.5 } 
+		.s5 { fill: #ffffff } 
+		.s6 { fill: url(#g4) } 
+		.s7 { fill: #000000;stroke: url(#g5);stroke-linecap: round;stroke-width: 4 } 
+		.s8 { fill: #000000;stroke: url(#g6);stroke-linecap: round;stroke-width: 4 } 
+	</style>
+	<path fill-rule="evenodd" class="s0" d="m250 480c-127.19 0-230-102.81-230-230 0-127.19 102.81-230 230-230 127.19 0 230 102.81 230 230 0 127.19-102.81 230-230 230z"/>
+	<path fill-rule="evenodd" class="s1" d="m250 35v430"/>
+	<g>
+		<path fill-rule="evenodd" class="s2" d="m250 423c-26.54 0-48-21.46-48-48 0-26.54 21.46-48 48-48 26.54 0 48 21.46 48 48 0 26.54-21.46 48-48 48z"/>
+		<path fill-rule="evenodd" class="s3" d="m250 351l20 14-8 24h-24l-8-24z"/>
+		<path class="s4" d="m250 351v-24m20 38l24-8m-32 32l18 24m-42-24l-18 24m10-48l-24-8"/>
+	</g>
+	<g>
+		<path class="s5" d="m150 103.62l100-21.25c45-9.57 65 11.18 65 51.18 0 40-25 65.32-70 74.88l-50 10.63v85l-45 9.56zm45 30.44v45l45-9.57c20-4.25 28-12.95 28-28.95 0-15-10-19.87-28-16.05z"/>
+		<path class="s6" d="m266 134.18l105-22.32v40l-60 12.75v25l50-10.62v35l-50 10.62v55l-45 9.57z"/>
+	</g>
+	<g style="opacity: .7">
+		<path fill-rule="evenodd" class="s7" d="m75 210l-20 30"/>
+		<path fill-rule="evenodd" class="s8" d="m445 210l-20 30"/>
+	</g>
+</svg>

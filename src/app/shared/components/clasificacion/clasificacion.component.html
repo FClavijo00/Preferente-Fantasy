@@ -1,0 +1,125 @@
+<ion-card>
+  <ion-card-header>
+    <ion-segment
+      mode="md"
+      value="clasificacion"
+      (ionChange)="segmentChanged($event)"
+      class="clas-rank-segment"
+    >
+      <ion-segment-button value="clasificacion" content-id="clasificacion">
+        <ion-label>Clasificación</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ranking" content-id="ranking">
+        <ion-label>Rankings</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-segment-view>
+      <!-- CLASIFICACIÓN -->
+      <ion-segment-content id="clasificacion">
+        <ng-content>
+          <table
+            class="clas-table table table-sm table-dark table-striped table-hover align-middle"
+          >
+            <thead>
+              <tr>
+                <th class="text-center" scope="col"></th>
+                <th class="text-center" scope="col">Equipo</th>
+                <th class="text-center" scope="col">PTS</th>
+                <th class="text-center" scope="col">PJ</th>
+                <th class="text-center" scope="col">PG</th>
+                <th class="text-center" scope="col">PE</th>
+                <th class="text-center" scope="col">PP</th>
+                <th class="text-center" scope="col">GF</th>
+                <th class="text-center" scope="col">CF</th>
+                <th class="text-center" scope="col">DG</th>
+                <th class="text-center" scope="col">SAN</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (
+                equipo of clasificacion();
+                track equipo.id;
+                let index = $index
+              ) {
+                <tr>
+                  <td class="pos-cell">
+                    <ion-badge
+                      class="clasificacion-badge"
+                      [class.ascenso]="index === 0"
+                      [class.playoff]="index === 1 || index === 2"
+                      [class.copa]="index === 3 || index === 4"
+                      [class.descenso]="index >= 14 && index <= 17"
+                      mode="ios"
+                    >
+                      {{ index + 1 }}
+                    </ion-badge>
+                  </td>
+                  <td class="equipo-cell">
+                    <img
+                      class="clasificacion-escudo"
+                      [src]="equipo.escudo"
+                      [alt]="equipo.nombre"
+                    />
+                    <span class="clasificacion-nombre">{{
+                      equipo.nombre
+                    }}</span>
+                  </td>
+                  <td class="text-center">{{ equipo.pts }}</td>
+                  <td class="text-center">{{ equipo.pj }}</td>
+                  <td class="text-center">{{ equipo.pg }}</td>
+                  <td class="text-center">{{ equipo.pe }}</td>
+                  <td class="text-center">{{ equipo.pp }}</td>
+                  <td class="text-center">{{ equipo.gf }}</td>
+                  <td class="text-center">{{ equipo.gc }}</td>
+                  <td class="text-center">{{ equipo.dg }}</td>
+                  <td class="text-center">{{ equipo.san }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="clasificacion-info ion-padding-start ion-padding-bottom">
+            <div>
+              <ion-badge class="ascenso" mode="ios">*</ion-badge>
+              <span>Ascenso a DH</span>
+            </div>
+            <div>
+              <ion-badge class="playoff" mode="ios">*</ion-badge>
+              <span>Playoff a DH & Copa Andalucía</span>
+            </div>
+            <div>
+              <ion-badge class="copa" mode="ios">*</ion-badge>
+              <span>Copa Andalucía</span>
+            </div>
+            <div>
+              <ion-badge class="descenso" mode="ios">*</ion-badge>
+              <span>Descenso</span>
+            </div>
+          </div>
+        </ng-content>
+      </ion-segment-content>
+
+      <!-- RANKING -->
+      <ion-segment-content id="ranking">
+        <ng-content>
+          <ion-list>
+            @for (jugador of ranking(); track jugador.id) {
+              <ion-item>
+                <ion-label >
+                  {{
+                    jugador.apodo || jugador.nombre + " " + jugador.apellidos
+                  }}
+                </ion-label>
+                <ion-label class="ion-text-end">
+                  {{ jugador.goles }}
+                </ion-label>
+              </ion-item>
+            }
+          </ion-list>
+        </ng-content>
+      </ion-segment-content>
+    </ion-segment-view>
+  </ion-card-content>
+</ion-card>

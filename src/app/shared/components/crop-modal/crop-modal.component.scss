@@ -1,0 +1,17 @@
+ion-header {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  
+  ion-toolbar {
+    --background: var(--ion-color-stadium);
+  }
+}
+
+.content-cropper {
+  --background: var(--ion-color-stadium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+image-cropper {
+  max-height: 70vh;
+}

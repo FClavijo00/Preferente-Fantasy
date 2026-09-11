@@ -1,0 +1,23 @@
+<ion-header class="ion-no-border" mode="md">
+  <ion-toolbar>
+    <ion-title>Ajustar Imagen</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cancelar</ion-button>
+      <ion-button class="btn-pitch" [strong]="true" (click)="confirmar()"
+        >Guardar</ion-button
+      >
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding content-cropper">
+  <image-cropper
+    [imageChangedEvent]="imageChangedEvent"
+    [maintainAspectRatio]="true"
+    [aspectRatio]="1"
+    [resizeToWidth]="300"
+    [resizeToHeight]="300"
+    format="webp"
+    (imageCropped)="imageCropped($event)"
+  ></image-cropper>
+</ion-content>

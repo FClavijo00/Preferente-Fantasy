@@ -1,0 +1,60 @@
+/* Estilos para el contenedor de Auth */
+ion-content {
+  --background: var(--ion-color-stadium);
+
+  .auth-container {
+    padding: 20px 10px;
+
+    .auth-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 10px;
+    }
+
+    .fantasy-title {
+      color: var(--ion-color-pitch);
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      margin-top: 0;
+    }
+
+    .auth-subtitle {
+      color: var(--ion-color-slate-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+      margin-bottom: 20px;
+    }
+
+    ion-input.login-outline-input {
+      --border-color: var(--ion-color-pitch);
+      --border-radius: 10px;
+      --highlight-color-focused: #ffffff;
+      --highlight-color-valid: #ffffff;
+      --highlight-color-invalid: var(--ion-color-red-card);
+
+      ion-icon.input-icon {
+        color: var(--ion-color-pitch);
+        font-size: 1.5rem;
+      }
+    }
+
+    .btn-pitch {
+      --background: var(--ion-color-pitch);
+      --background-activated: var(--ion-color-pitch-shade);
+      --color: var(--ion-color-pitch-contrast);
+      font-family: "Titillium Web", sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      height: 48px;
+      --border-radius: 10px;
+    }
+
+    a {
+      color: var(--ion-color-pitch);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+}

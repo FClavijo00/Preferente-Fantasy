@@ -1,0 +1,16 @@
+ion-header {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+
+  ion-toolbar {
+    --background: var(--ion-color-stadium);
+    --color: var(--ion-color-pitch);
+
+    .div-img {
+      padding-top: 8px;
+
+      img {
+        width: 40px;
+      }
+    }
+  }
+}

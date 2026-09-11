@@ -1,0 +1,105 @@
+/* Estilos para el contenedor de Auth */
+ion-content {
+  --background: var(--ion-color-stadium);
+
+  .auth-container {
+    padding: 20px 10px;
+
+    .auth-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 10px;
+    }
+
+    .fantasy-title {
+      color: var(--ion-color-pitch);
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      margin-top: 0;
+    }
+
+    .auth-subtitle {
+      color: var(--ion-color-slate-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+      margin-bottom: 20px;
+    }
+
+    ion-input.login-outline-input {
+      --border-color: var(--ion-color-pitch);
+      --border-radius: 10px;
+      --highlight-color-focused: #ffffff;
+      --highlight-color-valid: #ffffff;
+      --highlight-color-invalid: var(--ion-color-red-card);
+
+      ion-icon.input-icon {
+        color: var(--ion-color-pitch);
+        font-size: 1.5rem;
+      }
+    }
+
+    .btn-pitch {
+      --background: var(--ion-color-pitch);
+      --color: var(--ion-color-pitch-contrast);
+      --background-activated: var(--ion-color-pitch-shade);
+      font-family: "Titillium Web", sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      height: 48px;
+      --border-radius: 10px;
+    }
+
+    a {
+      color: var(--ion-color-pitch);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+}
+
+
+.avatar-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .avatar-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    .avatar-preview {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background-color: #f8f9fa;
+      border: 2px solid var(--ion-color-pitch);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        border-color: #4a5d4e;
+        transform: scale(1.03);
+      }
+
+      .camera-icon {
+        font-size: 28px;
+        color: var(--ion-color-stadium);
+      }
+    }
+
+    .upload-hint {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ion-color-slate-muted);
+    }
+  }
+}

@@ -1,0 +1,110 @@
+ion-card {
+  margin: 0 0 16px 0 !important;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  ion-card-header {
+    padding: 0 0 10px 0 !important;
+  }
+
+  ion-card-content {
+    padding: 0 !important;
+  }
+}
+
+.clas-rank-segment {
+  ion-segment-button {
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    --color-checked: var(--ion-color-pitch) !important;
+  }
+}
+
+.clas-table {
+  font-size: 0.7rem;
+  //border: 1px solid rgba(255, 255, 255, 0.08);
+
+  .pos-cell {
+    .clasificacion-badge {
+      padding: 3px 5px !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.7rem !important;
+      --background: white;
+
+      &.ascenso {
+        --background: var(--ion-color-trophy);
+      }
+
+      &.playoff {
+        --background: var(--ion-color-grass);
+      }
+
+      &.copa {
+        --background: #2596be;
+      }
+
+      &.descenso {
+        --background: var(--ion-color-red-card);
+      }
+    }
+  }
+
+  .equipo-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    /* min-width: 130px;
+    max-width: 130px; */
+
+    .clasificacion-escudo {
+      width: 24px;
+      height: 24px;
+    }
+
+    .clasificacion-nombre {
+      font-size: 0.65rem;
+      font-weight: 100;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.clasificacion-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+
+  div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    ion-badge {
+      &.ascenso {
+        --background: var(--ion-color-trophy);
+      }
+
+      &.playoff {
+        --background: var(--ion-color-grass);
+      }
+
+      &.copa {
+        --background: #2596be;
+      }
+
+      &.descenso {
+        --background: var(--ion-color-red-card);
+      }
+    }
+
+    span {
+      font-size: 0.8rem;
+      font-weight: 100;
+    }
+  }
+}

@@ -1,2 +1,86 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+
+/* Importación de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Titillium+Web:wght@600;700&display=swap');
+
+/** Ionic CSS Variables **/
+
+:root {
+  /* Fuentes de texto */
+  --ion-font-family: 'Titillium Web', system-ui, -apple-system, sans-serif;
+
+  /* Color Primario - Pitch Neon Green */
+  --ion-color-pitch: #00e676;
+  --ion-color-pitch-rgb: 0, 230, 118;
+  --ion-color-pitch-contrast: #05140c;
+  --ion-color-pitch-contrast-rgb: 5, 20, 12;
+  --ion-color-pitch-shade: #00ca68;
+  --ion-color-pitch-tint: #1ae884;
+
+  /* Color Secundario - Grass Dark Green */
+  --ion-color-grass: #05c46b;
+  --ion-color-grass-rgb: 5, 196, 107;
+  --ion-color-grass-contrast: #ffffff;
+  --ion-color-grass-shade: #04ac5e;
+  --ion-color-grass-tint: #1ec97a;
+
+  /* Color Acento - Trophy Gold */
+  --ion-color-trophy: #ffd700;
+  --ion-color-trophy-rgb: 255, 215, 0;
+  --ion-color-trophy-contrast: #05140c;
+  --ion-color-trophy-contrast-rgb: 5, 20, 12;
+  --ion-color-trophy-shade: #e0bd00;
+  --ion-color-trophy-tint: #ffdb1a;
+
+  /* Alertas / Tarjeta Roja - Red Card */
+  --ion-color-red-card: #ff5252;
+  --ion-color-red-card-rgb: 255, 82, 82;
+  --ion-color-red-card-contrast: #ffffff;
+
+  /* Background - Stadium Night */
+  --ion-color-stadium: #080f0b;
+  --ion-color-stadium-rgb: 8, 15, 11;
+  --ion-color-stadium-contrast: #ffffff;
+
+  /* Surface - Turf Surface */
+  --ion-color-turf-surface: #121f17;
+  --ion-color-turf-surface-rgb: 18, 31, 23;
+  --ion-color-turf-surface-contrast: #ffffff;
+
+  /* Text Secondary - Slate Muted */
+  --ion-color-slate-muted: #94a3b8;
+  --ion-color-slate-muted-rgb: 148, 163, 184;
+  --ion-color-slate-muted-contrast: #ffffff;
+
+  /* Estructura UI & Fondos en Modo Oscuro */
+ /*  --ion-background-color: #080f0b;
+  --ion-background-color-rgb: 8, 15, 11;
+
+  --ion-text-color: #ffffff;
+  --ion-text-color-rgb: 255, 255, 255;
+
+  --ion-item-background: #121f17;
+  --ion-card-background: #121f17;
+  --ion-toolbar-background: #0b1d13;
+  --ion-tab-bar-background: #0b1d13; */
+
+  /* Bordes y separadores sutiles */
+  /* --ion-border-color: #1a3023;
+  --ion-item-border-color: #1a3023; */
+}
+
+/* Forzar que Ionic utilice la paleta oscura sin importar la preferencia del SO */
+@media (prefers-color-scheme: light) {
+  :root {
+    /* Mantenemos los mismos colores oscuros para garantizar Dark First */
+    --ion-background-color: #080f0b;
+    --ion-background-color-rgb: 8, 15, 11;
+    --ion-text-color: #ffffff;
+    --ion-text-color-rgb: 255, 255, 255;
+    --ion-item-background: #121f17;
+    --ion-card-background: #121f17;
+    --ion-toolbar-background: #0b1d13;
+    --ion-tab-bar-background: #0b1d13;
+  }
+}

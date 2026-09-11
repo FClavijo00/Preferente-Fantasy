@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Fondo degradado Verde Noche / Dark Mode -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B2317" />
+      <stop offset="100%" stop-color="#030E08" />
+    </linearGradient>
+
+    <!-- Verde Neón con mayor brillo para la F -->
+    <linearGradient id="neonGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00FF87" />
+      <stop offset="100%" stop-color="#00C853" />
+    </linearGradient>
+
+    <!-- Sombra proyectada para dar volumen -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- 1. Círculo Exterior Principal -->
+  <circle cx="250" cy="250" r="230" fill="url(#bgGradient)" stroke="url(#neonGreen)" stroke-width="6" />
+
+  <!-- 2. Línea vertical de fondo del campo -->
+  <line x1="250" y1="35" x2="250" y2="465" stroke="#FFFFFF" stroke-width="2" opacity="0.1" />
+
+  <!-- 3. Balón de Fútbol Moderno (Centrado en la base inferior) -->
+  <g transform="translate(200, 325)" filter="url(#dropShadow)">
+    <!-- Circunferencia base del balón -->
+    <circle cx="50" cy="50" r="48" fill="#0A1D13" stroke="#FFFFFF" stroke-width="4" />
+    
+    <!-- Pentágono central en verde neón -->
+    <polygon points="50,26 70,40 62,64 38,64 30,40" fill="url(#neonGreen)" />
+    
+    <!-- Costuras del balón -->
+    <path d="M 50,26 L 50,2 
+             M 70,40 L 94,32 
+             M 62,64 L 80,88 
+             M 38,64 L 20,88 
+             M 30,40 L 6,32" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" />
+
+    <!-- Acento de brillo circular -->
+    <circle cx="50" cy="50" r="48" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.5" stroke-dasharray="30 200" />
+  </g>
+
+  <!-- 4. Monograma "PF" (Perfectamente Centrado en X=250) -->
+  <g filter="url(#dropShadow)" transform="translate(120, 90) skewX(-12)">
+    <!-- Letra P (Blanco puro, estilo itálico deportivo) -->
+    <path d="M 30,20 H 130 C 175,20 195,45 195,85 C 195,125 170,145 125,145 H 75 V 230 H 30 Z M 75,60 V 105 H 120 C 140,105 148,98 148,82 C 148,67 138,60 120,60 Z" fill="#FFFFFF" />
+
+    <!-- Letra F (Verde Neón, entrelazada sobre la P) -->
+    <path d="M 145,75 H 250 V 115 H 190 V 140 H 240 V 175 H 190 V 230 H 145 Z" fill="url(#neonGreen)" />
+  </g>
+
+  <!-- 5. Detalle de destellos de velocidad laterales -->
+  <g stroke="url(#neonGreen)" stroke-width="4" stroke-linecap="round" opacity="0.7">
+    <line x1="75" y1="210" x2="55" y2="240" />
+    <line x1="445" y1="210" x2="425" y2="240" />
+  </g>
+</svg>
