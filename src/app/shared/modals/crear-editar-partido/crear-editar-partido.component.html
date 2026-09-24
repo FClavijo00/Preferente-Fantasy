@@ -1,0 +1,151 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ modo === "crear" ? "Crear" : "Editar" }} Partido</ion-title>
+    <ion-buttons slot="end">
+      <ion-button mode="ios" (click)="cerrarModal()">
+        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item
+    class="item-estado-selector ion-margin-bottom"
+    mode="ios"
+    lines="none"
+  >
+    <ion-label
+      >Partido perteneciente a : Jornada {{ jornada.numero_jornada }}</ion-label
+    >
+  </ion-item>
+
+  <form [formGroup]="partidoForm">
+    <div class="div-equipos">
+      <ion-item
+        mode="ios"
+        lines="none"
+        class="item-estado-selector ion-margin-bottom"
+      >
+        <ion-select
+          label="Equipo Local :"
+          mode="ios"
+          cancelText="Cancelar"
+          okText="Aceptar"
+          formControlName="equipo_local_id"
+          (ionChange)="cambiarEquipoLocal($event)"
+        >
+          @for (equipo of equipos(); track equipo) {
+            <ion-select-option [value]="equipo.id">{{
+              equipo.nombre
+            }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-input
+        class="outline-input ion-margin-bottom"
+        mode="md"
+        label="Goles"
+        label-placement="stacked"
+        fill="outline"
+        type="number"
+        formControlName="goles_local"
+      >
+      </ion-input>
+    </div>
+
+    <div class="div-equipos">
+      <ion-item
+        mode="ios"
+        lines="none"
+        class="item-estado-selector ion-margin-bottom"
+      >
+        <ion-select
+          label="Equipo Visitante :"
+          mode="ios"
+          cancelText="Cancelar"
+          okText="Aceptar"
+          formControlName="equipo_visitante_id"
+          (ionChange)="cambiarEquipoVisitante($event)"
+        >
+          @for (equipo of equipos(); track equipo) {
+            <ion-select-option [value]="equipo.id">{{
+              equipo.nombre
+            }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-input
+        class="outline-input ion-margin-bottom"
+        mode="md"
+        label="Goles"
+        label-placement="stacked"
+        fill="outline"
+        type="number"
+        formControlName="goles_visitante"
+      >
+      </ion-input>
+    </div>
+
+    <ion-item
+      mode="ios"
+      lines="none"
+      class="item-estado-selector ion-margin-bottom"
+    >
+      <ion-label>Fecha Partido :</ion-label>
+      <ion-datetime-button
+        class="date-picker-button"
+        datetime="id-datepicker"
+        slot="end"
+        mode="ios"
+      ></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true" class="date-picker-modal">
+        <ng-template>
+          <ion-datetime
+            id="id-datepicker"
+            mode="ios"
+            formControlName="fecha_partido"
+            showDefaultButtons="true"
+            doneText="Confirmar"
+            cancelText="Cancelar"
+            firstDayOfWeek="1"
+          >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <div class="div-checkboxs">
+      <ion-checkbox
+        class="input-checkbox ion-margin-right"
+        labelPlacement="start"
+        mode="ios"
+        formControlName="jugado"
+        (ionChange)="ionChangeCheckboxJugado($event)"
+        >¿Partido Jugado?</ion-checkbox
+      >
+
+      <ion-checkbox
+        class="input-checkbox"
+        labelPlacement="start"
+        mode="ios"
+        [checked]="hayFecha()"
+        (ionChange)="ionChangeCheckboxFecha($event)"
+        >¿Hay fecha?</ion-checkbox
+      >
+    </div>
+
+    <div class="div-buttons">
+      <ion-button
+        class="btn-cancelar-guardar ion-margin-top"
+        mode="md"
+        color="success"
+        (click)="crearEditarPartido()"
+      >
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        {{ modo === "crear" ? "Crear" : "Editar" }} Partido
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

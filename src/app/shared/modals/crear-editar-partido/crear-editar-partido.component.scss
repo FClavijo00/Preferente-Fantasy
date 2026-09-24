@@ -1,0 +1,99 @@
+ion-header {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+
+  ion-toolbar {
+    --background: var(--ion-color-stadium);
+    --border-color: var(--ion-color-pitch);
+    --border-width: 0 0 1px 0;
+    --color: var(--ion-color-pitch);
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-stadium);
+
+  .div-equipos {
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    align-items: center;
+
+    ion-item {
+      width: 75%;
+    }
+
+    ion-input {
+      width: 25%;
+      min-height: 46px !important;
+    }
+  }
+}
+
+ion-input.outline-input {
+  --border-color: var(--ion-color-pitch);
+  --border-radius: 10px;
+  --highlight-color-focused: var(--ion-color-pitch);
+  --highlight-color-valid: var(--ion-color-pitch);
+  --highlight-color-invalid: var(--ion-color-red-card);
+
+  ion-icon.input-icon {
+    color: var(--ion-color-pitch);
+    font-size: 1.5rem;
+  }
+}
+
+.toggle-privado {
+  --handle-background-checked: var(--ion-color-pitch);
+  --track-background-checked: #686c6a;
+}
+
+.item-estado-selector {
+  --background: transparent;
+  border: 1px solid var(--ion-color-pitch);
+  border-radius: 10px;
+}
+
+.date-picker-button {
+  &::part(native) {
+    background: var(--ion-color-pitch);
+    color: var(--ion-color-pitch-contrast);
+    padding: 5px;
+  }
+}
+
+.input-checkbox {
+  --border-radius: 6px;
+  --size: 25px;
+
+  --checkbox-background: var(--ion-color-stadium);
+
+  --border-color-checked: var(--ion-color-pitch);
+  --checkbox-background-checked: var(--ion-color-pitch);
+  --checkmark-color: var(--ion-color-pitch-contrast);
+  --checkmark-width: 3px;
+  --transition: background-color 0.2s ease-in-out;
+}
+
+.div-checkboxs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.div-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-grid.grid-acta {
+  padding: 0;
+
+  ion-col{
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
+  }
+}
