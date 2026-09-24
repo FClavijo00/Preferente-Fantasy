@@ -112,24 +112,28 @@ export class LoginPage {
       return;
     }
 
-    this.loadingSpinner.update((val) => true);
+    this.loadingSpinner.set(true);
 
     try {
-     const response = await firstValueFrom(this._authService.login(
-      this.loginForm.value.email,
-      this.loginForm.value.password
-     ));
-      console.log(response);
-      if (response) {
-        this.loadingSpinner.update((val) => false);
-        this._toastService.showSuccessToast('Inicio de sesión exitoso.');
-        this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
-      }
+      this._authService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe({
+        next: async (resp: any) => {
+          if (resp.ok) {
+            this._authService.clearSession();
+
+            this._authService.setSession(resp.data.usuario, resp.data.token);
+
+            this.loadingSpinner.set(false);
+
+            this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
+            this._toastService.showSuccessToast('Inicio de sesión exitoso.');
+          }
+        }
+      });
     } catch (error) {
-      this.loadingSpinner.update((val) => false);
+      this.loadingSpinner.set(false);
       this._toastService.showErrorToast('Error al iniciar sesión. Revisa tus credenciales.');
     } finally {
-      this.loadingSpinner.update((val) => false);
+      this.loadingSpinner.set(false);
     }
   }
 
