@@ -1,0 +1,209 @@
+ion-header {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+
+  ion-toolbar {
+    --background: var(--ion-color-stadium);
+    --border-color: var(--ion-color-pitch);
+    --border-width: 0 0 1px 0;
+    --color: var(--ion-color-pitch);
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-stadium);
+}
+
+.player-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 1. CARD CABECERA */
+.player-header-card {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: rgba(18, 29, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Avatar Picker (Izquierda) */
+  .avatar-picker {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: #22c55e;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: rgba(255, 255, 255, 0.5);
+
+      ion-icon {
+        font-size: 1.6rem;
+      }
+
+      span {
+        font-size: 0.68rem;
+        font-weight: 600;
+      }
+    }
+
+    .edit-overlay {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      padding: 3px 0;
+
+      ion-icon {
+        font-size: 0.9rem;
+        color: #ffffff;
+      }
+    }
+  }
+
+  /* Campos derecha */
+  .main-info-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* 2. CROPPER WRAPPER */
+.cropper-wrapper {
+  background: rgba(15, 20, 25, 0.95);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+
+  .cropper-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    .cropper-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+    }
+
+    .btn-close-cropper {
+      --padding-start: 0;
+      --padding-end: 0;
+      margin: 0;
+      font-size: 1.4rem;
+    }
+  }
+
+  .cropper-actions {
+    margin-top: 10px;
+  }
+}
+
+/* 3. SECCIÓN INFERIOR DE DETALLES */
+.details-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Estilo Inputs Floating */
+.custom-input {
+  --background: rgba(18, 29, 22, 0.6);
+  --border-radius: 12px;
+  --highlight-color-focused: #22c55e;
+  --color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 4px;
+
+  ion-label {
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
+}
+
+/* Toggles Grid */
+.toggles-grid {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+
+  .toggle-item {
+    flex: 1;
+    --background: rgba(18, 29, 22, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 0;
+
+    h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    p {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin: 2px 0 0 0;
+    }
+  }
+}
+
+/* Botón Guardar */
+.btn-submit {
+  --background: #22c55e;
+  --color: #080f0b;
+  --border-radius: 12px;
+  font-weight: 700;
+  margin-top: 12px;
+  height: 48px;
+}
+
+ion-input.outline-input {
+    --border-color: var(--ion-color-pitch);
+    --border-radius: 10px;
+    --highlight-color-focused: var(--ion-color-pitch);
+    --highlight-color-valid: var(--ion-color-pitch);
+    --highlight-color-invalid: var(--ion-color-red-card);
+
+    ion-icon.input-icon {
+      color: var(--ion-color-pitch);
+      font-size: 1.5rem;
+    }
+  }

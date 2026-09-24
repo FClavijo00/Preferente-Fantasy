@@ -1,0 +1,195 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ modo === "crear" ? "Crear" : "Editar" }} Jugador</ion-title>
+    <ion-buttons slot="end">
+      <ion-button mode="ios" (click)="cerrarModal()">
+        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="jugadorForm">
+    <!-- CARD CABECERA: FOTO + DATOS BÁSICOS -->
+    <div class="player-header-card">
+      <!-- LADO IZQUIERDO: SELECTOR DE IMAGEN / PREVIEW -->
+      <div class="avatar-picker" (click)="fileInput.click()">
+        @if (imagenPreview() || jugadorForm.get("foto")?.value) {
+        <img [src]="imagenPreview() || jugadorForm.get('foto')?.value" alt="Foto jugador" class="avatar-img" />
+        } @else {
+        <div class="avatar-placeholder">
+          <ion-icon name="camera-outline"></ion-icon>
+          <span>Subir foto</span>
+        </div>
+        }
+        <div class="edit-overlay">
+          <ion-icon name="pencil-outline"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Input file oculto -->
+      <input [disabled]="
+          jugadorForm.get('nombre')?.invalid ||
+          jugadorForm.get('apellidos')?.invalid ||
+          jugadorForm.get('apodo')?.invalid
+        " #fileInput type="file" accept="image/*" (change)="fileChangeEvent($event)" style="display: none" />
+
+      <!-- LADO DERECHO: NOMBRE, APELLIDOS Y APODO -->
+      <div class="main-info-fields">
+        <ion-input class="outline-input" mode="md" label="Nombre *" label-placement="stacked" fill="outline" type="text"
+          formControlName="nombre">
+        </ion-input>
+
+        <ion-input class="outline-input" mode="md" label="Apellidos *" label-placement="stacked" fill="outline"
+          type="text" formControlName="apellidos">
+        </ion-input>
+
+        <ion-input class="outline-input" mode="md" label="Apodo" label-placement="stacked" fill="outline" type="text"
+          formControlName="apodo">
+        </ion-input>
+      </div>
+    </div>
+
+    <!-- CROPPER CONTAINER CON BOTÓN DE CIERRE -->
+    @if (imageChangedEvent) {
+    <div class="cropper-wrapper ion-margin-top">
+      <div class="cropper-header">
+        <p class="cropper-title">Recortar foto del jugador</p>
+
+        <!-- Botón de Cierre / Cancelar -->
+        <ion-button fill="clear" color="danger" size="small" (click)="cancelarCropper()" class="btn-close-cropper">
+          <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
+      <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [aspectRatio]="1 / 1"
+        [resizeToWidth]="256" format="webp" (imageCropped)="imageCropped($event)"></image-cropper>
+
+      <div class="cropper-actions">
+        <ion-button expand="block" size="small" color="success" (click)="imageChangedEvent = null">
+          <ion-icon name="checkmark-sharp" slot="start"></ion-icon>
+          Confirmar Recorte
+        </ion-button>
+      </div>
+    </div>
+    }
+
+    <!-- SECCIÓN INFERIOR: SELECTS Y TOGGLES DE ESTADO -->
+    <div class="details-section ion-margin-top">
+      <!-- Posición -->
+      <ion-item mode="md" class="custom-input" lines="none">
+        <ion-select label="Posición * :" mode="ios" cancelText="Cancelar" okText="Aceptar" formControlName="posicion"
+          interface="popover">
+          <ion-select-option value="POR">Portero (POR)</ion-select-option>
+          <ion-select-option value="DEF">Defensa (DEF)</ion-select-option>
+          <ion-select-option value="MED">Centrocampista (MED)</ion-select-option>
+          <ion-select-option value="DEL">Delantero (DEL)</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Equipo -->
+      <ion-item mode="md" class="custom-input" lines="none">
+        <ion-select label="Equipo * :" mode="ios" cancelText="Cancelar" okText="Aceptar" formControlName="equipo_id"
+          interface="popover">
+          @for (equipo of equipos; track equipo.id) {
+          <ion-select-option [value]="equipo.id">{{
+            equipo.nombre
+            }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <!-- Estado (Toggles) -->
+      <div class="toggles-grid">
+        <ion-item lines="none" class="toggle-item">
+          <ion-label>
+            <h3>Jugador Activo</h3>
+            <p>Disponible para competir</p>
+          </ion-label>
+          <ion-toggle slot="end" formControlName="activo" color="success"></ion-toggle>
+        </ion-item>
+
+        <ion-item lines="none" class="toggle-item">
+          <ion-label>
+            <h3>Lesionado</h3>
+            <p>Muestra aviso médico</p>
+          </ion-label>
+          <ion-toggle slot="end" formControlName="lesionado" color="danger"></ion-toggle>
+        </ion-item>
+      </div>
+    </div>
+
+    <!-- Botón Guardar -->
+    <ion-button mode="md" expand="block" [disabled]="jugadorForm.invalid" class="btn-submit" (click)="guardarJugador()">
+      <ion-icon name="checkmark-sharp" slot="start"></ion-icon>
+      Guardar Jugador
+    </ion-button>
+  </form>
+  <!-- <ion-item class="item-estado-selector ion-margin-bottom" mode="ios" lines="none">
+    <ion-label>Partido perteneciente a : Jornada {{ jornada.numero_jornada }}</ion-label>
+  </ion-item> -->
+
+  <!-- <form [formGroup]="jugadorForm">
+    <div class="div-equipos">
+      <ion-item mode="ios" lines="none" class="item-estado-selector ion-margin-bottom">
+        <ion-select label="Equipo Local :" mode="ios" cancelText="Cancelar" okText="Aceptar"
+          formControlName="equipo_local_id">
+          @for (equipo of equipos(); track equipo) {
+          <ion-select-option [value]="equipo.id">{{
+            equipo.nombre
+            }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-input class="outline-input ion-margin-bottom" mode="md" label="Goles" label-placement="stacked"
+        fill="outline" type="number" formControlName="goles_local">
+      </ion-input>
+    </div>
+
+    <div class="div-equipos">
+      <ion-item mode="ios" lines="none" class="item-estado-selector ion-margin-bottom">
+        <ion-select label="Equipo Visitante :" mode="ios" cancelText="Cancelar" okText="Aceptar"
+          formControlName="equipo_visitante_id">
+          @for (equipo of equipos(); track equipo) {
+          <ion-select-option [value]="equipo.id">{{
+            equipo.nombre
+            }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-input class="outline-input ion-margin-bottom" mode="md" label="Goles" label-placement="stacked"
+        fill="outline" type="number" formControlName="goles_visitante">
+      </ion-input>
+    </div>
+
+    <ion-item mode="ios" lines="none" class="item-estado-selector ion-margin-bottom">
+      <ion-label>Fecha Partido :</ion-label>
+      <ion-datetime-button class="date-picker-button" datetime="id-datepicker" slot="end"
+        mode="ios"></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true" class="date-picker-modal">
+        <ng-template>
+          <ion-datetime id="id-datepicker" mode="ios" formControlName="fecha_partido" showDefaultButtons="true"
+            doneText="Confirmar" cancelText="Cancelar" firstDayOfWeek="1">
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <div class="div-checkboxs">
+      <ion-checkbox class="input-checkbox ion-margin-right" labelPlacement="start" mode="ios" formControlName="jugado"
+        (ionChange)="ionChangeCheckboxJugado($event)">¿Partido Jugado?</ion-checkbox>
+
+      <ion-checkbox class="input-checkbox" labelPlacement="start" mode="ios" [checked]="hayFecha()"
+        (ionChange)="ionChangeCheckboxFecha($event)">¿Hay fecha?</ion-checkbox>
+    </div>
+
+    <div class="div-buttons">
+      <ion-button class="btn-cancelar-guardar ion-margin-top" mode="md" color="success" (click)="crearEditarPartido()">
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        {{ modo === "crear" ? "Crear" : "Editar" }} Partido
+      </ion-button>
+    </div>
+  </form> -->
+</ion-content>
