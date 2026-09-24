@@ -1,7 +1,16 @@
 <ion-header>
-  <ion-toolbar mode="ios">
-    <div class="ion-text-center div-img">
-      <img src="assets/images/pf-logo-v2.svg">
-    </div>
+  <ion-toolbar mode="md">
+    @if (titulo === "Home") {
+      <ion-buttons slot="start">
+        <ion-button (click)="backRecepcion()">
+          <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <img src="assets/images/pf-logo-v2.svg" />
+    } @else {
+      <div class="ion-text-center div-img">
+        <img src="assets/images/pf-logo-v2.svg" />
+      </div>
+    }
   </ion-toolbar>
 </ion-header>
