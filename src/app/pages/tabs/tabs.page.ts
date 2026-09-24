@@ -5,6 +5,7 @@ import {
   IonTabButton,
   IonIcon,
   IonLabel,
+  IonButton
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { triangle, ellipse, square, home, homeOutline, shirt, shirtOutline, reader, readerOutline, podium, podiumOutline, trophy, trophyOutline } from 'ionicons/icons';
@@ -13,7 +14,7 @@ import { triangle, ellipse, square, home, homeOutline, shirt, shirtOutline, read
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonButton, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
