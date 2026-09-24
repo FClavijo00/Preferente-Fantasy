@@ -4,10 +4,13 @@
     <!-- Scroll de Jornadas (1 a 34) -->
     <div class="scroll-jornadas">
       @for (j of jornadasTotales(); track j; let i = $index) {
-      <button class="btn-jornada" [class.active]="jornadaSeleccionada() === (i + 1)"
-        (click)="seleccionarJornada(i + 1)">
-        J{{ i + 1 }}
-      </button>
+        <button
+          class="btn-jornada"
+          [class.active]="jornadaSeleccionada() === i + 1"
+          (click)="seleccionarJornada(i + 1)"
+        >
+          J{{ i + 1 }}
+        </button>
       }
     </div>
     <!-- <ion-segment
@@ -46,58 +49,71 @@
   <!-- CONTENT CON LISTA DE PARTIDOS -->
   <ion-card-content>
     @if (jornadaActual(); as j) {
-    <div class="partidos-list">
-      @for (partido of j.partidos; track partido.partido_id) {
-      <div class="partido-item">
-        <!-- Fecha u Hora -->
-        <div class="partido-meta">
-          @if (partido.fecha_partido) {
-          <span>{{
-            partido.fecha_partido
-            | date: "dd/MM/yyyy - H:mm"
-            }}</span>
-          } @else {
-          <span>Horario por confirmar</span>
-          }
-        </div>
-
-        <!-- Enfrentamiento (Local vs Visitante) -->
-        <div class="match-row">
-          <!-- Local -->
-          <div class="equipo local">
-            <span class="nombre">{{ partido.local.nombre }}</span>
-            <img [src]="partido.local.escudo || 'assets/escudos/default.png'" [alt]="partido.local.nombre"
-              class="escudo" />
-          </div>
-
-          <!-- Resultado / VS -->
-          <div class="marcador-box">
-            @if (j.jornada_estado === 'CERRADA') {
-            <div class="marcador">
-              <span class="goles">{{ partido.goles_local }}</span>
-              <span class="guion">-</span>
-              <span class="goles">{{ partido.goles_visitante }}</span>
+      <div class="partidos-list">
+        @for (partido of j.partidos; track partido.partido_id) {
+          <div class="partido-item">
+            <!-- Fecha u Hora -->
+            <div class="partido-meta">
+              @if (partido.fecha_partido) {
+                <span>{{
+                  partido.fecha_partido | date: "dd/MM/yyyy - H:mm"
+                }}</span>
+              } @else {
+                <span>Horario por confirmar</span>
+              }
             </div>
-            } @else {
-            <div class="vs-badge">VS</div>
-            }
-          </div>
 
-          <!-- Visitante -->
-          <div class="equipo visitante">
-            <img [src]="
+            <!-- Enfrentamiento (Local vs Visitante) -->
+            <div class="match-row">
+              <!-- Local -->
+              <div class="equipo local">
+                <span class="nombre">{{ partido.local.nombre }}</span>
+                <img
+                  [src]="partido.local.escudo || 'assets/escudos/default.png'"
+                  [alt]="partido.local.nombre"
+                  class="escudo"
+                />
+              </div>
+
+              <!-- Resultado / VS -->
+              <div class="marcador-box">
+                @if (
+                  j.jornada_estado === "CERRADA" ||
+                  j.jornada_estado === "EN_JUEGO"
+                ) {
+                  <div class="marcador">
+                    @if (partido.jugado === true) {
+                      <span class="goles">{{ partido.goles_local }}</span>
+                      <span class="guion">-</span>
+                      <span class="goles">{{ partido.goles_visitante }}</span>
+                    } @else {
+                      <div class="vs-badge">VS</div>
+                    }
+                  </div>
+                } @else {
+                  <div class="vs-badge">VS</div>
+                }
+              </div>
+
+              <!-- Visitante -->
+              <div class="equipo visitante">
+                <img
+                  [src]="
                     partido.visitante.escudo || 'assets/escudos/default.png'
-                  " [alt]="partido.visitante.nombre" class="escudo" />
-            <span class="nombre">{{ partido.visitante.nombre }}</span>
+                  "
+                  [alt]="partido.visitante.nombre"
+                  class="escudo"
+                />
+                <span class="nombre">{{ partido.visitante.nombre }}</span>
+              </div>
+            </div>
           </div>
-        </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No hay partidos programados en esta jornada.</p>
+          </div>
+        }
       </div>
-      } @empty {
-      <div class="empty-state">
-        <p>No hay partidos programados en esta jornada.</p>
-      </div>
-      }
-    </div>
     }
   </ion-card-content>
 </ion-card>

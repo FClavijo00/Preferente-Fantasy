@@ -27,6 +27,7 @@ export interface Partido {
   goles_visitante: number | null;
   local: Equipo;
   visitante: Equipo;
+  jugado: boolean;
 }
 
 export interface Jornada {
