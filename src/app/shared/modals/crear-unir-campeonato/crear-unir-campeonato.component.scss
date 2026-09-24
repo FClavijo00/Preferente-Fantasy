@@ -1,0 +1,248 @@
+ion-header {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+
+  ion-toolbar {
+    --background: var(--ion-color-stadium);
+    --border-color: var(--ion-color-pitch);
+    --border-width: 0 0 1px 0;
+    --color: var(--ion-color-pitch);
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-stadium);
+
+  .div-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .btn-unir {
+    --background: var(--ion-color-pitch);
+    --color: var(--ion-color-pitch-contrast);
+  }
+
+  div-cod {
+    animation: fade-in 1s ease-in-out;
+  }
+}
+
+ion-input.outline-input {
+  --border-color: var(--ion-color-pitch);
+  --border-radius: 10px;
+  --highlight-color-focused: var(--ion-color-pitch);
+  --highlight-color-valid: var(--ion-color-pitch);
+  --highlight-color-invalid: var(--ion-color-red-card);
+
+  ion-icon.input-icon {
+    color: var(--ion-color-pitch);
+    font-size: 1.5rem;
+  }
+}
+
+.leagues-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+/* Base de Tarjeta con efecto cristal (Glassmorphism) */
+.league-card {
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* =======================================================
+   1. ESTILO "MIS LIGAS" (Tarjetas donde ya estás dentro)
+   ======================================================= */
+.league-card.joined {
+  background: rgba(18, 29, 22, 0.85); // Tono verde muy oscuro con transparencia
+  border: 1px solid rgba(34, 197, 94, 0.25); // Borde verde fino
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    .league-badge-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      ion-icon {
+        font-size: 1.4rem;
+        color: #22c55e;
+      }
+    }
+
+    .league-title {
+      flex: 1;
+      h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .code-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 2px;
+      }
+    }
+
+    .role-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+
+      &.admin {
+        background: rgba(34, 197, 94, 0.2);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.4);
+      }
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.6);
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background-color: #22c55e;
+        box-shadow: 0 0 8px #22c55e;
+      }
+    }
+
+    .btn-enter {
+      background: transparent;
+      border: none;
+      color: #22c55e;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+  }
+}
+
+/* =======================================================
+   2. ESTILO "LIGAS PÚBLICAS" (Explorar / Unirme)
+   ======================================================= */
+.league-card.discover {
+  background: rgba(15, 20, 25, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  .card-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .public-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+
+    .details {
+      h3 {
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      span {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .stats {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
+
+        span {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+  }
+
+  .btn-join {
+    --background: #22c55e;
+    --color: #080f0b;
+    border: none;
+    //padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    //cursor: pointer;
+    //transition: background 0.2s ease;
+
+    &:active {
+      background: #16a34a;
+    }
+  }
+}
+
+.toggle-privado{
+  --handle-background-checked: var(--ion-color-pitch);
+  --track-background-checked: #686c6a;
+}

@@ -1,0 +1,143 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title
+      >{{ modo === "crear" ? "Crear" : "Unirse a" }} Campeonato</ion-title
+    >
+    <ion-buttons slot="end">
+      <ion-button mode="ios" (click)="cerrarModal()">
+        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding campeonato-modal">
+  @if (modo === "crear") {
+    <form [formGroup]="campeonatoForm">
+      <ion-input
+        class="outline-input ion-margin-bottom"
+        mode="md"
+        label="Nombre del Campeonato"
+        label-placement="stacked"
+        fill="outline"
+        type="text"
+        formControlName="nombre_campeonato"
+      >
+        <ion-icon
+          name="trophy-outline"
+          slot="start"
+          class="input-icon"
+        ></ion-icon>
+      </ion-input>
+
+      <ion-toggle class="toggle-privado" formControlName="privado"
+        >¿Campeonato Privado?</ion-toggle
+      >
+
+      <ion-button
+        class="btn-unir ion-margin-top"
+        mode="md"
+        expand="block"
+        fill="clear"
+        shape="round"
+        (click)="crearCampeonato()"
+        [disabled]="!campeonatoForm.valid"
+      >
+        Crear Campeonato
+      </ion-button>
+    </form>
+  } @else if (modo === "unir") {
+    <div class="div-buttons ion-margin-bottom">
+      <ion-button
+        class="btn-unir"
+        mode="md"
+        expand="block"
+        fill="clear"
+        shape="round"
+        (click)="abrirFormularioCodigo()"
+        [disabled]="medianteCodigo()"
+      >
+        Mediante Código
+      </ion-button>
+      <ion-button
+        class="btn-unir"
+        mode="md"
+        expand="block"
+        fill="clear"
+        shape="round"
+        (click)="abrirLigasAbiertas()"
+        [disabled]="medianteLigasAbiertas()"
+      >
+        Ver Ligas Abiertas
+      </ion-button>
+    </div>
+
+    @if (medianteCodigo()) {
+      <div class="div-cod">
+        <ion-input
+          class="outline-input ion-margin-bottom"
+          mode="md"
+          label="Código Liga"
+          label-placement="stacked"
+          fill="outline"
+          type="text"
+          [value]="codigo()"
+          (ionInput)="codigo.set($event.detail.value ?? '')"
+        >
+          <ion-icon
+            name="document-text-outline"
+            slot="start"
+            class="input-icon"
+          ></ion-icon>
+        </ion-input>
+
+        <ion-button
+          class="btn-unir"
+          mode="md"
+          expand="block"
+          fill="clear"
+          shape="round"
+          (click)="unirseALigaXCodigo(codigo())"
+          [disabled]="!codigo()"
+        >
+          Unirse
+        </ion-button>
+      </div>
+    }
+
+    @if (medianteLigasAbiertas()) {
+      <div class="leagues-grid">
+        @for (liga of ligasAbiertas(); track liga.id) {
+          <div class="league-card discover">
+            <div class="card-info">
+              <div class="public-icon">
+                <ion-icon name="globe-outline"></ion-icon>
+              </div>
+              <div class="details">
+                <h3>{{ liga.nombre_liga }}</h3>
+                <span> {{ liga.nombre_competicion }}</span>
+                <div class="stats">
+                  <span
+                    ><ion-icon name="people-outline"></ion-icon>
+                    {{ liga.total_participantes }} equipos</span
+                  >
+                  <span
+                    ><ion-icon name="shield-checkmark-outline"></ion-icon>
+                    Pública</span
+                  >
+                </div>
+              </div>
+            </div>
+            <ion-button class="btn-join" (click)="unirseALiga(liga)"
+              >Unirme</ion-button
+            >
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No hay ligas públicas disponibles en este momento.</p>
+          </div>
+        }
+      </div>
+    }
+  }
+</ion-content>
