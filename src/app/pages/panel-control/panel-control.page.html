@@ -1,0 +1,168 @@
+<ion-menu contentId="main-content">
+  <app-header></app-header>
+  <ion-content class="ion-padding menu-content">
+    <ion-list mode="ios" [inset]="true" lines="full" class="menu-list">
+      <ion-item mode="ios" button="true" detail="true" (click)="abrirMainContent('calendario')">
+        <ion-icon slot="start" name="calendar-outline"></ion-icon>
+        <ion-label>Calendario</ion-label>
+      </ion-item>
+      <ion-item mode="ios" button="true" detail="true" (click)="abrirMainContent('jugadores')">
+        <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+        <ion-label>Jugadores</ion-label>
+      </ion-item>
+
+      <ion-item mode="ios" button="true" detail="false" (click)="volverRecepcion()">
+        <ion-icon color="danger" slot="start" name="arrow-back-outline"></ion-icon>
+        <ion-label color="danger">Volver a Recepción</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+<div class="ion-page" id="main-content">
+  <ion-header mode="md">
+    <ion-toolbar class="main-toolbar">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <div>
+        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
+        <ion-title>PF - Panel de Control</ion-title>
+      </div>
+      <ion-buttons slot="end">
+        <ion-button mode="ios" fill="clear"></ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [fullscreen]="true" class="main-content">
+    @if (content() === 'calendario') {
+    <div class="add-jornada-div ion-margin-top">
+      <ion-button mode="md" fill="clear" shape="round" (click)="crearNuevaJornada()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Añadir Jornada
+      </ion-button>
+    </div>
+    <ion-item mode="ios" lines="none" class="jornada-selector ion-margin-start ion-margin-end">
+      <ion-select label="Seleccione una jornada :" [value]="jornadas()" mode="ios" cancelText="Cancelar"
+        okText="Aceptar" (ionChange)="seleccionarJornada($event)">
+        @for (jornada of jornadas(); track jornada.id) {
+        <ion-select-option value="{{ jornada.id }}">Jornada {{ jornada.numero_jornada }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+
+    @if (jornadaSeleccionada().id !== 0) {
+    <ion-list mode="ios" [inset]="true" lines="full" class="partidos-list">
+      <ion-list-header>
+        @if (editandoEstado() === true) {
+        <ion-item mode="ios" lines="none" class="estado-selector">
+          <ion-select label="Seleccione un estado :" [value]="jornadaSeleccionada().estado" mode="ios"
+            cancelText="Cancelar" okText="Aceptar" (ionChange)="estadoEditadoChange.set($event.detail.value)">
+            <ion-select-option value="CERRADA">CERRADA</ion-select-option>
+            <ion-select-option value="EN_JUEGO">EN JUEGO</ion-select-option>
+            <ion-select-option value="PENDIENTE">PENDIENTE</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <div>
+          <ion-button class="btn-cancelar-guardar" mode="ios" fill="clear" color="danger"
+            (click)="editandoEstado.set(false)">
+            <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button class="btn-cancelar-guardar" mode="ios" fill="clear" color="success"
+            (click)="guardarEstadoJornada()">
+            <ion-icon slot="icon-only" name="checkmark-circle-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        } @else {
+        <ion-label>
+          <h2>Estado de jornada : {{jornadaSeleccionada().estado}}</h2>
+        </ion-label>
+        <ion-button class="ion-no-margin" mode="ios" fill="clear" color="medium"
+          (click)="editarEstadoJornada(jornadaSeleccionada())">
+          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+        </ion-button>
+        }
+      </ion-list-header>
+      @for (partido of partidosJornada(); track partido.partido_id) {
+      <ion-item>
+        <ion-label>
+          <h3>
+            {{ partido.local_nombre }} ({{ partido.goles_local}}) - ({{
+            partido.goles_visitante}}) {{partido.visitante_nombre}}
+          </h3>
+          <p>{{ partido.fecha_partido | date: "dd/MM/yyyy - H:mm" }}</p>
+        </ion-label>
+        <ion-button mode="ios" fill="clear" slot="end" color="medium" (click)="editarPartido(partido)">
+          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+        </ion-button>
+        <ion-button mode="ios" fill="clear" slot="end" color="medium" (click)="abrirEditarActaPartido(partido)">
+          <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+      } @empty {
+      <ion-item mode="ios" lines="none">
+        <ion-label>La jornada no tiene partidos aún.</ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    <div class="add-jornada-div ion-margin-bottom">
+      <ion-button mode="md" fill="clear" shape="round" (click)="crearNuevoPartido()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Añadir Partido
+      </ion-button>
+    </div>
+
+    } } @else if (content() === 'jugadores') {
+    <div class="team-selector-scroll">
+      @for (equipo of equipos(); track equipo.id) {
+      <div class="team-badge-item" [class.active]="equipoSeleccionado()?.id === equipo.id"
+        (click)="seleccionarEquipo(equipo)">
+        <div class="shield-container">
+          <img [src]="equipo.escudo" [alt]="equipo.nombre" />
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="add-jornada-div ion-margin-top">
+      <ion-button mode="md" fill="clear" shape="round" (click)="abrirCrearJugador()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Añadir Jugador
+      </ion-button>
+    </div>
+
+    <ion-list class="fantasy-player-list">
+      @for (jugador of jugadores(); track jugador.id) {
+      <ion-item class="player-item" lines="none">
+        <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
+          <img [src]="jugador.foto || 'assets/images/default-player.png'" />
+        </ion-avatar>
+        <!-- <ion-avatar slot="start" class="pos-avatar" [class]="jugador.posicion.toLowerCase()">
+            <span>{{ jugador.posicion }}</span>
+          </ion-avatar> -->
+
+        <ion-label>
+          <h3 class="player-name">
+            {{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}
+          </h3>
+          <p class="player-value">{{ jugador.posicion.toUpperCase() }}</p>
+        </ion-label>
+
+        <div slot="end" class="player-stats ion-text-end">
+          <!-- <span class="pts-label">PTS</span>
+            <ion-badge color="primary" class="pts-badge">{{ jugador.puntosTotales }}</ion-badge> -->
+          <ion-button class="ion-no-margin" mode="ios" fill="clear" color="medium"
+            (click)="editarJugador(jugador)">
+            <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+
+    } @else {
+    <ion-label class="ion-padding">Seleccione una sección en el menú.</ion-label>
+    }
+  </ion-content>
+</div>

@@ -1,0 +1,244 @@
+.menu-content {
+  --background: var(--ion-color-stadium);
+  --color: var(--ion-color-stadium-contrast);
+
+  ion-list.menu-list {
+    margin: 0 0 16px 0;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 0 !important;
+
+    ion-item {
+      --background: transparent;
+    }
+  }
+}
+
+.main-toolbar {
+  --background: var(--ion-color-stadium);
+  --color: var(--ion-color-stadium-contrast);
+
+  div {
+    display: flex;
+    align-items: center;
+
+    img {
+      height: 30px;
+      margin-right: 10px;
+    }
+    ion-title {
+      padding: 0;
+    }
+  }
+}
+
+.main-content {
+  --background: var(--ion-color-stadium);
+  --color: var(--ion-color-stadium-contrast);
+
+  .add-jornada-div, .add-partido-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-button {
+        --background: rgba(255, 255, 255, 0.04);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --border-style: solid;
+        --border-width: 1px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        --border-radius: 10px;
+        --color: var(--ion-color-grass);
+        margin: 0 0 10px 0;
+    }
+  }
+
+  .jornada-selector {
+    --background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+  }
+
+  .estado-selector {
+    margin: -15px;
+  }
+
+  .partidos-list {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+
+    ion-list-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      ion-label {
+        margin-top: 0 !important;
+        margin-bottom: 0px !important;
+      }
+      div {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 25%;
+        ion-button.btn-cancelar-guardar {
+          padding: 0px !important;
+          margin: 0px !important;
+        }
+      }
+
+      ion-button {
+        padding-right: 16px;
+      }
+    }
+  }
+}
+
+.team-selector-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 12px;
+  background-color: var(--ion-color-stadium);
+  border-bottom: 1px solid var(--ion-border-color, #1A3023);
+  -webkit-overflow-scrolling: touch;
+
+  /* Ocultar scrollbar estándar en móviles */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  .team-badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 68px;
+    cursor: pointer;
+    opacity: 0.40;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+
+    .shield-container {
+      width: 54px;
+      height: 54px;
+      //border-radius: 50%;
+      //background-color: var(--ion-item-background, #121F17);
+      //border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      //padding: 6px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .team-name {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: #FFFFFF;
+      text-align: center;
+      white-space: nowrap;
+      max-width: 72px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Estado Seleccionado */
+    &.active {
+      opacity: 1;
+      transform: scale(1.10);
+
+      /* .shield-container {
+        border-color: var(--ion-color-primary, #00E676);
+        box-shadow: 0 0 12px rgba(0, 230, 118, 0.35);
+        background-color: #172B1F;
+      } */
+
+      .team-name {
+        color: var(--ion-color-primary, #00E676);
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+
+/* Lista de Jugadores */
+ion-list.fantasy-player-list {
+  background: transparent;
+  margin: 16px;
+  padding: 0;
+
+  .player-item {
+    backdrop-filter: blur(8px); // Efecto cristal esmerilado sobre la foto
+    --background:  rgba(18, 29, 22, 0.75);
+    --border-radius: 10px;
+    --border-width: 1px;
+    --border-color: rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+    //padding: 8px 0px;
+
+    .pos-avatar {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      border-radius: 8px;
+
+      &.por { background-color: #FFB300; color: #000; }
+      &.def { background-color: #1E88E5; color: #FFF; }
+      &.med { background-color: #43A047; color: #FFF; }
+      &.del { background-color: #E53935; color: #FFF; }
+    }
+
+    .player-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      &.por { border: 2px solid #43a047;  }
+      &.def { border: 2px solid #f18436; }
+      &.med { border: 2px solid #0288d1; }
+      &.del { border: 2px solid var(--ion-color-red-card); }
+    }
+
+    .player-name {
+      font-family: 'Titillium Web', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .player-value {
+      font-size: 0.8rem;
+      color: #94A3B8;
+    }
+
+    .pts-label {
+      font-size: 0.65rem;
+      display: block;
+      color: #94A3B8;
+      margin-bottom: 2px;
+    }
+
+    .pts-badge {
+      font-size: 0.85rem;
+      padding: 4px 8px;
+    }
+  }
+}
