@@ -24,4 +24,22 @@ export class JornadasService {
       .get<ApiResponse<[]>>(`${this.apiUrl}` + '/getJornadaActual')
       .pipe(map((res) => res.data));
   }
+
+  getJornadas(): Observable<[]> {
+    return this.http
+      .get<ApiResponse<[]>>(`${this.apiUrl}` + '/getJornadas')
+      .pipe(map((res) => res.data));
+  }
+
+  cargarPartidosJornada(jornada: number) {
+    return this.http.post(`${this.apiUrl}/cargarPartidosJornada`, {jornadaId: jornada});
+  }
+
+  cambiarEstadoJornada(data: any) {
+    return this.http.post(`${this.apiUrl}/cambiarEstadoJornada`, data);
+  }
+
+  crearJornada(data: any) {
+    return this.http.post(`${this.apiUrl}/crearJornada`, data);
+  }
 }
