@@ -82,8 +82,8 @@ ion-tab-bar.custom-tab-bar {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 
               0 4px 10px rgba(0, 0, 0, 0.04); */
               // 2. Efecto desenfoque de cristal (Glassmorphism)
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%); // Soporte para Safari / iOS
+  backdrop-filter: blur(3px) saturate(180%);
+  -webkit-backdrop-filter: blur(3px) saturate(180%); // Soporte para Safari / iOS
 
   // 3. Borde sutil y sombra suave para darle volumen
   border: 1px solid rgba(255, 255, 255, 0.08);

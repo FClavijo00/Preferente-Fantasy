@@ -1,0 +1,67 @@
+ion-modal.date-picker-modal {
+  --border-radius: 10px;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  // 2. Forzamos al ion-datetime interno a heredar el redondeo
+  ion-datetime {
+    border-radius: 10px;
+    overflow: hidden; // Crucial para que las esquinas del calendario no "sobresalgan"
+
+    // Opcional: si quieres cambiar el fondo del calendario para que vaya a juego
+    background: var(--ion-color-stadium);
+
+    &::part(calendar-day today) {
+      //color: var(--ion-color-pitch-contrast) !important;
+    }
+    &::part(calendar-day) {
+      color: white;
+    }
+
+    &::part(datetime-selected-date) {
+      color: white !important;
+    }
+
+    &::part(datetime-title) {
+      color: white !important;
+    }
+
+    &::part(month-year-button) {
+      color: white !important;
+      ion-icon {
+        color: white !important;
+      }
+    }
+
+    &::part(navigation-button) {
+      color: white !important;
+    }
+
+    &::part(next-button) {
+      color: white !important;
+    }
+
+    &::part(previous-button) {
+      color: white !important;
+    }
+
+    &::part(time-button active) {
+      color: white !important;
+    }
+
+    &::part(wheel) {
+      color: white !important;
+    }
+
+    &::part(wheel-item) {
+      color: white !important;
+    }
+
+    &::part(wheel-item active) {
+      color: var(--ion-color-pitch) !important;
+    }
+
+    .datetime-action-buttons ion-button {
+      --color: var(--ion-color-pitch) !important;
+    }
+  }
+}
