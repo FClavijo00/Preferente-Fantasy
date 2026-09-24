@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Crear Jornada</ion-title>
+    <ion-buttons slot="end">
+      <ion-button mode="ios" (click)="cerrarModal()">
+        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding campeonato-modal">
+  <form [formGroup]="jornadaForm">
+    <ion-input
+      class="outline-input ion-margin-bottom"
+      mode="md"
+      label="Número de Jornada"
+      label-placement="stacked"
+      fill="outline"
+      type="number"
+      formControlName="numero_jornada"
+    >
+    </ion-input>
+
+    <ion-item
+      mode="ios"
+      lines="none"
+      class="item-estado-selector ion-margin-bottom"
+    >
+      <ion-label>Fecha Inicio Jornada</ion-label>
+      <ion-datetime-button
+        class="date-picker-button"
+        datetime="id-datepicker"
+        slot="end"
+        mode="ios"
+      ></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true" class="date-picker-modal">
+        <ng-template>
+          <ion-datetime
+            id="id-datepicker"
+            mode="ios"
+            presentation="date"
+            formControlName="fecha_inicio"
+            showDefaultButtons="true"
+            doneText="Confirmar"
+            cancelText="Cancelar"
+            firstDayOfWeek="1"
+          >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <ion-item
+      mode="ios"
+      lines="none"
+      class="item-estado-selector ion-margin-bottom"
+    >
+      <ion-label>Fecha Fin Jornada</ion-label>
+      <ion-datetime-button
+        class="date-picker-button"
+        datetime="id-datepicker-2"
+        slot="end"
+        mode="ios"
+      ></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true" class="date-picker-modal">
+        <ng-template>
+          <ion-datetime
+            id="id-datepicker-2"
+            mode="ios"
+            presentation="date"
+            formControlName="fecha_fin"
+            showDefaultButtons="true"
+            doneText="Confirmar"
+            cancelText="Cancelar"
+            firstDayOfWeek="1"
+          >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <ion-item
+      mode="ios"
+      lines="none"
+      class="item-estado-selector ion-margin-bottom"
+    >
+      <ion-select
+        label="Estado de la jornada :"
+        mode="ios"
+        cancelText="Cancelar"
+        okText="Aceptar"
+        formControlName="estado"
+      >
+        <ion-select-option value="CERRADA">CERRADA</ion-select-option>
+        <ion-select-option value="EN_JUEGO">EN JUEGO</ion-select-option>
+        <ion-select-option value="PENDIENTE">PENDIENTE</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <div class="buttons-div">
+      <ion-button
+        class=""
+        mode="md"
+        color="danger"
+        (click)="cerrarModal()"
+      >
+        <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+        Cancelar
+      </ion-button>
+      <ion-button
+        class="btn-cancelar-guardar"
+        mode="md"
+        color="success"
+        (click)="crearJornada()"
+      >
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        Guardar
+      </ion-button>
+    </div>
+  </form>
+</ion-content>
