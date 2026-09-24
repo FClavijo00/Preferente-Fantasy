@@ -38,4 +38,12 @@ export class JugadoresService {
       .get<ApiResponse<JugadorRanking[]>>(`${this.apiUrl}` + '/getRanking')
       .pipe(map((res) => res.data));
   }
+
+  crearJugador(data: FormData) {
+    return this.http.post(`${this.apiUrl}/crearJugador`, data);
+  }
+
+  editarJugador(data: FormData) {
+    return this.http.post(`${this.apiUrl}/editarJugador`, data);
+  }
 }
