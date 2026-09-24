@@ -1,0 +1,187 @@
+ion-header {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+
+  ion-toolbar {
+    --background: var(--ion-color-stadium);
+    --border-color: var(--ion-color-pitch);
+    --border-width: 0 0 1px 0;
+    --color: var(--ion-color-pitch);
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-stadium);
+}
+
+.acta-container {
+  margin-top: 16px;
+  background: rgba(18, 29, 22, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+
+  .acta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .team-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .col-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      padding-bottom: 4px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+
+      &.local {
+        color: #3b82f6;
+      }
+      &.visitante {
+        color: #ef4444;
+      }
+    }
+
+    .sub-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 6px;
+    }
+  }
+
+  /* Filas compactas para jugadores */
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    padding: 2px 8px;
+    margin-bottom: 4px;
+
+    ion-select {
+      flex: 1;
+      --padding-start: 0;
+      font-size: 0.8rem;
+      color: #ffffff;
+    }
+
+    .cards-checks {
+      display: flex;
+      gap: 6px;
+
+      .card-check {
+        font-size: 0.65rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        cursor: pointer;
+
+        &.yellow {
+          color: #eab308;
+        }
+        &.red {
+          color: #ef4444;
+        }
+
+        input {
+          accent-color: currentColor;
+        }
+      }
+    }
+  }
+
+  /* Registro de goles */
+  .goles-section {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #22c55e;
+      margin: 0 0 12px 0;
+    }
+
+    .goal-row {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 2px 8px;
+      margin-bottom: 6px;
+
+      ion-select {
+        flex: 2;
+        font-size: 0.8rem;
+      }
+
+      .tipo-gol-select {
+        flex: 1;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+}
+
+.add-jornada-div,
+.add-partido-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-button {
+    --background: rgba(255, 255, 255, 0.04);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-style: solid;
+    --border-width: 1px;
+    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --border-radius: 10px;
+    --color: var(--ion-color-grass);
+    margin: 0 0 10px 0;
+  }
+}
+
+ion-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-evento {
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 4px;
+  background-color: var(--ion-color-step-50, #f9f9f9);
+}
+
+.text-muted {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+ion-list-header {
+  min-height: 28px;
+  ion-label {
+    margin: 0;
+    color: var(--ion-color-primary);
+  }
+}
