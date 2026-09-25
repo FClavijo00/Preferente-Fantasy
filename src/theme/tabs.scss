@@ -161,6 +161,7 @@ ion-tab-bar.style-line {
     align-items: center;
     gap: 2px;
     padding: 5px 0;
+    margin-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px) !important;
 
     ion-icon {
       font-size: 22px;
