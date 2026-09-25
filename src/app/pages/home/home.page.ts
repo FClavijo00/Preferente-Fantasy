@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -29,9 +29,7 @@ import { CalendarioComponent } from '../../shared/components/calendario/calendar
     CalendarioComponent
 ],
 })
-export class HomePage implements OnInit {
-  constructor() {}
+export class HomePage {
 
-  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
-  ngOnInit() {}
+  constructor() {}
 }
