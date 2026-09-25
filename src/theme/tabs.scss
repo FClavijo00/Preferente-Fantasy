@@ -72,10 +72,10 @@ ion-tab-bar.custom-tab-bar {
   --background: rgba(18, 29, 22, 0.65);
   --border: none;
 
-  margin-left: 40px;
-  margin-right: 40px;
-  margin-bottom: 15px;
-  border-radius: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px) !important;
+  border-radius: 12px;
   /* background: rgba(255, 255, 255, 0.08); 
   backdrop-filter: blur(2px); // Aumentamos el desenfoque estilo iOS
   -webkit-backdrop-filter: blur(2px);
@@ -161,7 +161,6 @@ ion-tab-bar.style-line {
     align-items: center;
     gap: 2px;
     padding: 5px 0;
-    margin-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px) !important;
 
     ion-icon {
       font-size: 22px;
