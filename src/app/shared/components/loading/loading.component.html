@@ -1,0 +1,17 @@
+@if (loadingService.isLoading()) {
+<div class="pwa-loading-overlay">
+  <div class="loader-content">
+
+    <!-- Animación con estética futbolera -->
+    <div class="football-container">
+      <div class="glow-ring"></div>
+      <div class="ball">
+        <div class="pentagon"></div>
+      </div>
+    </div>
+
+    <!-- Mensaje dinámico de carga -->
+    <p class="loading-text">{{ loadingService.mensaje() }}</p>
+  </div>
+</div>
+}

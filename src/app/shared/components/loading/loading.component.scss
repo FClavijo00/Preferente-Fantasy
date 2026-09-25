@@ -1,0 +1,107 @@
+.pwa-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px); // Efecto cristal difuminado
+  z-index: 99999; // Por encima de modales, headers y popovers
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor del balón e iluminación */
+.football-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Halo verde neón con pulsación */
+  .glow-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #00ff66;
+    box-shadow: 0 0 15px #00ff66, inset 0 0 15px #00ff66;
+    animation: pulseGlow 1.5s infinite ease-in-out;
+  }
+
+  /* Balón dibujado por CSS */
+  .ball {
+    width: 48px;
+    height: 48px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    animation: spinBall 1.2s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Pentágono central del balón */
+    .pentagon {
+      width: 16px;
+      height: 16px;
+      background-color: #000000;
+      clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    }
+  }
+}
+
+/* Mensaje de texto */
+.loading-text {
+  margin-top: 24px;
+  color: #00ff66;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+  animation: fadeInOut 1.5s infinite ease-in-out;
+}
+
+/* ANIMACIONES */
+@keyframes spinBall {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.6;
+    box-shadow: 0 0 10px #00ff66, inset 0 0 10px #00ff66;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 25px #00ff66, inset 0 0 25px #00ff66;
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
