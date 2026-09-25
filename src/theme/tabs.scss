@@ -74,7 +74,7 @@ ion-tab-bar.custom-tab-bar {
 
   margin-left: 30px;
   margin-right: 30px;
-  margin-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px) !important;
+  //margin-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px) !important;
   border-radius: 12px;
   /* background: rgba(255, 255, 255, 0.08); 
   backdrop-filter: blur(2px); // Aumentamos el desenfoque estilo iOS
