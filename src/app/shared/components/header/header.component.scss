@@ -27,3 +27,10 @@ ion-button {
     color: var(--ion-color-pitch);
   }
 }
+
+.div-img-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}

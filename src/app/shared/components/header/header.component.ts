@@ -7,7 +7,7 @@ import {
   IonBackButton,
   IonButton,
   IonIcon,
-  NavController,
+  NavController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
@@ -19,13 +19,11 @@ import { arrowBackOutline } from 'ionicons/icons';
   imports: [
     IonIcon,
     IonButton,
-    IonBackButton,
     IonButtons,
     IonToolbar,
-    IonHeader,
-  ],
+    IonHeader],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   @Input() titulo: string = '';
 
   private _navCtrl = inject(NavController);
@@ -38,10 +36,5 @@ export class HeaderComponent implements OnInit {
 
   backRecepcion() {
     this._navCtrl.navigateBack(['recepcion']);
-  }
-
-  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
-  ngOnInit() {
-    console.log(this.titulo);
   }
 }
