@@ -108,3 +108,76 @@ ion-card {
     }
   }
 }
+
+
+.ranking-list {
+  background: transparent;
+  padding: 0;
+}
+
+.ranking-item {
+  --background: transparent;
+  --border-color: rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+  border-radius: 8px;
+
+  ion-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--ion-color-pitch);
+  }
+
+  h2 {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ion-text-color, #ffffff);
+  }
+
+  .equipo-nombre {
+    font-size: 0.8rem;
+    color: var(--ion-color-medium, #92949c);
+    margin-top: 2px;
+  }
+
+  .goles-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+
+    .numero-goles {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ion-color-pitch);
+      line-height: 1;
+    }
+
+    .label-goles {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--ion-color-medium);
+      margin-top: 2px;
+    }
+  }
+}
+
+/* Paginador inferior */
+.paginador-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  gap: 12px;
+
+  .paginador-texto {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ion-color-medium);
+  }
+
+  ion-button {
+    --color: var(--ion-color-pitch);
+  }
+}

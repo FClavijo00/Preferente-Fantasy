@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   IonBadge,
   IonCard,
@@ -13,39 +13,43 @@ import {
   IonSegmentContent,
   IonItem,
   IonList,
+  IonAvatar,
+  IonButton, IonIcon
 } from '@ionic/angular';
 import { EquiposService } from '../../../core/services/equipos-service';
 import { JugadoresService } from '../../../core/services/jugadores-service';
+import { addIcons } from 'ionicons';
+import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 
 export interface Clasificacion {
-  id: number;
-  nombre: string;
+  equipo_id: number;
+  equipo: string;
   escudo_url: string;
   escudo: string;
-  pj: number;
-  pg: number;
-  pe: number;
-  pp: number;
-  gf: number;
-  gc: number;
-  dg: number;
-  pts: number;
+  partidos_jugados: number;
+  ganados: number;
+  perdidos: number;
+  empatados: number;
+  goles_favor: number;
+  goles_contra: number;
+  diferencia_goles: number;
+  puntos: number;
   san: number;
 }
 
 interface JugadorRanking {
-  id: number;
+  jugador_id: number;
   nombre: string;
   apellidos: string;
   apodo: string;
   posicion: string;
   foto_url: string;
   foto: string;
-  equipo: string;
+  nombre_equipo: string;
   partidos_jugados: number;
   partidos_titular: number;
   partidos_suplente: number;
-  goles: number;
+  goles_favor: number;
   tarjetas_amarillas: number;
   tarjetas_rojas: number;
   goles_en_propia: number;
@@ -57,7 +61,7 @@ interface JugadorRanking {
   selector: 'app-clasificacion',
   templateUrl: './clasificacion.component.html',
   styleUrls: ['./clasificacion.component.scss'],
-  imports: [
+  imports: [IonIcon, IonButton, IonAvatar,
     IonList,
     IonItem,
     IonBadge,
@@ -69,7 +73,7 @@ interface JugadorRanking {
     IonCard,
     IonSegmentView,
     IonSegmentContent
-],
+  ],
 })
 export class ClasificacionComponent implements OnInit {
   private _equiposService = inject(EquiposService);
@@ -78,7 +82,33 @@ export class ClasificacionComponent implements OnInit {
   public clasificacion = signal<Clasificacion[]>([]);
   public ranking = signal<JugadorRanking[]>([]);
 
-  constructor() {}
+  // Estado paginator
+  paginaActual = signal<number>(1);
+  elementoPorPagina = signal<number>(10);
+
+  jugadoresPaginados = computed(() => {
+    const inicio = (this.paginaActual() - 1) * this.elementoPorPagina();
+    const fin = inicio + this.elementoPorPagina();
+    return this.ranking().slice(inicio, fin);
+  });
+
+  totalPaginas = computed(() => {
+    return Math.ceil(this.ranking().length / this.elementoPorPagina()) || 1;
+  });
+
+  // Método para navegar entre páginas
+  cambiarPagina(nuevaPagina: number) {
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas()) {
+      this.paginaActual.set(nuevaPagina);
+    }
+  }
+
+  constructor() {
+    addIcons({
+      chevronForwardOutline,
+      chevronBackOutline
+    })
+  }
 
   async getClasificacion() {
     this._equiposService.getClasificacion().subscribe({
@@ -103,7 +133,7 @@ export class ClasificacionComponent implements OnInit {
   }
 
   segmentChanged(ev: any) {
-    console.log('Segment changed', ev.detail.value);
+    /* console.log('Segment changed', ev.detail.value); */
   }
 
   ngOnInit() {

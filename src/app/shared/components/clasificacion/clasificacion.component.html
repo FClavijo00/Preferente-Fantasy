@@ -1,11 +1,6 @@
 <ion-card>
   <ion-card-header>
-    <ion-segment
-      mode="md"
-      value="clasificacion"
-      (ionChange)="segmentChanged($event)"
-      class="clas-rank-segment"
-    >
+    <ion-segment mode="md" value="clasificacion" (ionChange)="segmentChanged($event)" class="clas-rank-segment">
       <ion-segment-button value="clasificacion" content-id="clasificacion">
         <ion-label>Clasificación</ion-label>
       </ion-segment-button>
@@ -19,9 +14,7 @@
       <!-- CLASIFICACIÓN -->
       <ion-segment-content id="clasificacion">
         <ng-content>
-          <table
-            class="clas-table table table-sm table-dark table-striped table-hover align-middle"
-          >
+          <table class="clas-table table table-sm table-dark table-striped table-hover align-middle">
             <thead>
               <tr>
                 <th class="text-center" scope="col"></th>
@@ -39,43 +32,34 @@
             </thead>
             <tbody>
               @for (
-                equipo of clasificacion();
-                track equipo.id;
-                let index = $index
+              equipo of clasificacion();
+              track equipo.equipo_id;
+              let index = $index
               ) {
-                <tr>
-                  <td class="pos-cell">
-                    <ion-badge
-                      class="clasificacion-badge"
-                      [class.ascenso]="index === 0"
-                      [class.playoff]="index === 1 || index === 2"
-                      [class.copa]="index === 3 || index === 4"
-                      [class.descenso]="index >= 14 && index <= 17"
-                      mode="ios"
-                    >
-                      {{ index + 1 }}
-                    </ion-badge>
-                  </td>
-                  <td class="equipo-cell">
-                    <img
-                      class="clasificacion-escudo"
-                      [src]="equipo.escudo"
-                      [alt]="equipo.nombre"
-                    />
-                    <span class="clasificacion-nombre">{{
-                      equipo.nombre
+              <tr>
+                <td class="pos-cell">
+                  <ion-badge class="clasificacion-badge" [class.ascenso]="index === 0"
+                    [class.playoff]="index === 1 || index === 2" [class.copa]="index === 3 || index === 4"
+                    [class.descenso]="index >= 14 && index <= 17" mode="ios">
+                    {{ index + 1 }}
+                  </ion-badge>
+                </td>
+                <td class="equipo-cell">
+                  <img class="clasificacion-escudo" [src]="equipo.escudo" [alt]="equipo.equipo" />
+                  <span class="clasificacion-nombre">{{
+                    equipo.equipo
                     }}</span>
-                  </td>
-                  <td class="text-center">{{ equipo.pts }}</td>
-                  <td class="text-center">{{ equipo.pj }}</td>
-                  <td class="text-center">{{ equipo.pg }}</td>
-                  <td class="text-center">{{ equipo.pe }}</td>
-                  <td class="text-center">{{ equipo.pp }}</td>
-                  <td class="text-center">{{ equipo.gf }}</td>
-                  <td class="text-center">{{ equipo.gc }}</td>
-                  <td class="text-center">{{ equipo.dg }}</td>
-                  <td class="text-center">{{ equipo.san }}</td>
-                </tr>
+                </td>
+                <td class="text-center">{{ equipo.puntos }}</td>
+                <td class="text-center">{{ equipo.partidos_jugados }}</td>
+                <td class="text-center">{{ equipo.ganados }}</td>
+                <td class="text-center">{{ equipo.perdidos }}</td>
+                <td class="text-center">{{ equipo.empatados }}</td>
+                <td class="text-center">{{ equipo.goles_favor }}</td>
+                <td class="text-center">{{ equipo.goles_contra }}</td>
+                <td class="text-center">{{ equipo.diferencia_goles }}</td>
+                <td class="text-center">{{ equipo.san || "0" }}</td>
+              </tr>
               }
             </tbody>
           </table>
@@ -104,20 +88,56 @@
       <!-- RANKING -->
       <ion-segment-content id="ranking">
         <ng-content>
-          <ion-list>
-            @for (jugador of ranking(); track jugador.id) {
-              <ion-item>
-                <ion-label >
-                  {{
-                    jugador.apodo || jugador.nombre + " " + jugador.apellidos
-                  }}
-                </ion-label>
-                <ion-label class="ion-text-end">
-                  {{ jugador.goles }}
-                </ion-label>
-              </ion-item>
+          <ion-list class="ranking-list">
+            @for (jugador of jugadoresPaginados(); track jugador.jugador_id) {
+            <ion-item lines="full" class="ranking-item">
+              <!-- 1. Foto / Avatar del Jugador -->
+              <ion-avatar slot="start">
+                <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo || jugador.nombre"
+                  (error)="jugador.foto = 'assets/images/default-player.png'" />
+              </ion-avatar>
+
+              <!-- 2. Información del Jugador y Equipo -->
+              <ion-label>
+                <h2>
+                  {{ jugador.apodo || (jugador.nombre + " " + jugador.apellidos) }}
+                </h2>
+                <p class="equipo-nombre">
+                  {{ jugador.nombre_equipo || 'Sin equipo' }}
+                </p>
+              </ion-label>
+
+              <!-- 3. Contador de Goles -->
+              <div slot="end" class="goles-badge">
+                <span class="numero-goles">{{ jugador.goles_favor }}</span>
+                <span class="label-goles">goles</span>
+              </div>
+            </ion-item>
+            } @empty {
+            <ion-item lines="none">
+              <ion-label class="ion-text-center">No hay datos registrados en el ranking</ion-label>
+            </ion-item>
             }
           </ion-list>
+
+          <!-- 4. Paginador (Solo se muestra si hay más de 1 página) -->
+          @if (totalPaginas() > 1) {
+          <div class="paginador-container">
+            <ion-button fill="clear" size="small" [disabled]="paginaActual() === 1"
+              (click)="cambiarPagina(paginaActual() - 1)">
+              <ion-icon name="chevron-back-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+
+            <span class="paginador-texto">
+              Página {{ paginaActual() }} de {{ totalPaginas() }}
+            </span>
+
+            <ion-button fill="clear" size="small" [disabled]="paginaActual() === totalPaginas()"
+              (click)="cambiarPagina(paginaActual() + 1)">
+              <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+          }
         </ng-content>
       </ion-segment-content>
     </ion-segment-view>
