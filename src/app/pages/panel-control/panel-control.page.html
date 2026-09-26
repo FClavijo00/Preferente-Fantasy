@@ -97,7 +97,7 @@
           <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
         </ion-button>
         <ion-button mode="ios" fill="clear" slot="end" color="medium" (click)="abrirEditarActaPartido(partido)">
-          <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+          <ion-icon [color]="partido.tiene_acta ? 'success' : 'danger'" slot="icon-only" name="document-text-outline"></ion-icon>
         </ion-button>
       </ion-item>
       } @empty {

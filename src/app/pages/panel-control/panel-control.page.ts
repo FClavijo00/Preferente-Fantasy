@@ -63,6 +63,7 @@ interface Partido {
   local_nombre: string;
   visitante_nombre: string;
   jugado: boolean;
+  tiene_acta: boolean;
 }
 
 export interface Equipo {
@@ -93,7 +94,6 @@ export interface Jugador {
   styleUrls: ['./panel-control.page.scss'],
   imports: [
     IonAvatar,
-    IonBadge,
     IonListHeader,
     IonButton,
     IonSelect,
@@ -112,10 +112,10 @@ export interface Jugador {
     IonToolbar,
     CommonModule,
     FormsModule,
-    HeaderComponent,
-  ],
+    HeaderComponent
+],
 })
-export class PanelControlPage implements OnInit {
+export class PanelControlPage {
   private _menuCtrl = inject(MenuController);
   private _jornadasService = inject(JornadasService);
   private _modalCtrl = inject(ModalController);
@@ -148,6 +148,7 @@ export class PanelControlPage implements OnInit {
     local_nombre: '',
     visitante_nombre: '',
     jugado: false,
+    tiene_acta: false,
   });
 
   equipos = signal<Equipo[]>([]);
@@ -418,6 +419,4 @@ export class PanelControlPage implements OnInit {
   volverRecepcion() {
     this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
   }
-
-  ngOnInit() {}
 }
