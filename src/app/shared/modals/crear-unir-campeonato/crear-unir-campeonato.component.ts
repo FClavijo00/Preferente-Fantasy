@@ -43,9 +43,6 @@ export interface Ligas {
   styleUrls: ['./crear-unir-campeonato.component.scss'],
   imports: [
     IonToggle,
-    IonList,
-    IonItem,
-    IonLabel,
     IonInput,
     IonButtons,
     IonIcon,
@@ -54,8 +51,8 @@ export interface Ligas {
     IonHeader,
     IonTitle,
     IonContent,
-    ReactiveFormsModule,
-  ],
+    ReactiveFormsModule
+],
 })
 export class CrearUnirCampeonatoComponent implements OnInit {
   @Input() modo: 'crear' | 'unir' = 'crear';
