@@ -1,0 +1,39 @@
+/* Modal Flotante Centrado */
+.card-modal-center {
+  --width: 90%;
+  --max-width: 440px; /* Tamaño ideal tipo card */
+  --height: auto;
+  --max-height: 85vh;
+  --border-radius: 20px;
+  --box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 102, 0.15);
+
+  /* Ajusta la opacidad base del fondo oscuro */
+  --backdrop-opacity: 0.6;
+
+  /* Centrado en pantalla */
+  align-items: center;
+  justify-content: center;
+
+  &::part(content) {
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(0, 255, 102, 0.25);
+    background: #121212;
+    overflow: hidden;
+  }
+
+  &::part(backdrop) {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* Compatibilidad con Safari/iOS */
+  }
+
+  /* Ajuste para que la tarjeta de adentro encaje sin doble margen */
+  app-detalle-jugador {
+    .jugador-card {
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+  }
+}
