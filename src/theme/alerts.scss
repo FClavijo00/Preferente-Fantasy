@@ -1,0 +1,19 @@
+ion-alert {
+    --background: var(--ion-color-stadium) !important;
+    
+    .alert-button-role-cancel {
+        color: var(--ion-color-red-card) !important;
+    }
+
+    .alert-button.sc-ion-alert-ios:last-child {
+        color: var(--ion-color-pitch) !important;
+    }
+}
+
+[aria-checked=true].sc-ion-alert-ios .alert-radio-label.sc-ion-alert-ios {
+    color: var(--ion-color-pitch) !important;
+}
+
+[aria-checked=true].sc-ion-alert-ios .alert-radio-inner.sc-ion-alert-ios {
+    border-color: var(--ion-color-pitch) !important;
+}

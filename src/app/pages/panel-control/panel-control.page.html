@@ -85,7 +85,7 @@
         }
       </ion-list-header>
       @for (partido of partidosJornada(); track partido.partido_id) {
-      <ion-item>
+      <ion-item mode="ios" lines="full" class="partido-item">
         <ion-label>
           <h3>
             {{ partido.local_nombre }} ({{ partido.goles_local}}) - ({{
