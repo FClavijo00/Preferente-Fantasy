@@ -14,7 +14,7 @@ import { triangle, ellipse, square, home, homeOutline, shirt, shirtOutline, read
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonButton, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
