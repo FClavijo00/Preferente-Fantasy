@@ -17,6 +17,16 @@ export const routes: Routes = [
           import('../plantillas/plantillas.page').then((m) => m.PlantillasPage),
       },
       {
+        path: 'alineacion',
+        loadComponent: () =>
+          import('../alineacion/alineacion.page').then((m) => m.AlineacionPage),
+      },
+      {
+        path: 'clasificaciones',
+        loadComponent: () =>
+          import('../clasificaciones/clasificaciones.page').then((m) => m.ClasificacionesPage),
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full',
