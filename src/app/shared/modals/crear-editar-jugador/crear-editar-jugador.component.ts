@@ -46,6 +46,7 @@ import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { CropModalComponent } from '../../components/crop-modal/crop-modal.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { JugadoresService } from '../../../core/services/jugadores-service';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-crear-editar-jugador',
@@ -82,6 +83,7 @@ export class CrearEditarJugadorComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _toastService = inject(ToastService);
   private _jugadoresService = inject(JugadoresService);
+  private _loadingService = inject(LoadingService);
 
   imageChangedEvent: Event | null = null;
   croppedImageFile: File | null = null;
@@ -179,7 +181,9 @@ export class CrearEditarJugadorComponent implements OnInit {
   }
 
   guardarJugador() {
+    this._loadingService.show('Guardando jugador...');
     if (this.jugadorForm.invalid) {
+      this._loadingService.hide();
       this._toastService.showErrorToast(
         'Por favor, completa todos los campos.',
       );
@@ -212,6 +216,7 @@ export class CrearEditarJugadorComponent implements OnInit {
       this._jugadoresService.crearJugador(formData).subscribe({
         next: (resp: any) => {
           if (resp.ok) {
+            this._loadingService.hide();
             this._toastService.showSuccessToast(
               'Jugador creado correctamente.',
             );
@@ -219,6 +224,7 @@ export class CrearEditarJugadorComponent implements OnInit {
           }
         },
         error: () => {
+          this._loadingService.hide();
           this._toastService.showErrorToast('Error al crear jugador.');
         },
       });
@@ -226,6 +232,7 @@ export class CrearEditarJugadorComponent implements OnInit {
       this._jugadoresService.editarJugador(formData).subscribe({
         next: (resp: any) => {
           if (resp.ok) {
+            this._loadingService.hide();
             this._toastService.showSuccessToast(
               'Jugador editado correctamente.',
             );
@@ -233,6 +240,7 @@ export class CrearEditarJugadorComponent implements OnInit {
           }
         },
         error: () => {
+          this._loadingService.hide();
           this._toastService.showErrorToast('Error al editar jugador.');
         },
       });
