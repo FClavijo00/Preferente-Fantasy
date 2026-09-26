@@ -44,14 +44,14 @@ export interface Jugador {
   lesionado: boolean;
   activo: boolean;
   puntos_totales: number;
-  puntuaciones_jornada: PuntuacionesJornada[]
+  puntuaciones_jornada: PuntuacionesJornada[];
 }
 
 export interface PuntuacionesJornada {
-  desglose: [],
-  jornada_id: number,
-  jornada: number,
-  puntos: number
+  desglose: [];
+  jornada_id: number;
+  jornada: number;
+  puntos: number;
 }
 
 @Component({
@@ -69,7 +69,8 @@ export interface PuntuacionesJornada {
     IonContent,
     CommonModule,
     FormsModule,
-    HeaderComponent],
+    HeaderComponent,
+  ],
 })
 export class PlantillasPage implements OnInit {
   private _equiposService = inject(EquiposService);
@@ -110,7 +111,7 @@ export class PlantillasPage implements OnInit {
       this.jugadoresFiltrados.set(this.jugadores());
     } else {
       const filtrados = this.jugadores().filter(
-        (jugador) => jugador.posicion === posicion
+        (jugador) => jugador.posicion === posicion,
       );
       this.jugadoresFiltrados.set(filtrados);
     }
@@ -122,32 +123,30 @@ export class PlantillasPage implements OnInit {
     const listaCompleta = equipo.jugadores || [];
 
     this.jugadores.set(listaCompleta);
-    
+
     if (this.posicionFiltro() === 'TODOS') {
       this.jugadoresFiltrados.set(listaCompleta);
     } else {
       this.jugadoresFiltrados.set(
-        listaCompleta.filter((j: Jugador) => j.posicion === this.posicionFiltro())
+        listaCompleta.filter(
+          (j: Jugador) => j.posicion === this.posicionFiltro(),
+        ),
       );
     }
   }
 
   async verDetalleJugador(jugador: Jugador) {
     const modal = await this._modalCtrl.create({
-          component: DetalleJugadorComponent,
-          initialBreakpoint: 1,
-          breakpoints: [0, 0.5, 0.75, 1],
-          handle: false,
-          mode: 'md',
-          componentProps: {
-            jugador: jugador
-          },
-        });
-    
-        await modal.present();
-    
-        const { data, role } = await modal.onWillDismiss();
-  } 
+      component: DetalleJugadorComponent,
+      cssClass: 'card-modal-center', // Clase CSS para estilizar el modal
+      backdropDismiss: true,
+      componentProps: {
+        jugador: jugador
+      },
+    });
+
+    await modal.present();
+  }
 
   ngOnInit() {
     this.cargarEquipos();

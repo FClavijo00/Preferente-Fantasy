@@ -1,3 +1,94 @@
-<p>
-  detalle-jugador works!
-</p>
+<!-- <ion-content class="jugador-detalle-content"> -->
+  <ion-card class="jugador-card">
+    <ion-card-content>
+      <div class="jugador-header">
+        <!-- Avatar con borde neón -->
+        <ion-avatar class="jugador-avatar" [class]="jugador.posicion.toLowerCase()">
+          <img [src]="jugador.foto || 'assets/images/default-player.png'"
+            (error)="jugador.foto = 'assets/images/default-player.png'" [alt]="jugador.apodo || jugador.nombre" />
+        </ion-avatar>
+
+        <!-- Información central: Nombre/Apodo y Posición -->
+        <div class="player-info-div">
+          <h2 class="jugador-nombre">
+            {{ jugador.apodo || (jugador.nombre + ' ' + jugador.apellidos) }}
+          </h2>
+          <span class="posicion-badge" [class]="jugador.posicion.toLowerCase()">{{ jugador.posicion }}</span>
+
+          <!-- @if (jugador.lesionado) {
+          <div class="lesion-div">
+            <ion-icon name="medkit"></ion-icon>
+            <span>Lesionado</span>
+          </div>
+          } @else {
+          <div class="disponible-div">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <span>Disponible</span>
+          </div>
+          } -->
+        </div>
+
+        <!-- Estadísticas a la derecha (Puntos y Media) -->
+        <div class="player-pts-div">
+          <div class="stat-box highlight">
+            <span class="stat-value">{{ jugador.puntos_totales }}</span>
+            <span class="stat-label">PTS</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-value">{{ media() | number:'1.1-1' }}</span>
+            <span class="stat-label">MEDIA</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="jornadas-scroll-container">
+        @for (item of jugador.puntuaciones_jornada; track item.jornada) {
+          <div 
+            class="jornada-item" 
+            [class.active]="jornadaSeleccionada()?.jornada === item.jornada"
+            (click)="seleccionarJornada(item)">
+            <span class="jornada-num">J{{ item.jornada }}</span>
+            <span class="jornada-pts" [class.positive]="item.puntos > 0" [class.zero]="item.puntos === 0">
+              {{ item.puntos }}
+            </span>
+          </div>
+        } @empty {
+          <p class="no-data">Sin jornadas disputadas aún</p>
+        }
+      </div>
+
+      <!-- LÍNEA DIVISORIA SECUNDARIA -->
+      <div class="divider secondary"></div>
+
+      <!-- 3. DESGLOSE DE PUNTOS DE LA JORNADA SELECCIONADA -->
+      @if (jornadaSeleccionada(); as jornadaActiva) {
+        <div class="desglose-section">
+          <div class="desglose-header">
+            <h3>Puntuación Jornada {{ jornadaActiva.jornada }}</h3>
+            <span class="total-badge">{{ jornadaActiva.puntos }} PTS</span>
+          </div>
+
+          <!-- Muestra el JSON de desglose que calculamos en PostgreSQL -->
+          <div class="desglose-grid">
+      @for (item of getDesgloseArray(jornadaActiva.desglose); track $index) {
+        <div class="desglose-row">
+          <span class="stat-name">{{ item.concepto }}</span>
+          <span 
+            class="stat-val" 
+            [class.positive]="item.puntos > 0" 
+            [class.negative]="item.puntos < 0"
+            [class.neutral]="item.puntos === 0">
+            {{ item.puntos > 0 ? '+' + item.puntos : item.puntos }}
+          </span>
+        </div>
+      } @empty {
+        <p class="no-desglose">Sin acciones registradas en esta jornada</p>
+      }
+    </div>
+        </div>
+      }
+    </ion-card-content>
+  </ion-card>
+<!-- </ion-content> -->

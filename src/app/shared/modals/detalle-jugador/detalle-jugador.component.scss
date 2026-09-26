@@ -1,0 +1,340 @@
+.jugador-detalle-content {
+  --background: var(--ion-color-stadium);
+}
+
+.jugador-card {
+  background: #121212;
+  border: 1px solid rgba(0, 255, 102, 0.15);
+  border-radius: 16px;
+  margin: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  min-height: 65vh;
+
+  ion-card-content {
+    padding: 14px;
+  }
+}
+
+.jugador-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  /* Avatar con anillo neón */
+  .jugador-avatar {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 50%;
+    /* border: 2px solid #00ff66; */
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+    overflow: hidden;
+
+    &.por {
+      border: 2px solid #43a047;
+    }
+    &.def {
+      border: 2px solid #f18436;
+    }
+    &.med {
+      border: 2px solid #0288d1;
+    }
+    &.del {
+      border: 2px solid var(--ion-color-red-card);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* Info central */
+  .player-info-div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0; // Evita saltos raros si el nombre es muy largo
+
+    .jugador-nombre {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .posicion-badge {
+      //background: rgba(0, 255, 102, 0.12);
+      //color: #00ff66;
+      //border: 1px solid rgba(0, 255, 102, 0.4);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &.por {
+        background: rgba(67, 160, 71, 0.12);
+        border: 1px solid rgba(67, 160, 71, 0.4);
+        color: #43a047;
+      }
+      &.def {
+        background: rgba(241, 132, 54, 0.12);
+        border: 1px solid rgba(241, 132, 54, 0.4);
+        color: #f18436;
+      }
+      &.med {
+        background: rgba(2, 136, 209, 0.12);
+        border: 1px solid #0288d1;
+        color: #0288d1;
+      }
+      &.del {
+        background: rgba(255, 0, 0, 0.12);
+        border: 1px solid var(--ion-color-red-card);
+        color: var(--ion-color-red-card);
+      }
+    }
+  }
+
+  /* Bloque de estadísticas */
+  .player-pts-div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 6px 10px;
+      min-width: 48px;
+
+      .stat-value {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1;
+      }
+
+      .stat-label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: #8e8e93;
+        margin-top: 3px;
+        text-transform: uppercase;
+      }
+
+      /* Resaltado especial para los Puntos Totales */
+      &.highlight {
+        background: rgba(0, 255, 102, 0.08);
+        border-color: rgba(0, 255, 102, 0.3);
+
+        .stat-value {
+          color: #00ff66;
+          text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+        }
+
+        .stat-label {
+          color: rgba(0, 255, 102, 0.8);
+        }
+      }
+    }
+  }
+}
+
+.equipo-logo {
+        position: absolute;
+    width: 25px;
+    height: 25px;
+    bottom: 10px;
+    left: 50px;
+    opacity: 0.9;
+}
+
+.lesion-div, .disponible-div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  ion-icon {
+    font-size: 1rem;
+    color: #ffffff;
+  }
+
+  span {
+    color: #ffffff;
+    margin: 0;
+  }
+}
+
+/* Líneas divisorias neón */
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg, 
+    rgba(0, 255, 102, 0) 0%, 
+    rgba(0, 255, 102, 0.3) 50%, 
+    rgba(0, 255, 102, 0) 100%
+  );
+  margin: 16px 0;
+
+  &.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    margin: 12px 0 16px 0;
+  }
+}
+
+/* Carrusel horizontal de Jornadas (Scroll sin scrollbar) */
+.jornadas-scroll-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Oculta barra en Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Oculta barra en Chrome/Safari */
+  }
+
+  .jornada-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    padding: 8px 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .jornada-num {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #8e8e93;
+      text-transform: uppercase;
+    }
+
+    .jornada-pts {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 2px;
+
+      &.positive {
+        color: #00ff66;
+      }
+      &.zero {
+        color: #8e8e93;
+      }
+    }
+
+    /* Estado cuando la jornada está seleccionada */
+    &.active {
+      background: rgba(0, 255, 102, 0.12);
+      border-color: #00ff66;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.25);
+      transform: scale(1.05);
+
+      .jornada-num {
+        color: #00ff66;
+      }
+    }
+  }
+
+  .no-data {
+    font-size: 0.8rem;
+    color: #8e8e93;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Sección Desglose de Puntos */
+.desglose-section {
+  .desglose-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .total-badge {
+      background: rgba(0, 255, 102, 0.15);
+      color: #00ff66;
+      border: 1px solid rgba(0, 255, 102, 0.3);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 8px;
+    }
+  }
+
+  .desglose-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .desglose-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+
+    .stat-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .stat-val {
+      font-size: 0.88rem;
+      font-weight: 700;
+
+      &.positive {
+        color: #00ff66;
+        text-shadow: 0 0 6px rgba(0, 255, 102, 0.3);
+      }
+      &.negative {
+        color: #ff4d4d;
+        text-shadow: 0 0 6px rgba(255, 77, 77, 0.3);
+      }
+      &.neutral {
+        color: #8e8e93;
+      }
+    }
+  }
+
+  .no-desglose {
+    font-size: 0.8rem;
+    color: #8e8e93;
+    text-align: center;
+    padding: 12px 0;
+  }
+}
+}
