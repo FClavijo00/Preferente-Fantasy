@@ -10,7 +10,7 @@ import {
   NavController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline } from 'ionicons/icons';
+import { arrowBackOutline, chevronBackOutline, trophyOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-header',
@@ -31,6 +31,8 @@ export class HeaderComponent {
   constructor() {
     addIcons({
       arrowBackOutline,
+      trophyOutline,
+      chevronBackOutline
     });
   }
 
