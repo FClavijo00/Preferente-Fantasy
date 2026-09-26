@@ -49,10 +49,10 @@
     <ion-item class="player-item" lines="none" (click)="verDetalleJugador(jugador)">
       <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
         <img [src]="jugador.foto || 'assets/images/default-player.png'" />
+        @if (jugador.lesionado) {
+        <img src="assets/images/injured-icon.webp" alt="Lesion" class="lesion-icon" />
+        }
       </ion-avatar>
-      <!-- <ion-avatar slot="start" class="pos-avatar" [class]="jugador.posicion.toLowerCase()">
-            <span>{{ jugador.posicion }}</span>
-          </ion-avatar> -->
 
       <ion-label>
         <h3 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h3>

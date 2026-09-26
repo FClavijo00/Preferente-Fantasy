@@ -14,9 +14,11 @@ import {
   IonBadge,
   IonSegment,
   IonSegmentButton,
+  ModalController,
 } from '@ionic/angular';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { EquiposService } from '../../core/services/equipos-service';
+import { DetalleJugadorComponent } from '../../shared/modals/detalle-jugador/detalle-jugador.component';
 
 export interface Equipo {
   id: number;
@@ -59,7 +61,6 @@ export interface PuntuacionesJornada {
   imports: [
     IonSegmentButton,
     IonSegment,
-    IonBadge,
     IonLabel,
     IonAvatar,
     IonItem,
@@ -68,11 +69,11 @@ export interface PuntuacionesJornada {
     IonContent,
     CommonModule,
     FormsModule,
-    HeaderComponent
-],
+    HeaderComponent],
 })
 export class PlantillasPage implements OnInit {
   private _equiposService = inject(EquiposService);
+  private _modalCtrl = inject(ModalController);
 
   equipos = signal<Equipo[]>([]);
   equipoSeleccionado = signal<Equipo | null>(null);
@@ -132,7 +133,20 @@ export class PlantillasPage implements OnInit {
   }
 
   async verDetalleJugador(jugador: Jugador) {
-    console.log(jugador);
+    const modal = await this._modalCtrl.create({
+          component: DetalleJugadorComponent,
+          initialBreakpoint: 1,
+          breakpoints: [0, 0.5, 0.75, 1],
+          handle: false,
+          mode: 'md',
+          componentProps: {
+            jugador: jugador
+          },
+        });
+    
+        await modal.present();
+    
+        const { data, role } = await modal.onWillDismiss();
   } 
 
   ngOnInit() {
