@@ -20,6 +20,7 @@ import {
   addOutline,
   arrowForwardOutline,
   keyOutline,
+  lockClosedOutline,
   peopleOutline,
   powerOutline,
   sparklesOutline,
@@ -83,7 +84,8 @@ export class RecepcionPage implements OnInit {
       arrowForwardOutline,
       powerOutline,
       peopleOutline,
-      sparklesOutline
+      sparklesOutline,
+      lockClosedOutline
     });
   }
 

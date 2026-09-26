@@ -1,20 +1,16 @@
 <ion-content class="ion-padding reception-background">
   <!-- Botones de accion - PANEL ADMIN - LOGOUT -->
-   @if (user?.rol_id === 1) {
-    <ion-button mode="ios" fill="clear" (click)="abrirPanelDeControl()" class="btn-panel">
-      <ion-icon slot="icon-only"name="sparkles-outline"></ion-icon>
-    </ion-button>
-   }
+  @if (user?.rol_id === 1) {
+  <ion-button mode="ios" fill="clear" (click)="abrirPanelDeControl()" class="btn-panel">
+    <ion-icon slot="icon-only" name="sparkles-outline"></ion-icon>
+  </ion-button>
+  }
 
   <ion-button mode="ios" fill="clear" (click)="logout()" class="btn-logout">
-    <ion-icon color="danger" slot="icon-only"name="power-outline"></ion-icon>
+    <ion-icon color="danger" slot="icon-only" name="power-outline"></ion-icon>
   </ion-button>
   <div class="brand-section ion-text-center">
-    <img
-      src="assets/images/pf-logo-v2.svg"
-      alt="Preferente Fantasy"
-      class="auth-logo"
-    />
+    <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="auth-logo" />
     <h1 class="fantasy-title">PREFERENTE FANTASY</h1>
     <p class="auth-subtitle">Crea tu campeonato o únete a uno existente</p>
   </div>
@@ -35,16 +31,15 @@
             </span> -->
         </div>
         <span class="people-badge">
-            <ion-icon name="people-outline"></ion-icon>
-            {{ liga.total_participantes }}
-          </span>
+          <ion-icon name="people-outline"></ion-icon>
+          {{ liga.total_participantes }}
+        </span>
       </div>
 
       <!-- Footer de la tarjeta: Acceso rápido -->
       <div class="card-footer">
         <span class="status-indicator">
-          <span class="dot"></span> Liga {{ liga.privada ? 'Privada' : 'Publica'
-          }}
+          <span class="dot"></span> Liga {{ liga.privada ? `Privada (Código: ${liga.codigo_acceso})` : 'Publica' }}
         </span>
         <button class="btn-enter">
           Entrar <ion-icon name="arrow-forward-outline"></ion-icon>
