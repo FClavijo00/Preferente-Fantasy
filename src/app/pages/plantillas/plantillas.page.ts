@@ -39,6 +39,17 @@ export interface Jugador {
   puntosTotales: number;
   fotoUrl?: string;
   foto?: string;
+  lesionado: boolean;
+  activo: boolean;
+  puntos_totales: number;
+  puntuaciones_jornada: PuntuacionesJornada[]
+}
+
+export interface PuntuacionesJornada {
+  desglose: [],
+  jornada_id: number,
+  jornada: number,
+  puntos: number
 }
 
 @Component({
@@ -119,6 +130,10 @@ export class PlantillasPage implements OnInit {
       );
     }
   }
+
+  async verDetalleJugador(jugador: Jugador) {
+    console.log(jugador);
+  } 
 
   ngOnInit() {
     this.cargarEquipos();

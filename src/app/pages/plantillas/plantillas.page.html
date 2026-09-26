@@ -1,46 +1,15 @@
 <app-header titulo="Plantillas"></app-header>
 
-<!-- <ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-title class="fantasy-title">PLANTILLAS OFICIALES</ion-title>
-  </ion-toolbar>
-
-  <div class="team-selector-scroll">
-    @for (equipo of equipos(); track equipo.id) {
-      <div 
-        class="team-badge-item"
-        [class.active]="equipoSeleccionado()?.id === equipo.id"
-        (click)="seleccionarEquipo(equipo)"
-      >
-        <div class="shield-container">
-          <img 
-            [src]="getEscudoUrl(equipo.escudo)" 
-            [alt]="equipo.nombre"
-            onerror="this.src='assets/icon/default-shield.svg'" 
-          />
-        </div>
-        <span class="team-name">{{ equipo.nombre }}</span>
-      </div>
-    }
-  </div>
-</ion-header> -->
-
 <ion-content [fullscreen]="true">
   <div class="team-selector-scroll">
     @for (equipo of equipos(); track equipo.id) {
-      <div 
-        class="team-badge-item"
-        [class.active]="equipoSeleccionado()?.id === equipo.id"
-        (click)="seleccionarEquipo(equipo)"
-      >
-        <div class="shield-container">
-          <img 
-            [src]="equipo.escudo" 
-            [alt]="equipo.nombre"
-          />
-        </div>
-        <!-- <span class="team-name">{{ equipo.nombre }}</span> -->
+    <div class="team-badge-item" [class.active]="equipoSeleccionado()?.id === equipo.id"
+      (click)="seleccionarEquipo(equipo)">
+      <div class="shield-container">
+        <img [src]="equipo.escudo" [alt]="equipo.nombre" />
       </div>
+      <!-- <span class="team-name">{{ equipo.nombre }}</span> -->
+    </div>
     }
   </div>
   <div class="position-segment-filter">
@@ -63,39 +32,39 @@
     </ion-segment>
   </div>
   @if (equipoSeleccionado()) {
-    <div class="section-header ion-padding">
-      <h2>{{ equipoSeleccionado()?.nombre }}</h2>
-      <span class="player-count">{{ jugadores().length }} Jugadores</span>
-    </div>
+  <div class="section-header ion-padding">
+    <h2>{{ equipoSeleccionado()?.nombre }}</h2>
+    <span class="player-count">{{ jugadores().length }} Jugadores</span>
+  </div>
   }
 
   @if (loadingJugadores()) {
-    <div class="spinner-container ion-text-center ion-padding">
-      <ion-spinner name="crescent" color="primary"></ion-spinner>
-    </div>
+  <div class="spinner-container ion-text-center ion-padding">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
   } @else {
-    <!-- Lista Base de Jugadores -->
-    <ion-list class="fantasy-player-list">
-      @for (jugador of jugadoresFiltrados(); track jugador.id) {
-        <ion-item class="player-item" lines="none">
-          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
-            <img [src]="jugador.foto || 'assets/images/default-player.png'" />
-          </ion-avatar>
-          <!-- <ion-avatar slot="start" class="pos-avatar" [class]="jugador.posicion.toLowerCase()">
+  <!-- Lista Base de Jugadores -->
+  <ion-list class="fantasy-player-list">
+    @for (jugador of jugadoresFiltrados(); track jugador.id) {
+    <ion-item class="player-item" lines="none" (click)="verDetalleJugador(jugador)">
+      <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
+        <img [src]="jugador.foto || 'assets/images/default-player.png'" />
+      </ion-avatar>
+      <!-- <ion-avatar slot="start" class="pos-avatar" [class]="jugador.posicion.toLowerCase()">
             <span>{{ jugador.posicion }}</span>
           </ion-avatar> -->
 
-          <ion-label>
-            <h3 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h3>
-            <p class="player-value">{{ jugador.posicion.toUpperCase() }}</p>
-          </ion-label>
+      <ion-label>
+        <h3 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h3>
+        <p class="player-value">{{ jugador.posicion.toUpperCase() }}</p>
+      </ion-label>
 
-          <div slot="end" class="player-stats ion-text-end">
-            <span class="pts-label">PTS</span>
-            <ion-badge color="primary" class="pts-badge">{{ jugador.puntosTotales }}</ion-badge>
-          </div>
-        </ion-item>
-      }
-    </ion-list>
+      <div slot="end" class="player-stats ion-text-end">
+        <span class="puntos-span">{{ jugador.puntos_totales }}</span>
+        <span class="pts-label">PTS</span>
+      </div>
+    </ion-item>
+    }
+  </ion-list>
   }
 </ion-content>
