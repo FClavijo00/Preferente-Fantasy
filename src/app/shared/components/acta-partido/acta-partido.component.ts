@@ -45,6 +45,7 @@ import {
   trash,
   saveOutline,
 } from 'ionicons/icons';
+import { LoadingService } from '../../../core/services/loading.service';
 export interface JugadorSimple {
   id: number;
   nombre: string;
@@ -57,13 +58,6 @@ export interface JugadorSimple {
   selector: 'app-acta-partido',
   standalone: true,
   imports: [
-    IonItem,
-    IonCardTitle,
-    IonListHeader,
-    IonLabel,
-    IonCardContent,
-    IonCardHeader,
-    IonCard,
     IonButtons,
     IonToolbar,
     IonHeader,
@@ -74,8 +68,8 @@ export interface JugadorSimple {
     IonSelect,
     IonSelectOption,
     IonButton,
-    IonIcon,
-  ],
+    IonIcon
+],
   templateUrl: './acta-partido.component.html',
   styleUrls: ['./acta-partido.component.scss'],
 })
@@ -88,6 +82,7 @@ export class ActaPartidoComponent implements OnInit {
   private _partidosService = inject(PartidosService);
   private _equiposService = inject(EquiposService);
   private _modalCtrl = inject(ModalController);
+  private _loadingService = inject(LoadingService);
 
   equipos = signal<any>([]);
   plantillaLocal: JugadorSimple[] = [];
@@ -138,13 +133,16 @@ export class ActaPartidoComponent implements OnInit {
   }
 
   private obtenerActa() {
+    this._loadingService.show();
     this._partidosService.obtenerActa(this.partido.partido_id).subscribe({
       next: (acta: any) => {
         this.actaExistente = acta;
         this.cargarDatosEnFormulario(acta);
+        this._loadingService.hide();
       },
       error: (error) => {
         this.generarSlotsVacios();
+        this._loadingService.hide();
       },
     });
   }
@@ -518,6 +516,8 @@ export class ActaPartidoComponent implements OnInit {
   }
 
   async cerrarActa() {
+    this._loadingService.show();
+
     const titularesLocal = this.extraerIdsSeleccionados('titulares_local');
     const suplentesLocal = this.extraerIdsSeleccionados('suplentes_local');
     const titularesVisitante = this.extraerIdsSeleccionados(
@@ -573,6 +573,7 @@ export class ActaPartidoComponent implements OnInit {
     this._partidosService.cerrarActa(payloadActa).subscribe({
       next: (data: any) => {
         this._modalCtrl.dismiss(data, 'confirm');
+        this._loadingService.hide();
       },
       error: (error: any) => {
         console.log(error);
