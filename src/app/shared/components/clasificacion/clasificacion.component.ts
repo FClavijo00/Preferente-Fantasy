@@ -20,6 +20,7 @@ import { EquiposService } from '../../../core/services/equipos-service';
 import { JugadoresService } from '../../../core/services/jugadores-service';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+import { DecimalPipe } from '@angular/common';
 
 export interface Clasificacion {
   equipo_id: number;
@@ -38,23 +39,16 @@ export interface Clasificacion {
 }
 
 interface JugadorRanking {
-  jugador_id: number;
-  nombre: string;
   apellidos: string;
   apodo: string;
-  posicion: string;
-  foto_url: string;
+  equipo: string;
   foto: string;
-  nombre_equipo: string;
-  partidos_jugados: number;
-  partidos_titular: number;
-  partidos_suplente: number;
-  goles_favor: number;
-  tarjetas_amarillas: number;
-  tarjetas_rojas: number;
-  goles_en_propia: number;
-  goles_penalti: number;
-  goles_encajados: number;
+  foto_url: string;
+  jornadas_jugadas: number;
+  jugador_id: number;
+  nombre: string;
+  posicion: string;
+  puntos_totales_temporada: number;
 }
 
 @Component({
@@ -72,7 +66,8 @@ interface JugadorRanking {
     IonCardHeader,
     IonCard,
     IonSegmentView,
-    IonSegmentContent
+    IonSegmentContent,
+    DecimalPipe
   ],
 })
 export class ClasificacionComponent implements OnInit {

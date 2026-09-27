@@ -92,7 +92,7 @@
             @for (jugador of jugadoresPaginados(); track jugador.jugador_id) {
             <ion-item lines="full" class="ranking-item">
               <!-- 1. Foto / Avatar del Jugador -->
-              <ion-avatar slot="start">
+              <ion-avatar slot="start" [class]="jugador.posicion.toLowerCase()">
                 <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo || jugador.nombre"
                   (error)="jugador.foto = 'assets/images/default-player.png'" />
               </ion-avatar>
@@ -103,14 +103,20 @@
                   {{ jugador.apodo || (jugador.nombre + " " + jugador.apellidos) }}
                 </h2>
                 <p class="equipo-nombre">
-                  {{ jugador.nombre_equipo || 'Sin equipo' }}
+                  {{ jugador.equipo || 'Sin equipo' }}
                 </p>
               </ion-label>
 
               <!-- 3. Contador de Goles -->
-              <div slot="end" class="goles-badge">
-                <span class="numero-goles">{{ jugador.goles_favor }}</span>
-                <span class="label-goles">goles</span>
+              <div class="player-pts-div">
+                <div class="stat-box highlight">
+                  <span class="stat-value">{{ jugador.puntos_totales_temporada }}</span>
+                  <span class="stat-label">PTS</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-value">{{ jugador.puntos_totales_temporada / jugador.jornadas_jugadas | number:'1.1-1' }}</span>
+                  <span class="stat-label">MEDIA</span>
+                </div>
               </div>
             </ion-item>
             } @empty {
