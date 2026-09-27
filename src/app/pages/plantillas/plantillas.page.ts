@@ -19,6 +19,7 @@ import {
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { EquiposService } from '../../core/services/equipos-service';
 import { DetalleJugadorComponent } from '../../shared/modals/detalle-jugador/detalle-jugador.component';
+import { LoadingService } from '../../core/services/loading.service';
 
 export interface Equipo {
   id: number;
@@ -75,30 +76,29 @@ export interface PuntuacionesJornada {
 export class PlantillasPage implements OnInit {
   private _equiposService = inject(EquiposService);
   private _modalCtrl = inject(ModalController);
+  private _loadingService = inject(LoadingService);
 
   equipos = signal<Equipo[]>([]);
   equipoSeleccionado = signal<Equipo | null>(null);
-  loadingEquipos = signal<boolean>(true);
   jugadores = signal<Jugador[]>([]);
   jugadoresFiltrados = signal<Jugador[]>([]);
-  loadingJugadores = signal<boolean>(false);
   posicionFiltro = signal<string>('TODOS');
 
   constructor() {}
 
   async cargarEquipos() {
-    this.loadingEquipos.set(true);
+    this._loadingService.show();
     this._equiposService.getEquipos().subscribe({
       next: (data: any) => {
         this.equipos.set(data);
         if (data.length > 0) {
           this.seleccionarEquipo(data[0]);
         }
-        this.loadingEquipos.set(false);
+        this._loadingService.hide();
       },
       error: (error) => {
         console.log(error);
-        this.loadingEquipos.set(false);
+        this._loadingService.hide();
       },
     });
   }

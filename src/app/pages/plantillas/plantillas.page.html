@@ -38,11 +38,6 @@
   </div>
   }
 
-  @if (loadingJugadores()) {
-  <div class="spinner-container ion-text-center ion-padding">
-    <ion-spinner name="crescent" color="primary"></ion-spinner>
-  </div>
-  } @else {
   <!-- Lista Base de Jugadores -->
   <ion-list class="fantasy-player-list">
     @for (jugador of jugadoresFiltrados(); track jugador.id) {
@@ -66,5 +61,5 @@
     </ion-item>
     }
   </ion-list>
-  }
+
 </ion-content>
