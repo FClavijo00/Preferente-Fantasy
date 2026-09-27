@@ -1,0 +1,77 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="modal-toolbar">
+    <ion-title>Seleccionar {{ posicion }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Scroll Horizontal de Equipos -->
+  <div class="equipos-scroll-container">
+    <!-- 1. Primer elemento: Logo Federación (Todos los equipos) -->
+    <div class="equipo-item" [class.active]="equipoFiltro() === null" (click)="filtrarPorEquipo(null)">
+      <div class="escudo-wrapper federacion">
+        <img src="assets/images/rfaf-white.png" alt="Federación" />
+      </div>
+      <!-- <span class="equipo-label">Todos</span> -->
+    </div>
+
+    <!-- 2. Lista de Equipos de la Competición -->
+    @for (equipo of listaEquipos; track equipo.id) {
+    <div class="equipo-item" [class.active]="equipoFiltro() === equipo.id"
+      [class.disabled]="esEquipoBloqueado(equipo.id)" (click)="filtrarPorEquipo(equipo.id)">
+      <div class="escudo-wrapper">
+        <img [src]="equipo.escudo" [alt]="equipo.nombre" />
+        @if (conteoPorEquipo().get(equipo.id); as count) {
+        <span class="count-badge" [class.max]="count >= 3">{{ count }}/3</span>
+        }
+      </div>
+      <!-- <span class="equipo-label">{{ equipo.nombre }}</span> -->
+    </div>
+    }
+  </div>
+</ion-header>
+
+<div class="modal-container">
+  <div class="jugadores-list">
+    @for (jugador of jugadoresFiltrados(); track jugador.id) {
+    @let estaBloqueado = esEquipoBloqueado(jugador.equipo_id);
+
+    <div class="jugador-item-card" [class.blocked]="estaBloqueado" (click)="seleccionarJugador(jugador)">
+      <!-- Foto Jugador -->
+      <ion-avatar class="jugador-avatar">
+        <img [src]="jugador.foto || 'assets/images/default-player.png'" />
+      </ion-avatar>
+
+      <!-- Detalle Jugador -->
+      <div class="jugador-info">
+        <span class="jugador-nombre">
+          {{ jugador.apodo || jugador.nombre }}
+        </span>
+        <div class="equipo-row">
+          <img [src]="jugador.equipo_escudo" class="mini-escudo" />
+          <span class="equipo-nombre">{{ jugador.equipo_nombre }}</span>
+        </div>
+      </div>
+
+      <!-- Puntos Totales y Estado -->
+      <div class="jugador-stats">
+        <div class="pts-box">
+          <span class="pts-val">{{ jugador.puntos_totales }}</span>
+          <span class="pts-lbl">PTS</span>
+        </div>
+
+        @if (estaBloqueado) {
+        <span class="blocked-badge">Máx 3/3</span>
+        }
+      </div>
+    </div>
+    } @empty {
+    <div class="empty-state">
+      <p>No hay futbolistas disponibles para esta posición.</p>
+    </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,268 @@
+.alineacion-content {
+  --background: #0a0a0a;
+}
+
+.pitch-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Selector Flotante */
+.formation-selector-wrapper {
+  position: absolute;
+  top: 12vh;
+  z-index: 10;
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  border-radius: 20px;
+  padding: 2px 16px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 102, 0.15);
+
+  .neon-select {
+    color: #00ff66;
+    font-weight: 800;
+    font-size: 1.1rem;
+    --placeholder-color: #00ff66;
+    --icon-color: #00ff66;
+    --highlight-color-focused: #00ff66;
+  }
+}
+
+/* Campo de Fútbol (Césped Neón) */
+.pitch-grass {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  min-height: 600px;
+  margin-top: 10px;
+  background: linear-gradient(180deg, #0d1f14 0%, #08120b 100%);
+  border: 2px solid rgba(0, 255, 102, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Dibujo de las líneas del campo */
+.pitch-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Que no interfiera con los clics */
+
+  .center-line {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 255, 102, 0.15);
+  }
+
+  .center-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgba(0, 255, 102, 0.15);
+    border-radius: 50%;
+  }
+
+  .penalty-box {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 15%;
+    border: 2px solid rgba(0, 255, 102, 0.15);
+
+    &.top {
+      top: 0;
+      border-top: none;
+    }
+
+    &.bottom {
+      bottom: 0;
+      border-bottom: none;
+    }
+  }
+}
+
+/* Grid de Jugadores (Flexbox) */
+.players-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 60px 10px 20px 10px; /* Espacio arriba para el select */
+  z-index: 2;
+}
+
+.pitch-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+/* Huecos de los jugadores */
+.player-slot {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  /* Botón "+" vacío neón */
+  .empty-slot {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px dashed rgba(0, 255, 102, 0.6);
+    background: rgba(0, 255, 102, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.1);
+    position: relative;
+
+    ion-icon {
+      font-size: 1.5rem;
+      color: #00ff66;
+    }
+
+    .rol-badge {
+      position: absolute;
+      bottom: -14px;
+      background: #121212;
+      color: #00ff66;
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 255, 102, 0.4);
+      letter-spacing: 0.5px;
+    }
+  }
+
+  /* Estilos para cuando haya un jugador ocupando el slot */
+  .player-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &.out-position {
+      .player-img {
+        border: 2px solid var(--ion-color-red-card) !important;
+      }
+    }
+
+    .player-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #00ff66;
+      background: #121212;
+      object-fit: cover;
+    }
+
+    .player-name {
+      position: absolute;
+      bottom: -14px;
+      background: rgba(18, 18, 18, 0.9);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.jornada-header-banner {
+  width: 100%;
+  padding: 10px 16px;
+  background: rgba(18, 18, 18, 0.9);
+  border-bottom: 1px solid rgba(0, 255, 102, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .jornada-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+    flex-direction: column;
+
+    .badge-jornada {
+      background: rgba(0, 255, 102, 0.15);
+      color: #00ff66;
+      border: 1px solid rgba(0, 255, 102, 0.4);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .fecha-limite {
+      color: #8e8e93;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+
+  .guardar-div {
+    display: flex;
+    align-items: flex-end;
+
+    ion-button.neon-button {
+      --background: rgba(0, 255, 102, 0.15);
+      --background-activated: #00ff66;
+      --background-hover: #00ff66;
+      --color: #00ff66;
+      --color-activated: #00ff66;
+      --color-hover: #00ff66;
+      --border-width: 1px;
+      --border-style: solid;
+      --border-color: rgba(0, 255, 102, 0.4);
+      font-size: 0.8rem;
+      font-weight: 800;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+.warning-icon {
+  position: absolute;
+  font-size: 1.5rem;
+  color: var(--ion-color-red-card);
+  top: -5px;
+  right: -10px;
+}

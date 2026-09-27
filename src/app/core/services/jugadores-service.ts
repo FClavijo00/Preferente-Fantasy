@@ -46,4 +46,11 @@ export class JugadoresService {
   editarJugador(data: FormData) {
     return this.http.post(`${this.apiUrl}/editarJugador`, data);
   }
+
+  getJugadores(posicion: string, idsExcluidos: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.apiUrl}/getJugadores`, {
+      posicion: posicion,
+      idsExcluidos
+    });
+  }
 }

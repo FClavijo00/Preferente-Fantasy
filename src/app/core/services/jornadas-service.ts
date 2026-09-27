@@ -25,6 +25,12 @@ export class JornadasService {
       .pipe(map((res) => res.data));
   }
 
+  getSiguienteJornada(): Observable<[]> {
+    return this.http
+      .get<ApiResponse<[]>>(`${this.apiUrl}` + '/getSiguienteJornada')
+      .pipe(map((res) => res.data));
+  }
+
   getJornadas(): Observable<[]> {
     return this.http
       .get<ApiResponse<[]>>(`${this.apiUrl}` + '/getJornadas')

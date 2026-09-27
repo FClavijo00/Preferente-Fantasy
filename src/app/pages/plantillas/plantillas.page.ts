@@ -66,12 +66,11 @@ export interface PuntuacionesJornada {
     IonAvatar,
     IonItem,
     IonList,
-    IonSpinner,
     IonContent,
     CommonModule,
     FormsModule,
-    HeaderComponent,
-  ],
+    HeaderComponent
+],
 })
 export class PlantillasPage implements OnInit {
   private _equiposService = inject(EquiposService);

@@ -1,0 +1,232 @@
+.modal-toolbar {
+  --background: #121212;
+  --color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  ion-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #00ff66;
+  }
+}
+
+.modal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 80vh; /* O la altura máxima que quieras para la card */
+  background: #0a0a0a;
+}
+
+/* Carrusel Horizontal de Equipos */
+.equipos-scroll-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 12px 16px;
+  background: #121212;
+  border-bottom: 1px solid rgba(0, 255, 102, 0.15);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .equipo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    //min-width: 58px;
+
+    .escudo-wrapper {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+      transition: all 0.2s ease;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      &.federacion img {
+        filter: drop-shadow(0 0 4px rgba(0, 255, 102, 0.4));
+      }
+
+      /* Indicator de cuántos elegidos del equipo llevas (ej: 2/3) */
+      .count-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #121212;
+        color: #00ff66;
+        border: 1px solid #00ff66;
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 1px 4px;
+        border-radius: 6px;
+
+        &.max {
+          color: #ff4d4d;
+          border-color: #ff4d4d;
+        }
+      }
+    }
+
+    .equipo-label {
+      font-size: 0.65rem;
+      color: #8e8e93;
+      font-weight: 600;
+      white-space: nowrap;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Selección Activa */
+    &.active {
+      .escudo-wrapper {
+        border-color: #00ff66;
+        background: rgba(0, 255, 102, 0.12);
+        box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+        transform: scale(1.08);
+      }
+
+      .equipo-label {
+        color: #00ff66;
+      }
+    }
+
+    /* Estado cuando ya tiene 3 jugadores */
+    &.disabled {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* Tarjetas de Jugadores */
+.jugadores-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  flex: 1;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .jugador-item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .jugador-avatar {
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(0, 255, 102, 0.3);
+    }
+
+    .jugador-info {
+      flex: 1;
+      margin-left: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      .jugador-nombre {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .equipo-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .mini-escudo {
+          width: 14px;
+          height: 14px;
+          object-fit: contain;
+        }
+
+        .equipo-nombre {
+          font-size: 0.72rem;
+          color: #8e8e93;
+        }
+      }
+    }
+
+    .jugador-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      .pts-box {
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+
+        .pts-val {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #00ff66;
+        }
+
+        .pts-lbl {
+          font-size: 0.6rem;
+          font-weight: 700;
+          color: #8e8e93;
+        }
+      }
+
+      .blocked-badge {
+        font-size: 0.6rem;
+        color: #ff4d4d;
+        background: rgba(255, 77, 77, 0.12);
+        border: 1px solid rgba(255, 77, 77, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 2px;
+      }
+    }
+
+    /* Estado bloqueado si ya hay 3 del mismo club */
+    &.blocked {
+      opacity: 0.45;
+      filter: grayscale(0.8);
+      cursor: not-allowed;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #8e8e93;
+    padding: 30px 0;
+    font-size: 0.85rem;
+  }
+}

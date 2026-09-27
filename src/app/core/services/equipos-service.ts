@@ -46,4 +46,8 @@ export class EquiposService {
       .get<ApiResponse<Equipo[]>>(`${this.apiUrl}` + '/getEquipos')
       .pipe(map((res) => res.data));
   }
+
+  getEquiposLimpios() {
+    return this.http.get(`${this.apiUrl}/getEquiposLimpios`);
+  }
 }
