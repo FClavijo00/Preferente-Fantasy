@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -112,7 +112,8 @@ export interface Jugador {
     IonToolbar,
     CommonModule,
     FormsModule,
-    HeaderComponent
+    HeaderComponent,
+    DatePipe
 ],
 })
 export class PanelControlPage {
