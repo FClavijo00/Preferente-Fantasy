@@ -19,7 +19,7 @@
               <tr>
                 <th class="text-center" scope="col"></th>
                 <th class="text-center" scope="col">Equipo</th>
-                <th class="text-center" scope="col">PTS</th>
+                <th class="text-center pts-cell" scope="col">PTS</th>
                 <th class="text-center" scope="col">PJ</th>
                 <th class="text-center" scope="col">PG</th>
                 <th class="text-center" scope="col">PE</th>
@@ -50,14 +50,18 @@
                     equipo.equipo
                     }}</span>
                 </td>
-                <td class="text-center">{{ equipo.puntos }}</td>
+                <td class="text-center pts-cell">{{ equipo.puntos }}</td>
                 <td class="text-center">{{ equipo.partidos_jugados }}</td>
                 <td class="text-center">{{ equipo.ganados }}</td>
-                <td class="text-center">{{ equipo.perdidos }}</td>
                 <td class="text-center">{{ equipo.empatados }}</td>
+                <td class="text-center">{{ equipo.perdidos }}</td>
                 <td class="text-center">{{ equipo.goles_favor }}</td>
                 <td class="text-center">{{ equipo.goles_contra }}</td>
+                @if (equipo.diferencia_goles < 0) {
                 <td class="text-center">{{ equipo.diferencia_goles }}</td>
+                } @else {
+                <td class="text-center">+{{ equipo.diferencia_goles }}</td>
+                }
                 <td class="text-center">{{ equipo.san || "0" }}</td>
               </tr>
               }
