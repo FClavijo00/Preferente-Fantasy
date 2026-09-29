@@ -145,8 +145,7 @@ export class RecepcionPage implements OnInit {
   }
 
   entrarEnLiga(liga: Ligas) {
-    console.log(liga);
-    /* this._navCtrl.navigateRoot(['/liga', liga.id], { replaceUrl: true }); */
+    this._ligasService.setLigaSeleccionada(liga);
     this._navCtrl.navigateRoot(['/tabs/home'], { replaceUrl: true });
   }
 
