@@ -1,0 +1,30 @@
+<div class="mini-calendario-grid">
+  @for (partido of miniCalendario; track partido.partido_id) {
+    <div class="mini-match-card">
+      <!-- Equipo Local -->
+      <div class="equipo local" [title]="partido.local_nombre">
+        <img 
+          [src]="partido.local_escudo || 'assets/images/default-shield.png'" 
+          [alt]="partido.local_nombre" 
+          class="escudo" 
+        />
+      </div>
+
+      <!-- VS Badge -->
+      <div class="marcador-box">
+        <span class="vs-badge">VS</span>
+      </div>
+
+      <!-- Equipo Visitante -->
+      <div class="equipo visitante" [title]="partido.visitante_nombre">
+        <img 
+          [src]="partido.visitante_escudo || 'assets/images/default-shield.png'" 
+          [alt]="partido.visitante_nombre" 
+          class="escudo" 
+        />
+      </div>
+    </div>
+  } @empty {
+    <div class="empty-state">No hay partidos cargados</div>
+  }
+</div>
