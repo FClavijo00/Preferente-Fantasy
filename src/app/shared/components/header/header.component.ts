@@ -11,6 +11,7 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronBackOutline, trophyOutline } from 'ionicons/icons';
+import { LigasService } from '../../../core/services/ligas.service';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +28,7 @@ export class HeaderComponent {
   @Input() titulo: string = '';
 
   private _navCtrl = inject(NavController);
+  private _ligasService = inject(LigasService);
 
   constructor() {
     addIcons({
@@ -37,6 +39,7 @@ export class HeaderComponent {
   }
 
   backRecepcion() {
+    this._ligasService.clearLigaSeleccionada();
     this._navCtrl.navigateBack(['recepcion']);
   }
 }
