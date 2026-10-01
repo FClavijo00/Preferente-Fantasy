@@ -1,9 +1,12 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar class="modal-toolbar">
+  <ion-toolbar class="modal-toolbar" mode="md">
     <ion-title>Seleccionar {{ posicion }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrarModal()">
-        <ion-icon name="close"></ion-icon>
+      <ion-button (click)="vaciarHueco()" class="btn-vaciar" mode="ios">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-button>
+      <ion-button (click)="cerrarModal()" class="btn-close" mode="ios">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

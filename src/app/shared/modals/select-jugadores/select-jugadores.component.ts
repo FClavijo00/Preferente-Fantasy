@@ -11,7 +11,7 @@ import {
   ModalController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add, close } from 'ionicons/icons';
+import { add, close, trash } from 'ionicons/icons';
 
 export interface JugadorMercado {
   id: number;
@@ -31,13 +31,12 @@ export interface JugadorMercado {
   styleUrls: ['./select-jugadores.component.scss'],
   imports: [
     IonTitle,
-    IonContent,
     IonIcon,
     IonButton,
     IonButtons,
     IonToolbar,
     IonAvatar,
-    IonHeader,
+    IonHeader
   ],
 })
 export class SelectJugadoresComponent implements OnInit {
@@ -70,7 +69,7 @@ export class SelectJugadoresComponent implements OnInit {
   });
 
   constructor() {
-    addIcons({ add, close });
+    addIcons({ add, close, trash });
   }
 
   ngOnInit() {
@@ -79,7 +78,9 @@ export class SelectJugadoresComponent implements OnInit {
 
     // 2. Aplicamos el filtro inicial por defecto (Todos)
     this.filtrarPorEquipo(null);
-  }eliminarJugadoresYaAlineados() {
+  }
+
+  eliminarJugadoresYaAlineados() {
     // Extraemos los IDs de los jugadores actualmente en el 11
     const idsAlineados = new Set(
       this.alineacionActual
@@ -114,6 +115,10 @@ export class SelectJugadoresComponent implements OnInit {
       return; // Bloqueado si el club ya tiene 3 elegidos
     }
     this._modalCtrl.dismiss(jugador, 'confirm');
+  }
+
+  vaciarHueco() {
+    this._modalCtrl.dismiss(null, 'confirm');
   }
 
   cerrarModal() {

@@ -230,3 +230,11 @@
     font-size: 0.85rem;
   }
 }
+
+.btn-close {
+  --color: var(--ion-color-pitch) !important;
+}
+
+.btn-vaciar {
+  --color: var(--ion-color-red-card) !important;
+}
