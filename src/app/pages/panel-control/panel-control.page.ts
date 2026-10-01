@@ -377,6 +377,7 @@ export class PanelControlPage {
       },
       error: (error) => {
         console.log(error);
+        this.partidosJornada.set([]);
       },
     });
   }
