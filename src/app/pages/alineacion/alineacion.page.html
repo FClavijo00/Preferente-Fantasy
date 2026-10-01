@@ -45,29 +45,6 @@
 
       <!-- Jugadores renderizados con Flexbox -->
       <div class="players-grid">
-        <!-- @for (linea of lineasCampo(); track $index) {
-          <div class="pitch-row">
-            @for (slot of linea; track slot.index) {
-              <div class="player-slot" (click)="abrirSelectorJugador(slot)">
-                
-                @if (slot.jugador) {
-                  
-                  <div class="player-card">
-                    <img [src]="slot.jugador.foto" class="player-img"/>
-                    <span class="player-name">{{ slot.jugador.apodo }}</span>
-                  </div>
-                } @else {
-                  
-                  <div class="empty-slot">
-                    <ion-icon name="add"></ion-icon>
-                    <span class="rol-badge">{{ slot.rol }}</span>
-                  </div>
-                }
-
-              </div>
-            }
-          </div>
-        } -->
         <!-- Línea de Delanteros -->
         <div class="pitch-row">
           @for (slot of delanteros(); track slot.index) {
@@ -108,6 +85,7 @@
           <ion-icon class="warning-icon" name="warning"></ion-icon>
           }
           <span class="player-name">{{ slot.jugador.apodo || slot.jugador.nombre }}</span>
+          <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
         </div>
         } @else {
         <div class="empty-slot" (click)="abrirSelectorJugador(slot)">

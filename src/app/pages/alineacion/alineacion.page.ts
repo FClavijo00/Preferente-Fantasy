@@ -28,6 +28,7 @@ export interface JugadorSlot {
   index: number;
   rol: 'POR' | 'DEF' | 'MED' | 'DEL';
   jugador: any | null; // Nulo significa hueco vacío
+  escudo: string | null;
 }
 
 @Component({
@@ -266,6 +267,7 @@ export class AlineacionPage implements OnInit {
           index: idx,
           rol: grupo.rol,
           jugador: jugadorPrevio,
+          escudo: jugadorPrevio?.equipo_escudo || null,
         });
         idx++;
       }
@@ -310,14 +312,17 @@ export class AlineacionPage implements OnInit {
 
         await modal.present();
 
-        const { data: jugadorElegido } = await modal.onDidDismiss();
-        if (jugadorElegido) {
+        const { data: jugadorElegido, role } = await modal.onDidDismiss();
+
+        if (jugadorElegido !== null && role === 'confirm') {
           const validacion = this.validarSeleccionJugador(jugadorElegido);
           if (!validacion.valido) {
             this._toastService.showErrorToast(validacion.mensaje!);
             return;
           }
           this.asignarJugadorASlot(slot.index, jugadorElegido);
+        } else if (jugadorElegido === null && role === 'confirm') {
+          this.asignarJugadorASlot(slot.index, null);
         }
       },
       error: (err) => console.error('Error al cargar futbolistas:', err),
