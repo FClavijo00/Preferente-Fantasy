@@ -48,11 +48,11 @@
 
     /* Estado cuando la jornada está seleccionada */
     &.active {
-      background: var(--ion-color-grass); // Color verde acento/primario
-      color: #080f0b; // Texto oscuro para máximo contraste
-      border-color: var(--ion-color-grass);
+      background: rgba(0, 255, 102, 0.15);
+      color: #00ff66; 
+      border-color: rgba(0, 255, 102, 0.4);
       font-weight: 700;
-      transform: scale(1.08); // Pequeño efecto de elevación al seleccionar
+      transform: scale(1.08);
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
     }
 
