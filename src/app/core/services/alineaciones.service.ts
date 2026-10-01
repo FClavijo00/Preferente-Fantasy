@@ -11,6 +11,10 @@ export class AlineacionesService {
         return this.http.post(`${this.apiUrl}/cargarAlineacion`, data);
     }
 
+    cargarAlineacionesJornadas(data: any) {
+        return this.http.post(`${this.apiUrl}/cargarAlineacionesJornadas`, data);
+    }
+
     guardarAlineacion(payload: any) {
         return this.http.post(`${this.apiUrl}/guardarAlineacion`, payload);
     }

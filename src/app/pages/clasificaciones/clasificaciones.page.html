@@ -1,13 +1,156 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>clasificaciones</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Clasificaciones"></app-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">clasificaciones</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-segment mode="ios" [value]="tabActivo()" (ionChange)="cambiarTab($event)" class="custom-segment">
+    <ion-segment-button value="jornada_mi_equipo">
+      <ion-label>Mi Equipo</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="clasificacion_jornadas">
+      <ion-label>Jornadas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="clasificacion_general">
+      <ion-label>General</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Selector de Jornada Filtro (Para Tab 1 y Tab 2) -->
+  <!-- @if (tabActivo() !== 'clasificacion_general') {
+  <div class="jornada-selector-bar">
+    <span class="label">Jornada:</span>
+    <ion-select [value]="jornadaSeleccionadaId()" (ionChange)="cambiarJornadaFiltro($event)" interface="popover"
+      class="custom-select">
+      @for (j of jornadasDisponibles(); track j.id) {
+      <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
+      }
+    </ion-select>
+  </div>
+  } -->
+
+  <!-- TAB 1: Mi Alineación en la Jornada + Puntos obtenidos -->
+  @if (tabActivo() === 'jornada_mi_equipo') {
+  <div class="tab-container mi-jornada-container">
+    <!-- Scroll Horizontal de Minitarjetas de Jornadas -->
+    <div class="jornadas-scroll-container">
+      <div class="jornadas-track">
+        @for (jornada of jornadasDisponibles(); track jornada.jornada_id) {
+        <div class="jornada-card" [class.active]="jornadaSeleccionadaId() === jornada.jornada_id"
+          (click)="seleccionarJornada(jornada)">
+          <span class="jornada-title">
+            {{ jornadaSeleccionadaId() === jornada.jornada_id ? 'Jornada ' +
+            jornada.numero_jornada : 'J' + jornada.numero_jornada }}
+          </span>
+
+          <span class="jornada-puntos">
+            {{ jornada.puntos_totales ?? 0 }} <small>PTS</small>
+          </span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
+    <div class="pitch-container">
+      <!-- Terreno de juego con las filas generadas dinámicamente -->
+      <div class="pitch-grass">
+        <!-- Líneas decorativas del campo -->
+        <div class="pitch-lines">
+          <div class="center-circle"></div>
+          <div class="center-line"></div>
+          <div class="penalty-box top"></div>
+          <div class="penalty-box bottom"></div>
+        </div>
+
+        <!-- Jugadores renderizados con Flexbox -->
+        <div class="players-grid">
+          <!-- Línea de Delanteros -->
+          <div class="pitch-row">
+            @for (slot of delanteros(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+
+          <!-- Línea de Mediocampistas -->
+          <div class="pitch-row">
+            @for (slot of medios(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+
+          <!-- Línea de Defensas -->
+          <div class="pitch-row">
+            @for (slot of defensas(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+
+          <!-- Portero -->
+          <div class="pitch-row">
+            @for (slot of portero(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+        </div>
+      </div>
+      <!-- Template reutilizable para cada slot de jugador -->
+      <ng-template #slotTemplate let-slot>
+        <div class="player-slot">
+          @if (slot.jugador) {
+          <div class="player-card" [class]="slot.rol !== slot.jugador.posicion ? 'out-position' : ''"
+            (click)="abrirDetalleJugador(slot)">
+            <!-- Badge de Puntos sobre el jugador -->
+            <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
+              [class.neutral]="slot.jugador.puntos_jornada === 0">
+              {{ slot.jugador.puntos_jornada }}
+            </div>
+            <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
+            @if (slot.rol !== slot.jugador.posicion) {
+            <ion-icon class="warning-icon" name="warning"></ion-icon>
+            }
+            <span class="player-name">{{ slot.jugador.apodo || slot.jugador.nombre }}</span>
+            <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
+          </div>
+          } @else {
+          <div class="empty-slot">
+            <img src="assets/images/default-player.png" class="empty-slot-img" />
+            <span class="rol-badge">{{ slot.rol }}</span>
+          </div>
+          }
+        </div>
+      </ng-template>
+    </div>
+  </div>
+  }
+
+  @if (tabActivo() === 'clasificacion_general') {
+  <ion-list class="ranking-list">
+    @for (user of rankingGeneral(); track user.usuario_id) {
+    <ion-item mode="ios" lines="none" button (click)="verAlineacionUsuario(user)" detail="false">
+      <!-- Posición en la tabla -->
+      <div slot="start" class="posicion-badge" [class.top3]="user.posicion <= 3">
+        {{ user.posicion }}
+      </div>
+
+      <!-- Avatar del usuario -->
+      <ion-avatar slot="start">
+        <img [src]="user.image_url || 'assets/images/default-avatar.png'" alt="Avatar" />
+      </ion-avatar>
+
+      <!-- Nombre y puntos -->
+      <ion-label class="nombre-usuario-club">
+        <h2>{{ user.nombre_club }}</h2>
+        <span>{{ user.nombre_usuario }}</span>
+      </ion-label>
+
+      <div slot="end" class="puntos-container">
+        <span class="puntos-val">{{ user.puntos_totales }}</span>
+        <span class="puntos-lbl">PTS</span>
+      </div>
+    </ion-item>
+    } @empty {
+    <div class="empty-state">
+      <p>No se encontraron datos en la clasificación.</p>
+    </div>
+    }
+  </ion-list>
+  }
 </ion-content>
