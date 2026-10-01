@@ -1,0 +1,69 @@
+<ion-card class="jugador-card">
+  <ion-card-content>
+    <div class="jugador-header">
+      <!-- Avatar con borde neón -->
+      <ion-avatar class="jugador-avatar" [class]="jugador.posicion.toLowerCase()">
+        <img [src]="jugador.foto || 'assets/images/default-player.png'"
+          (error)="jugador.foto = 'assets/images/default-player.png'" [alt]="jugador.apodo || jugador.nombre" />
+      </ion-avatar>
+
+      <!-- Información central: Nombre/Apodo y Posición -->
+      <div class="player-info-div">
+        <h2 class="jugador-nombre">
+          {{ jugador.apodo || (jugador.nombre + ' ' + jugador.apellidos) }}
+        </h2>
+        <span class="posicion-badge" [class]="jugador.posicion.toLowerCase()">{{ jugador.posicion }}</span>
+      </div>
+
+      <!-- Estadísticas a la derecha (Puntos y Media) -->
+      <div class="player-pts-div">
+        <div class="stat-box highlight">
+          <span class="stat-value">{{ jugador.puntos_jornada }}</span>
+          <span class="stat-label">PTS</span>
+        </div>
+        <!-- <div class="stat-box">
+            <span class="stat-value">{{ media() | number:'1.1-1' }}</span>
+            <span class="stat-label">MEDIA</span>
+          </div> -->
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="jornadas-scroll-container">
+      <div class="jornada-item active">
+        <span class="jornada-num">J{{ jornada }}</span>
+        <span class="jornada-pts" [class.positive]="jugador.puntos_jornada > 0" [class.zero]="jugador.puntos_jornada === 0">
+          {{ jugador.puntos_jornada }}
+        </span>
+      </div>
+    </div>
+
+    <!-- LÍNEA DIVISORIA SECUNDARIA -->
+    <div class="divider secondary"></div>
+
+    <!-- 3. DESGLOSE DE PUNTOS DE LA JORNADA SELECCIONADA -->
+
+    <div class="desglose-section">
+      <div class="desglose-header">
+        <h3>Puntuación Jornada {{ jornada }}</h3>
+        <span class="total-badge"> {{ jugador.puntos_jornada }} PTS</span>
+      </div>
+
+      <!-- Muestra el JSON de desglose que calculamos en PostgreSQL -->
+      <div class="desglose-grid">
+        @for (item of getDesgloseArray(jugador.desglose); track $index) {
+        <div class="desglose-row">
+          <span class="stat-name">{{ item.concepto }}</span>
+          <span class="stat-val" [class.positive]="item.puntos > 0" [class.negative]="item.puntos < 0"
+            [class.neutral]="item.puntos === 0">
+            {{ item.puntos > 0 ? '+' + item.puntos : item.puntos }}
+          </span>
+        </div>
+        } @empty {
+        <p class="no-desglose">Sin acciones registradas en esta jornada</p>
+        }
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card>
