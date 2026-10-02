@@ -37,6 +37,10 @@ export class JornadasService {
       .pipe(map((res) => res.data));
   }
 
+  getPuntuacionesJornadas(data: any) {
+    return this.http.post(`${this.apiUrl}/getPuntuacionesJornadas`, data);
+  }
+
   cargarPartidosJornada(jornada: number) {
     return this.http.post(`${this.apiUrl}/cargarPartidosJornada`, {jornadaId: jornada});
   }

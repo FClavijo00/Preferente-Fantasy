@@ -1,0 +1,111 @@
+<div class="plantilla-clasificacion-container">
+  @if (miEquipo === false) {
+  <div class="team-header-container">
+    <div class="team-badge">
+      <img [src]="user?.image_url || 'assets/images/default-avatar.png'" [alt]="user?.nombre_club || 'Escudo club'"
+        loading="lazy" />
+    </div>
+
+    <div class="team-info">
+      <span class="user-name">{{ user?.nombre_usuario }}</span>
+      <h2 class="club-name">{{ user?.nombre_club }}</h2>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  }
+
+
+  <div class="plantilla-clasificacion-container">
+    <div class="jornadas-scroll-container">
+      <div class="jornadas-track">
+        @if (jornadasDisponibles().length > 0) {
+        @for (jornada of jornadasDisponibles(); track jornada.jornada_id) {
+        <div class="jornada-card" [class.active]="jornadaSeleccionadaId() === jornada.jornada_id"
+          (click)="seleccionarJornada(jornada)">
+          <span class="jornada-title">
+            {{ jornadaSeleccionadaId() === jornada.jornada_id ? 'Jornada ' +
+            jornada.numero_jornada : 'J' + jornada.numero_jornada }}
+          </span>
+
+          <span class="jornada-puntos">
+            {{ jornada.puntos_totales ?? 0 }} <small>PTS</small>
+          </span>
+        </div>
+        }
+        }
+      </div>
+    </div>
+
+    <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
+    <div class="pitch-container">
+      <!-- Terreno de juego con las filas generadas dinámicamente -->
+      <div class="pitch-grass">
+        <!-- Líneas decorativas del campo -->
+        <div class="pitch-lines">
+          <div class="center-circle"></div>
+          <div class="center-line"></div>
+          <div class="penalty-box top"></div>
+          <div class="penalty-box bottom"></div>
+        </div>
+
+        <!-- Jugadores renderizados con Flexbox -->
+        <div class="players-grid">
+          <!-- Línea de Delanteros -->
+          <div class="pitch-row">
+            @for (slot of delanteros(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+
+          <!-- Línea de Mediocampistas -->
+          <div class="pitch-row">
+            @for (slot of medios(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+
+          <!-- Línea de Defensas -->
+          <div class="pitch-row">
+            @for (slot of defensas(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+
+          <!-- Portero -->
+          <div class="pitch-row">
+            @for (slot of portero(); track slot.index) {
+            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+            }
+          </div>
+        </div>
+      </div>
+      <!-- Template reutilizable para cada slot de jugador -->
+      <ng-template #slotTemplate let-slot>
+        <div class="player-slot">
+          @if (slot.jugador) {
+          <div class="player-card" [class]="slot.rol !== slot.jugador.posicion ? 'out-position' : ''"
+            (click)="abrirDetalleJugador(slot)">
+            <!-- Badge de Puntos sobre el jugador -->
+            <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
+              [class.neutral]="slot.jugador.puntos_jornada === 0">
+              {{ slot.jugador.puntos_jornada }}
+            </div>
+            <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
+            @if (slot.rol !== slot.jugador.posicion) {
+            <ion-icon class="warning-icon" name="warning"></ion-icon>
+            }
+            <span class="player-name">{{ slot.jugador.apodo || slot.jugador.nombre }}</span>
+            <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
+          </div>
+          } @else {
+          <div class="empty-slot">
+            <img src="assets/images/default-player.png" class="empty-slot-img" />
+            <span class="rol-badge">{{ slot.rol }}</span>
+          </div>
+          }
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

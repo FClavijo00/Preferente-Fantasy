@@ -10,7 +10,9 @@ import {
   IonToolbar,
   ModalController,
   IonIcon,
-  IonAvatar, IonItem, IonList
+  IonAvatar,
+  IonItem,
+  IonList,
 } from '@ionic/angular';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { LoadingService } from '../../core/services/loading.service';
@@ -22,6 +24,7 @@ import { addIcons } from 'ionicons';
 import { warning } from 'ionicons/icons';
 import { DetalleJugadorJornadaComponent } from '../../shared/modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
 import { ClasificacionesService } from '../../core/services/clasificaciones.service';
+import { PlantillaClasificacionComponent } from '../../shared/components/plantilla-clasificacion/plantilla-clasificacion.component';
 
 export interface JugadorSlot {
   index: number;
@@ -35,7 +38,10 @@ export interface JugadorSlot {
   selector: 'app-clasificaciones',
   templateUrl: './clasificaciones.page.html',
   styleUrls: ['./clasificaciones.page.scss'],
-  imports: [IonList, IonItem, IonAvatar,
+  imports: [
+    IonList,
+    IonItem,
+    IonAvatar,
     IonIcon,
     IonSegmentButton,
     IonLabel,
@@ -44,12 +50,10 @@ export interface JugadorSlot {
     CommonModule,
     FormsModule,
     HeaderComponent,
+    PlantillaClasificacionComponent,
   ],
 })
 export class ClasificacionesPage implements OnInit {
-verAlineacionUsuario(_t101: any) {
-throw new Error('Method not implemented.');
-}
   //private _clasificacionesService = inject(ClasificacionesService);
   private _loadingService = inject(LoadingService);
   private _modalCtrl = inject(ModalController);
@@ -185,6 +189,7 @@ throw new Error('Method not implemented.');
     let data = {
       liga_id: this.liga?.id,
       usuario_id: this.user?.id,
+      jornada_id: this.jornadaSeleccionadaId() || 6,
     };
     this._alineacionesService.cargarAlineacionesJornadas(data).subscribe({
       next: (resp: any) => {
@@ -282,12 +287,11 @@ throw new Error('Method not implemented.');
       this._loadingService.show();
       let data = {
         liga_id: this.liga?.id,
-      }
+      };
       this._clasificacionesService.getClasificacion(data).subscribe({
         next: (resp: any) => {
           if (resp.ok) {
             this.rankingGeneral.set(resp.data || []);
-            console.log(this.rankingGeneral());
             this._loadingService.hide();
           }
         },
@@ -295,7 +299,7 @@ throw new Error('Method not implemented.');
           console.error('Error al cargar jornadas:', err);
           this._loadingService.hide();
         },
-      })
+      });
     } catch (error) {
       console.error('Error al cargar datos del tab:', error);
     } finally {
@@ -303,8 +307,24 @@ throw new Error('Method not implemented.');
     }
   }
 
+  async verAlineacionUsuario(userClasificacion: any) {
+    const modal = await this._modalCtrl.create({
+      component: PlantillaClasificacionComponent,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.5, 0.75, 1],
+      handle: false,
+      mode: 'md',
+      componentProps: {
+        user: userClasificacion,
+        liga: this.liga,
+      },
+    });
+
+    await modal.present();
+  }
+
   ngOnInit() {
-    this.cargarAlineacionesJornadas();
+    //this.cargarAlineacionesJornadas();
     this.getRankingGeneral();
   }
 }
