@@ -63,9 +63,6 @@ export class DetalleJugadorJornadaComponent implements OnInit {
   }
 
 
-  ngOnInit() {
-    console.log(this.jugador);
-    console.log(this.jornada);
-  }
+  ngOnInit() {}
 
 }

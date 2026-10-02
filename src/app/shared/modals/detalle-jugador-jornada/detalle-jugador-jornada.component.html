@@ -17,30 +17,31 @@
 
       <!-- Estadísticas a la derecha (Puntos y Media) -->
       <div class="player-pts-div">
+        <div class="stat-box">
+          <span class="stat-label">JORNADA</span>
+          <span class="stat-value">{{ jornada }}</span>
+        </div>
         <div class="stat-box highlight">
           <span class="stat-value">{{ jugador.puntos_jornada }}</span>
           <span class="stat-label">PTS</span>
         </div>
-        <!-- <div class="stat-box">
-            <span class="stat-value">{{ media() | number:'1.1-1' }}</span>
-            <span class="stat-label">MEDIA</span>
-          </div> -->
+
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <div class="jornadas-scroll-container">
+    <!-- <div class="jornadas-scroll-container">
       <div class="jornada-item active">
         <span class="jornada-num">J{{ jornada }}</span>
         <span class="jornada-pts" [class.positive]="jugador.puntos_jornada > 0" [class.zero]="jugador.puntos_jornada === 0">
           {{ jugador.puntos_jornada }}
         </span>
       </div>
-    </div>
+    </div> -->
 
     <!-- LÍNEA DIVISORIA SECUNDARIA -->
-    <div class="divider secondary"></div>
+    <!-- <div class="divider secondary"></div> -->
 
     <!-- 3. DESGLOSE DE PUNTOS DE LA JORNADA SELECCIONADA -->
 
