@@ -1,227 +1,138 @@
-<ion-header>
-  <ion-toolbar mode="md">
-    <ion-title>{{ partido.tiene_acta ? "Editar Acta" : "Crear Acta" }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button mode="ios" (click)="cerrarModal()">
-        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="acta-partido-container">
 
-<ion-content class="ion-padding">
-  <form [formGroup]="actaForm" class="acta-container">
-    <div class="acta-grid">
-      <div class="team-col">
-        <h3 class="col-title local">
-          Equipo Local : {{ partido.local_nombre }}
-        </h3>
+  @if(partido()) {
 
-        <span class="sub-title">Titulares (11)</span>
-        <div formArrayName="titulares_local" class="players-list">
-          @for (
-          control of getFormArray("titulares_local").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaLocal; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
-
-        <span class="sub-title">Suplentes (7)</span>
-        <div formArrayName="suplentes_local" class="players-list">
-          @for (
-          control of getFormArray("suplentes_local").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaLocal; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
+  <!-- 1. MARCADOR DEL PARTIDO -->
+  <div class="match-header-card">
+    <div class="scoreboard">
+      <!-- Equipo Local -->
+      <div class="team local">
+        <img [src]="partido()?.escudo_local" class="shield" [alt]="partido()?.nombre_local" />
+        <span class="siglas">{{ partido()?.siglas_local }}</span>
       </div>
 
-      <div class="team-col">
-        <h3 class="col-title visitante">
-          Equipo Visitante : {{ partido.visitante_nombre }}
-        </h3>
+      <!-- Resultado / Goles -->
+      <div class="score-box">
+        <span class="goals">{{ partido()?.goles_local ?? 0 }}</span>
+        <span class="divider-match">-</span>
+        <span class="goals">{{ partido()?.goles_visitante ?? 0 }}</span>
+      </div>
 
-        <span class="sub-title">Titulares (11)</span>
-        <div formArrayName="titulares_visitante" class="players-list">
-          @for (
-          control of getFormArray("titulares_visitante").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaVisitante; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
-
-        <span class="sub-title">Suplentes (7)</span>
-        <div formArrayName="suplentes_visitante" class="players-list">
-          @for (
-          control of getFormArray("suplentes_visitante").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaVisitante; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
+      <!-- Equipo Visitante -->
+      <div class="team visitante">
+        <span class="siglas">{{ partido()?.siglas_visitante }}</span>
+        <img [src]="partido()?.escudo_visitante" class="shield" [alt]="partido()?.nombre_visitante" />
       </div>
     </div>
 
-    <div class="goles-section">
-      <h3 class="section-title">Anotadores del Partido</h3>
-
-      <div class="acta-grid">
-        <div class="team-col">
-          <span class="sub-title">Goles Locales ({{ getFormArray("goles_local_list").length }})</span>
-          <div formArrayName="goles_local_list" class="goals-list">
-            @for (
-            control of getFormArray("goles_local_list").controls;
-            track $index
-            ) {
-            <div [formGroupName]="$index" class="goal-row">
-              <ion-select formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
-                <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-                @for (
-                j of control.get("tipo")?.value === "PROPIA"
-                ? plantillaVisitante
-                : plantillaLocal;
-                track j.id
-                ) {
-                <ion-select-option [value]="j.id">{{
-                  obtenerNombreFormateado(j)
-                  }}</ion-select-option>
-                }
-              </ion-select>
-
-              <ion-select formControlName="tipo" interface="popover" class="tipo-gol-select">
-                <ion-select-option value="NORMAL">Normal</ion-select-option>
-                <ion-select-option value="PENALTI">Penalti</ion-select-option>
-                <ion-select-option value="PROPIA">En propia</ion-select-option>
-              </ion-select>
-            </div>
-            }
-          </div>
-        </div>
-
-        <div class="team-col">
-          <span class="sub-title">Goles Visitantes ({{
-            getFormArray("goles_visitante_list").length
-            }})</span>
-          <div formArrayName="goles_visitante_list" class="goals-list">
-            @for (
-            control of getFormArray("goles_visitante_list").controls;
-            track $index
-            ) {
-            <div [formGroupName]="$index" class="goal-row">
-              <ion-select formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
-                <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-                @for (
-                j of control.get("tipo")?.value === "PROPIA"
-                ? plantillaLocal
-                : plantillaVisitante;
-                track j.id
-                ) {
-                <ion-select-option [value]="j.id">{{
-                  obtenerNombreFormateado(j)
-                  }}</ion-select-option>
-                }
-              </ion-select>
-
-              <ion-select formControlName="tipo" interface="popover" class="tipo-gol-select">
-                <ion-select-option value="NORMAL">Normal</ion-select-option>
-                <ion-select-option value="PENALTI">Penalti</ion-select-option>
-                <ion-select-option value="PROPIA">En propia</ion-select-option>
-              </ion-select>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
+    <!-- Subtítulo de Jornada y Estado -->
+    <div class="match-info">
+      <span class="jornada-badge">Jornada {{ partido()?.numero_jornada }}</span>
     </div>
-
-    <div class="goles-section">
-      <h3 class="section-title">⭐ JUGADOR DESTACADO</h3>
-      <div class="player-list">
-        <div class="player-row">
-          <ion-select formControlName="jugador_destacado_id" interface="popover">
-            <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-            @for (jugador of plantillasJuntas; track jugador.id) {
-            <ion-select-option [value]="jugador.id">{{
-              obtenerNombreFormateado(jugador)
-              }}</ion-select-option>
-            }
-          </ion-select>
-        </div>
-      </div>
-    </div>
-  </form>
-
-  <div class="add-jornada-div ion-margin-vertical">
-    <ion-button mode="md" fill="clear" shape="round" (click)="cerrarActa()">
-      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-      Cerrar Acta
-    </ion-button>
   </div>
+
+  <!-- 2. LISTADO EN 2 COLUMNAS (LOCAL vs VISITANTE) -->
+  <div class="teams-grid">
+
+    <!-- Columna Equipo Local -->
+    <div class="team-column">
+      <div class="column-header">
+        <h3>{{ partido()?.nombre_local }}</h3>
+      </div>
+
+      <ion-list class="players-list">
+        @for (jugador of jugadoresLocalTitulares(); track jugador.id) {
+        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
+          detail="false">
+          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
+            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
+          </ion-avatar>
+
+          <ion-label>
+            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
+            <p class="player-pos">{{ jugador.posicion }}</p>
+          </ion-label>
+
+          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
+            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
+          </div>
+        </ion-item>
+        } @empty {
+        <div class="empty-col">Sin datos de alineación</div>
+        }
+
+        <div class="divider"></div>
+
+        @for (jugador of jugadoresLocalSuplentes(); track jugador.id) {
+        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
+          detail="false">
+          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
+            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
+          </ion-avatar>
+
+          <ion-label>
+            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
+            <p class="player-pos">{{ jugador.posicion }}</p>
+          </ion-label>
+
+          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
+            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
+          </div>
+        </ion-item>
+        }
+      </ion-list>
+    </div>
+
+    <!-- Columna Equipo Visitante -->
+    <div class="team-column">
+      <div class="column-header">
+        <h3>{{ partido()?.nombre_visitante }}</h3>
+      </div>
+
+      <ion-list class="players-list">
+        @for (jugador of jugadoresVisitanteTitulares(); track jugador.id) {
+        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
+          detail="false">
+          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
+            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
+          </ion-avatar>
+
+          <ion-label>
+            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
+            <p class="player-pos">{{ jugador.posicion }}</p>
+          </ion-label>
+
+          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
+            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
+          </div>
+        </ion-item>
+        } @empty {
+        <div class="empty-col">Sin datos de alineación</div>
+        }
+
+        <div class="divider"></div>
+
+        @for (jugador of jugadoresVisitanteSuplentes(); track jugador.id) {
+        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
+          detail="false">
+          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
+            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
+          </ion-avatar>
+
+          <ion-label>
+            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
+            <p class="player-pos">{{ jugador.posicion }}</p>
+          </ion-label>
+
+          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
+            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
+          </div>
+        </ion-item>
+        }
+      </ion-list>
+    </div>
+
+  </div>
+  }
+
 </ion-content>

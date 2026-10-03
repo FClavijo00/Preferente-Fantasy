@@ -1,187 +1,264 @@
-ion-header {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
-
-  ion-toolbar {
-    --background: var(--ion-color-stadium);
-    --border-color: var(--ion-color-pitch);
-    --border-width: 0 0 1px 0;
-    --color: var(--ion-color-pitch);
-  }
-}
-
-ion-content {
+.acta-partido-container {
   --background: var(--ion-color-stadium);
-}
-
-.acta-container {
-  margin-top: 16px;
-  background: rgba(18, 29, 22, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 16px;
-
-  .acta-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .team-col {
+  /* Hacemos un layout flex interno en el ion-content */
+  &::part(scroll) {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-
-    .col-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin: 0 0 6px 0;
-      padding-bottom: 4px;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-
-      &.local {
-        color: #3b82f6;
-      }
-      &.visitante {
-        color: #ef4444;
-      }
-    }
-
-    .sub-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 6px;
-    }
+    height: 100%;
   }
+}
 
-  /* Filas compactas para jugadores */
-  .player-row {
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 1. Marcador Header */
+.match-header-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px;
+  margin: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+
+  .scoreboard {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
-    padding: 2px 8px;
-    margin-bottom: 4px;
+    justify-content: space-between;
+    padding: 0 8px;
 
-    ion-select {
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       flex: 1;
-      --padding-start: 0;
-      font-size: 0.8rem;
-      color: #ffffff;
-    }
 
-    .cards-checks {
-      display: flex;
-      gap: 6px;
+      &.local {
+        justify-content: flex-start;
+      }
 
-      .card-check {
-        font-size: 0.65rem;
+      &.visitante {
+        justify-content: flex-end;
+      }
+
+      .shield {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+      }
+
+      .siglas {
+        font-size: 1.1rem;
         font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        cursor: pointer;
-
-        &.yellow {
-          color: #eab308;
-        }
-        &.red {
-          color: #ef4444;
-        }
-
-        input {
-          accent-color: currentColor;
-        }
+        letter-spacing: 1px;
+        color: #ffffff;
       }
     }
-  }
 
-  /* Registro de goles */
-  .goles-section {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.15);
-
-    .section-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #22c55e;
-      margin: 0 0 12px 0;
-    }
-
-    .goal-row {
+    .score-box {
       display: flex;
+      align-items: center;
       gap: 8px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 8px;
-      padding: 2px 8px;
-      margin-bottom: 6px;
+      padding: 6px 16px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 255, 102, 0.3);
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.15);
 
-      ion-select {
-        flex: 2;
-        font-size: 0.8rem;
+      .goals {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #00ff66;
+        text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
       }
 
-      .tipo-gol-select {
-        flex: 1;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.7);
+      .divider-match {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.4);
+      }
+    }
+  }
+
+  .match-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+    .jornada-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .status-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(0, 255, 102, 0.15);
+      color: #00ff66;
+      border: 1px solid rgba(0, 255, 102, 0.3);
+      text-transform: uppercase;
+    }
+  }
+}
+
+/* 2. Grid de 2 Columnas */
+.teams-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex: 1;
+  min-height: 0; //Imprescindible para permitir scroll interno
+
+  .team-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .column-header {
+      padding: 8px;
+      margin-bottom: 6px;
+      border-bottom: 2px solid rgba(0, 255, 102, 0.4);
+      flex-shrink: 0;
+
+      h3 {
+        margin: 0;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .players-list {
+      background: transparent;
+      padding: 0;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      padding-bottom: 16px;
+
+      .player-item {
+        --background: rgba(255, 255, 255, 0.03);
+        //--border-radius: 10px;
+        --padding-start: 6px;
+        //--padding-end: 8px;
+        --min-height: 48px;
+        //margin-bottom: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+
+        .player-avatar {
+          width: 32px;
+          height: 32px;
+          margin: 0 8px;
+
+          &.por {
+            border: 2px solid #43a047;
+          }
+
+          &.def {
+            border: 2px solid #f18436;
+          }
+
+          &.med {
+            border: 2px solid #0288d1;
+          }
+
+          &.del {
+            border: 2px solid var(--ion-color-red-card);
+          }
+
+          img {
+            border-radius: 50%;
+            object-fit: cover;
+          }
+        }
+
+        ion-label {
+          margin: 4px 0;
+
+          .player-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+          }
+
+          .player-pos {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 0;
+          }
+        }
+
+        .pts-badge {
+          font-size: 0.8rem;
+          font-weight: 900;
+          color: #00ff66;
+          background: rgba(0, 255, 102, 0.1);
+          padding: 2px 6px;
+          border-radius: 6px;
+          border: 1px solid rgba(0, 255, 102, 0.25);
+          min-width: 28px;
+          text-align: center;
+
+          &.negative {
+            color: #ff3b30;
+            background: rgba(255, 59, 48, 0.1);
+            border-color: rgba(255, 59, 48, 0.25);
+          }
+        }
+      }
+
+      .empty-col {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.3);
+        text-align: center;
+        padding: 16px 0;
       }
     }
   }
 }
 
-.add-jornada-div,
-.add-partido-div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 102, 0) 0%,
+    rgba(0, 255, 102, 0.3) 50%,
+    rgba(0, 255, 102, 0) 100%
+  );
+  margin: 16px 0;
 
-  ion-button {
-    --background: rgba(255, 255, 255, 0.04);
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-style: solid;
-    --border-width: 1px;
-    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --border-radius: 10px;
-    --color: var(--ion-color-grass);
-    margin: 0 0 10px 0;
-  }
-}
-
-ion-card {
-  margin-bottom: 16px;
-  border-radius: 12px;
-}
-
-.header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.item-evento {
-  border: 1px solid var(--ion-color-light-shade);
-  border-radius: 8px;
-  margin-bottom: 12px;
-  padding-bottom: 4px;
-  background-color: var(--ion-color-step-50, #f9f9f9);
-}
-
-.text-muted {
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
-}
-
-ion-list-header {
-  min-height: 28px;
-  ion-label {
-    margin: 0;
-    color: var(--ion-color-primary);
+  &.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    margin: 12px 0 16px 0;
   }
 }

@@ -24,4 +24,8 @@ export class PartidosService {
         return this.http.post(`${this.apiUrl}/obtenerActa`, { partido_id: partidoId });
     }
 
+    getActaPartidoPuntos(partidoId: number) {
+        return this.http.post(`${this.apiUrl}/getActaPartidoPuntos`, { partido_id: partidoId });
+    }
+
 }
