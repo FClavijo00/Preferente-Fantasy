@@ -31,7 +31,6 @@ import {
 import { PartidosService } from '../../../core/services/partidos.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { format } from 'date-fns';
-import { ActaPartidoComponent } from '../../components/acta-partido/acta-partido.component';
 
 interface Equipo {
   id: number;

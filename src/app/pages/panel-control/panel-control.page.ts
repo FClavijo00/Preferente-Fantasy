@@ -42,7 +42,7 @@ import { CrearJornadaComponent } from '../../shared/modals/crear-jornada/crear-j
 import { CrearEditarPartidoComponent } from '../../shared/modals/crear-editar-partido/crear-editar-partido.component';
 import { EquiposService } from '../../core/services/equipos-service';
 import { CrearEditarJugadorComponent } from '../../shared/modals/crear-editar-jugador/crear-editar-jugador.component';
-import { ActaPartidoComponent } from '../../shared/components/acta-partido/acta-partido.component';
+import { CrearEditarActaPartidoComponent } from '../../shared/modals/crear-editar-acta-partido/crear-editar-acta-partido.component';
 
 interface Jornada {
   id: number;
@@ -298,7 +298,7 @@ export class PanelControlPage {
 
   async abrirEditarActaPartido(partido: Partido) {
     const modal = await this._modalCtrl.create({
-      component: ActaPartidoComponent,
+      component: CrearEditarActaPartidoComponent,
       initialBreakpoint: 1,
       breakpoints: [0, 0.5, 0.75, 1],
       handle: false,
