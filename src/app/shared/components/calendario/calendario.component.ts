@@ -10,8 +10,11 @@ import {
   IonSegmentButton,
   IonBadge,
   IonLabel,
+  ModalController,
 } from '@ionic/angular';
 import { DatePipe } from '@angular/common';
+import { ToastService } from '../../../core/services/toast.service';
+import { ActaPartidoComponent } from '../acta-partido/acta-partido.component';
 
 export interface Equipo {
   id: number;
@@ -28,6 +31,7 @@ export interface Partido {
   local: Equipo;
   visitante: Equipo;
   jugado: boolean;
+  tiene_acta: boolean;
 }
 
 export interface Jornada {
@@ -46,10 +50,12 @@ export interface Jornada {
     IonCardHeader,
     IonCard,
     DatePipe
-],
+  ],
 })
 export class CalendarioComponent implements OnInit {
   private _jornadasService = inject(JornadasService);
+  private _toastService = inject(ToastService);
+  private _modalCtrl = inject(ModalController);
 
   public calendario = signal<Jornada[]>([]);
   public jornadaSeleccionada = signal<number>(1);
@@ -61,7 +67,30 @@ export class CalendarioComponent implements OnInit {
   });
   public jornadasTotales = signal<number[]>(Array.from({ length: 0 }, (_, i) => i + 1));
 
-  constructor() {}
+  constructor() { }
+
+  async abrirActaPartido(partido: Partido) {
+    if (partido.tiene_acta === true && partido.jugado === true) {
+      const modal = await this._modalCtrl.create({
+        component: ActaPartidoComponent,
+        initialBreakpoint: 1,
+        breakpoints: [0, 0.5, 0.75, 1],
+        handle: false,
+        mode: 'md',
+        componentProps: {
+          partidoId: partido.partido_id
+        },
+      });
+      await modal.present();
+      
+      
+    } else if (partido.jugado === false) {
+      this._toastService.showErrorToast('Este partido no ha sido jugado aún.');
+    } else {
+      this._toastService.showErrorToast('Este partido no tiene acta aún.');
+    }
+
+  }
 
   async getCalendario() {
     this._jornadasService.getCalendario().subscribe({

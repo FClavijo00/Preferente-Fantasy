@@ -16,7 +16,7 @@
     @if (jornadaActual(); as j) {
     <div class="partidos-list">
       @for (partido of j.partidos; track partido.partido_id) {
-      <div class="partido-item">
+      <div class="partido-item" (click)="abrirActaPartido(partido)">
         <!-- Fecha u Hora -->
         <div class="partido-meta">
           @if (partido.fecha_partido) {
