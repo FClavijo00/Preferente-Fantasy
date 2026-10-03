@@ -9,7 +9,7 @@ import { IonAvatar, IonCard, IonCardContent } from "@ionic/angular";
   styleUrls: ['./detalle-jugador-jornada.component.scss'],
   imports: [IonCard, IonAvatar, IonCardContent ],
 })
-export class DetalleJugadorJornadaComponent implements OnInit {
+export class DetalleJugadorJornadaComponent {
 
   @Input() jugador: any;
   @Input() jornada: any;
@@ -61,8 +61,5 @@ export class DetalleJugadorJornadaComponent implements OnInit {
 
     return items;
   }
-
-
-  ngOnInit() {}
 
 }
