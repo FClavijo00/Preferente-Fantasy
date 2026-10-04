@@ -35,6 +35,7 @@ import { CropModalComponent } from '../../../shared/components/crop-modal/crop-m
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/services/auth-service.service';
 import { firstValueFrom } from 'rxjs';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-register',
@@ -60,37 +61,25 @@ export class RegisterPage implements OnInit {
   private _modalCtrl = inject(ModalController);
   private _toastService = inject(ToastService);
   private _authService = inject(AuthService);
+  private _loadingService = inject(LoadingService);
 
-  registerForm: FormGroup = new FormGroup({});
+  registerForm: FormGroup = this._fb.group({
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    club: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    foto: [null],
+    foto_url: [null],
+  });
+
   avatarPreview = signal<string | null>(null);
   selectedFile: File | null = null;
 
-  username = signal<string>('');
-  club = signal<string>('');
-  email = signal<string>('');
-  password = signal<string>('');
-
   loadingSpinner = signal<boolean>(false);
-
-  isEmailValid = computed(() => {
-    const val = this.email().trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(val);
-  });
-
-  isPasswordValid = computed(() => {
-    return this.password().length >= 6;
-  });
 
   showPassword = signal<boolean>(false);
 
-  isFormValid = computed(
-    () =>
-      this.isEmailValid() &&
-      this.isPasswordValid() &&
-      this.username().length >= 3 &&
-      this.club().length >= 3,
-  );
+  currentYear = signal<number>(new Date().getFullYear());
 
   constructor() {
     addIcons({
@@ -104,17 +93,10 @@ export class RegisterPage implements OnInit {
       eyeOffOutline,
       shirtOutline,
     });
-
-    this.registerForm = this._fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      club: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
   }
 
   toggleShowPassword() {
-    this.showPassword.update((val) => !val);
+    this.showPassword.set(!this.showPassword());
   }
   ngOnInit(): void {
     this.avatarPreview.set(null);
@@ -137,53 +119,14 @@ export class RegisterPage implements OnInit {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm' && data) {
-      this.avatarPreview.set(data);
+      this.avatarPreview.set(data.croppedImageBase64);
 
-      // Usamos el helper asíncrono
-      this.selectedFile = await this.dataURLtoFile(
-        data,
-        `avatar_${Date.now()}.webp`,
-      );
-      console.log(this.selectedFile);
-      /* this.selectedFile = this.base64ToFile(data, `avatar_${Date.now()}.png`);
-      console.log(this.selectedFile); */
+      this.registerForm.patchValue({ foto: data.croppedImageFile });
+      this.registerForm.patchValue({ foto_url: data.croppedImageFile.name });
     }
 
     // Limpiamos el input para permitir volver a seleccionar la misma imagen si se desea
     input.value = '';
-  }
-
-  private async dataURLtoFile(
-    dataUrl: string,
-    filename: string,
-  ): Promise<File> {
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-    return new File([blob], filename, { type: blob.type });
-  }
-
-  // Helper opcional para convertir el Base64 resultante a un objeto File
-  private base64ToFile(base64Data: string, filename: string): File {
-    // Separamos la cabecera (data:image/png;base64,) del contenido real
-    const parts = base64Data.split(',');
-    const mimeMatch = parts[0].match(/:(.*?);/);
-    const mime = mimeMatch ? mimeMatch[1] : 'image/webp';
-
-    // Limpiamos la cadena quitando espacios o saltos de línea por si acaso
-    const base64Clean = parts[1]
-      ? parts[1].replace(/\s/g, '')
-      : parts[0].replace(/\s/g, '');
-
-    // atob ahora recibe solo el payload Base64 sin el prefijo "data:..."
-    const byteString = atob(base64Clean);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const uint8Array = new Uint8Array(arrayBuffer);
-
-    for (let i = 0; i < byteString.length; i++) {
-      uint8Array[i] = byteString.charCodeAt(i);
-    }
-
-    return new File([arrayBuffer], filename, { type: mime });
   }
 
   async onRegister() {
@@ -194,49 +137,41 @@ export class RegisterPage implements OnInit {
       return;
     }
 
-    this.loadingSpinner.update((val) => true);
+    this.loadingSpinner.set(true);
 
     try {
-      let data = {
-        username: this.registerForm.value.username,
-        club: this.registerForm.value.club,
-        email: this.registerForm.value.email,
-        password: this.registerForm.value.password
+      const formData = new FormData();
+      const formValues = this.registerForm.value;
+      
+      formData.append('username', formValues.username || '');
+      formData.append('club', formValues.club || '');
+      formData.append('email', formValues.email || '');
+      formData.append('password', formValues.password || '');
+      
+      if (formValues.foto_url !== null && formValues.foto_url !== '') {
+        formData.append('foto_url', formValues.foto_url);
       }
+
+      if (formValues.foto !== null) {
+        formData.append('foto', formValues.foto, formValues.foto_url);
+      }
+
       const response = await firstValueFrom(
-        this._authService.register(data),
+        this._authService.register(formData),
       );
       if (response) {
-        this.loadingSpinner.update((val) => false);
+        this.loadingSpinner.set(false);
         this._toastService.showSuccessToast('Usuario creado con éxito.');
         this._navCtrl.navigateBack('/login');
       }
     } catch (error) {
-      this.loadingSpinner.update((val) => false);
+      this.loadingSpinner.set(false);
       this._toastService.showErrorToast(
         'Error al registrar el usuario.',
       );
     } finally {
-      this.loadingSpinner.update((val) => false);
+      this.loadingSpinner.set(false);
     }
-  }
-
-  private async showToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 3000,
-      color: 'danger',
-      position: 'bottom',
-    });
-    toast.present();
-  }
-
-  private async uploadImageToBucket(file: File): Promise<string> {
-    const fileName = `avatars/${Date.now()}-${file.name}`;
-
-    return new Promise<string>((resolve, reject) => {
-      resolve(fileName);
-    });
   }
 
   backLogin() {
