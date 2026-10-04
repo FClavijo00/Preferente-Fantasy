@@ -29,20 +29,29 @@ export class CropModalComponent implements OnInit {
 
   @Input() imageChangedEvent: Event | null = null;
   croppedImageBase64: string | null = null;
+  croppedImageFile: File | null = null;
 
   imageCropped(event: ImageCroppedEvent) {
-    // La imagen ya viene recortada y redimensionada exactamente a 300x300
-    this.croppedImageBase64 = event.objectUrl || null;
+    if (event.objectUrl && event.blob) {
+      this.croppedImageBase64 = event.objectUrl;
+      this.croppedImageFile = new File([event.blob], `avatar_${Date.now()}.webp`, { type: 'image/webp' });
+    }
   }
 
   cancelar() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
+
   confirmar() {
-    this.modalCtrl.dismiss(this.croppedImageBase64, 'confirm');
+    this.modalCtrl.dismiss(
+      {
+        croppedImageBase64: this.croppedImageBase64,
+        croppedImageFile: this.croppedImageFile
+      },
+      'confirm');
   }
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
-  ngOnInit() {}
+  ngOnInit() { }
 }
