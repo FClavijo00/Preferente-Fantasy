@@ -33,6 +33,7 @@ import {
 import { ToastService } from '../../../core/services/toast.service';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/services/auth-service.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -67,6 +68,8 @@ export class LoginPage {
   // Estado del formulario mediante señales
   email = signal<string>('');
   password = signal<string>('');
+
+  currentYear = signal<number>(new Date().getFullYear());
 
   // Validaciones reactivas computadas
   isEmailValid = computed(() => {
@@ -105,14 +108,13 @@ export class LoginPage {
   }
 
   async onLogin() {
+    this.loadingSpinner.set(true);
     if (this.loginForm.invalid) {
       this._toastService.showErrorToast(
         'Por favor, completa todos los campos correctamente.',
       );
       return;
     }
-
-    this.loadingSpinner.set(true);
 
     try {
       this._authService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe({
@@ -127,23 +129,18 @@ export class LoginPage {
             this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
             this._toastService.showSuccessToast('Inicio de sesión exitoso.');
           }
+        }, error: (error: HttpErrorResponse | any) => {
+          if (error.status === 401) {
+            this.loadingSpinner.set(false);
+            this._toastService.showErrorToast('Usuario o contraseña incorrectos.. Revisa tus credenciales.');
+          } else {
+            this.loadingSpinner.set(false);
+            this._toastService.showErrorToast('Ha ocurrido un error inesperado. Pruebe de nuevo.');
+          }
         }
       });
-    } catch (error) {
-      this.loadingSpinner.set(false);
-      this._toastService.showErrorToast('Error al iniciar sesión. Revisa tus credenciales.');
     } finally {
       this.loadingSpinner.set(false);
     }
-  }
-
-  private async showToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 3000,
-      color: 'danger',
-      position: 'bottom',
-    });
-    toast.present();
   }
 }

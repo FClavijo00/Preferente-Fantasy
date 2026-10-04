@@ -1,59 +1,25 @@
-<ion-content class="ion-padding">
+<ion-content>
   <div class="auth-container">
     <!-- Header / Branding -->
     <div class="brand-section ion-text-center">
-      <img
-        src="assets/images/pf-logo-v2.svg"
-        alt="Preferente Fantasy"
-        class="auth-logo"
-      />
+      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="auth-logo" />
       <h1 class="fantasy-title">PREFERENTE FANTASY</h1>
       <p class="auth-subtitle">Inicia sesión para gestionar tus campeonatos</p>
     </div>
 
     <!-- Formulario de Login -->
     <form [formGroup]="loginForm">
-      <ion-input
-        class="login-outline-input ion-margin-bottom"
-        mode="md"
-        label="Correo Electrónico"
-        label-placement="stacked"
-        fill="outline"
-        type="text"
-        formControlName="email"
-      >
-        <ion-icon
-          name="mail-outline"
-          slot="start"
-          class="input-icon"
-        ></ion-icon>
+      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Correo Electrónico"
+        label-placement="stacked" fill="outline" type="text" formControlName="email">
+        <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
       </ion-input>
 
-      <ion-input
-        class="login-outline-input ion-margin-bottom"
-        mode="md"
-        label="Contraseña"
-        label-placement="stacked"
-        fill="outline"
-        [type]="showPassword() ? 'text' : 'password'"
-        formControlName="password"
-      >
-        <ion-icon
-          name="lock-closed-outline"
-          slot="start"
-          class="input-icon"
-        ></ion-icon>
-        <ion-button
-          mode="ios"
-          slot="end"
-          fill="clear"
-          (click)="toggleShowPassword()"
-        >
-          <ion-icon
-            slot="icon-only"
-            class="input-icon"
-            [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"
-          ></ion-icon>
+      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Contraseña" label-placement="stacked"
+        fill="outline" [type]="showPassword() ? 'text' : 'password'" formControlName="password">
+        <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+        <ion-button mode="ios" slot="end" fill="clear" (click)="toggleShowPassword()">
+          <ion-icon slot="icon-only" class="input-icon"
+            [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
       </ion-input>
 
@@ -61,15 +27,11 @@
         <a routerLink="/auth/forgot-password">¿Olvidaste tu contraseña?</a>
       </div> -->
 
-      <ion-button
-        expand="block"
-        (click)="onLogin()"
-        [disabled]="loginForm.invalid"
-        class="btn-pitch"
-      >
+      <ion-button expand="block" (click)="onLogin()" [disabled]="loginForm.invalid" class="btn-pitch">
+        INICIAR SESIÓN
         @if (loadingSpinner()) {
-        <ion-spinner name="crescent"></ion-spinner>
-        } INICIAR SESIÓN
+        <ion-spinner class="ion-margin-start" name="crescent"></ion-spinner>
+        }
       </ion-button>
     </form>
 
@@ -80,5 +42,10 @@
         <a (click)="navRegister()">Regístrate aquí</a>
       </p>
     </div>
+  </div>
+
+  <div class="app-footer-credits">
+    <p>Preferente Fantasy © {{ currentYear() }}</p>
+    <p>Desarrollado por Francisco José Clavijo</p>
   </div>
 </ion-content>
