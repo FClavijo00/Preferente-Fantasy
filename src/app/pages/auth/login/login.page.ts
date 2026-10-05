@@ -52,7 +52,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   ],
   standalone: true,
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private loadingCtrl = inject(LoadingController);
@@ -65,25 +65,7 @@ export class LoginPage {
   showPassword = signal<boolean>(false);
   loginForm: FormGroup = new FormGroup({});
 
-  // Estado del formulario mediante señales
-  email = signal<string>('');
-  password = signal<string>('');
-
   currentYear = signal<number>(new Date().getFullYear());
-
-  // Validaciones reactivas computadas
-  isEmailValid = computed(() => {
-    const val = this.email().trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(val);
-  });
-
-  isPasswordValid = computed(() => {
-    return this.password().length >= 6;
-  });
-
-  // Estado global de validez del formulario
-  isFormValid = computed(() => this.isEmailValid() && this.isPasswordValid());
 
   constructor() {
     addIcons({
@@ -142,5 +124,10 @@ export class LoginPage {
     } finally {
       this.loadingSpinner.set(false);
     }
+  }
+
+  ngOnInit() {
+    this.loginForm.get('password')?.disable();
+    this.loginForm.get('email')?.disable();
   }
 }

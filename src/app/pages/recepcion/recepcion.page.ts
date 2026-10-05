@@ -158,6 +158,7 @@ export class RecepcionPage implements OnInit {
   }
 
   ngOnInit() {
-    this.cargasMisLigas();
+    //this.cargasMisLigas();
+    this.logout();
   }
 }
