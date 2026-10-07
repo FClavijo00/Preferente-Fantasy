@@ -42,7 +42,6 @@ export interface JugadorSlot {
     IonList,
     IonItem,
     IonAvatar,
-    IonIcon,
     IonSegmentButton,
     IonLabel,
     IonSegment,
@@ -50,10 +49,10 @@ export interface JugadorSlot {
     CommonModule,
     FormsModule,
     HeaderComponent,
-    PlantillaClasificacionComponent,
-  ],
+    PlantillaClasificacionComponent
+],
 })
-export class ClasificacionesPage implements OnInit {
+export class ClasificacionesPage {
   //private _clasificacionesService = inject(ClasificacionesService);
   private _loadingService = inject(LoadingService);
   private _modalCtrl = inject(ModalController);
@@ -136,6 +135,10 @@ export class ClasificacionesPage implements OnInit {
 
   cambiarTab(event: any) {
     this.tabActivo.set(event.detail.value);
+
+    if (this.tabActivo() === 'clasificacion_general') {
+      this.getRankingGeneral();
+    }
   }
 
   async cambiarJornadaFiltro(event: any) {
@@ -283,8 +286,8 @@ export class ClasificacionesPage implements OnInit {
   }
 
   async getRankingGeneral() {
+    this._loadingService.show();
     try {
-      this._loadingService.show();
       let data = {
         liga_id: this.liga?.id,
       };
@@ -321,10 +324,5 @@ export class ClasificacionesPage implements OnInit {
     });
 
     await modal.present();
-  }
-
-  ngOnInit() {
-    //this.cargarAlineacionesJornadas();
-    this.getRankingGeneral();
   }
 }
