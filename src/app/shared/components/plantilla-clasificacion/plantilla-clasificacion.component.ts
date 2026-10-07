@@ -203,7 +203,7 @@ export class PlantillaClasificacionComponent {
     }
     this._alineacionesService.cargarAlineacionesJornadas(data).subscribe({
       next: (res: any) => {
-        if (res.ok) {
+        if (res.ok && res.data.length > 0) {
           this.reconstuirSlots(res.data[0].formacion, res.data[0].jugadores);
           this._loadingService.hide();
         }
