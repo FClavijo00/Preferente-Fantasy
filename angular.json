@@ -33,7 +33,8 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
-              }
+              },
+              "src/ads.txt"
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": [],
