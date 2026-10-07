@@ -1,0 +1,168 @@
+.edit-modal-container {
+  --background: var(--ion-color-stadium);
+}
+
+.save-btn {
+  font-weight: 800;
+}
+
+/* 1. Selector de Avatar */
+.avatar-edit-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px 0 32px 0;
+
+  .avatar-wrapper {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 2px solid #00ff66;
+    box-shadow: 0 0 16px rgba(0, 255, 102, 0.3);
+    overflow: hidden;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+
+      ion-icon {
+        font-size: 1.8rem;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .change-photo-lbl {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #00ff66;
+    cursor: pointer;
+  }
+}
+
+/* 2. Inputs Personalizados */
+.edit-form {
+  .input-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 8px;
+      margin-left: 4px;
+    }
+
+    .custom-input-item {
+      --background: rgba(255, 255, 255, 0.04);
+      --border-radius: 12px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --min-height: 52px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      &.ion-touched.ion-invalid {
+        border-color: var(--ion-color-red-card);
+      }
+
+      .input-icon {
+        color: #00ff66;
+        font-size: 1.2rem;
+        margin-right: 10px;
+      }
+
+      /* ion-input {
+        --color: #ffffff;
+        --placeholder-color: rgba(255, 255, 255, 0.3);
+        font-weight: 600;
+        font-size: 0.95rem;
+      } */
+    }
+
+    .error-msg {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--ion-color-red-card);
+      margin-top: 6px;
+      margin-left: 4px;
+    }
+  }
+}
+
+.outline-input {
+  --border-color: var(--ion-color-pitch);
+  --border-radius: 10px;
+  --highlight-color-focused: #ffffff;
+  --highlight-color-valid: #ffffff;
+  --highlight-color-invalid: var(--ion-color-red-card);
+
+  ion-icon.input-icon {
+    color: var(--ion-color-pitch);
+    font-size: 1.5rem;
+  }
+}
+
+.avatar-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .avatar-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    .avatar-preview {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background-color: #f8f9fa;
+      border: 2px solid var(--ion-color-pitch);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        border-color: #4a5d4e;
+        transform: scale(1.03);
+      }
+
+      .camera-icon {
+        font-size: 28px;
+        color: var(--ion-color-stadium);
+      }
+    }
+
+    .upload-hint {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ion-color-slate-muted);
+    }
+  }
+}

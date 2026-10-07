@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrarModal()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Editar Perfil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="success" class="save-btn" (click)="guardarCambios()" [disabled]="!perfilForm.valid">
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="edit-modal-container ion-padding">
+  <!-- SELECCIÓN DE FOTO DE PERFIL -->
+  <div class="avatar-upload-container ion-margin-bottom">
+    <label for="avatarInput" class="avatar-label">
+      <div class="avatar-preview" [style.background-image]="
+          imagenPreview() ? 'url(' + imagenPreview() + ')' : null
+        ">
+        @if (!imagenPreview()) {
+        <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
+        }
+      </div>
+      <span class="upload-hint">{{
+        imagenPreview() ? "Cambiar foto" : "Añadir foto"
+        }}</span>
+    </label>
+    <input type="file" id="avatarInput" accept="image/*" (change)="onFileSelected($event)" hidden />
+  </div>
+
+  <!-- FORMULARIO DE EDICIÓN -->
+  <form [formGroup]="perfilForm" class="edit-form">
+    <!-- Nombre de Club -->
+    <div class="input-group">
+      <ion-input class="outline-input" mode="md" label="Nombre del Club" label-placement="stacked" fill="outline"
+        type="text" formControlName="nombre_club">
+        <ion-icon name="shield-outline" slot="start" class="input-icon"></ion-icon>
+      </ion-input>
+      @if (
+      perfilForm.get("nombre_club")?.touched &&
+      perfilForm.get("nombre_club")?.invalid
+      ) {
+      <span class="error-msg">El nombre del club es obligatorio (mínimo 3 caracteres).</span>
+      }
+    </div>
+
+    <!-- Nombre de Usuario -->
+    <div class="input-group">
+      <ion-input class="outline-input" mode="md" label="Nombre de Usuario" label-placement="stacked" fill="outline"
+        type="text" formControlName="nombre_usuario">
+        <ion-icon name="at-outline" slot="start" class="input-icon"></ion-icon>
+      </ion-input>
+      @if (
+      perfilForm.get("nombre_usuario")?.touched &&
+      perfilForm.get("nombre_usuario")?.invalid
+      ) {
+      <span class="error-msg">El usuario solo puede contener letras, números y guiones bajos (mín.
+        3 caracteres).</span>
+      }
+    </div>
+  </form>
+</ion-content>
