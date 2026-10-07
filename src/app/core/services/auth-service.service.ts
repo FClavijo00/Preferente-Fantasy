@@ -78,7 +78,7 @@ export class AuthService {
   }
 
   setCurrentUser(user: any) {
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('pf_user_session', JSON.stringify(user));
   }
 
   register(data: any) {
@@ -86,5 +86,17 @@ export class AuthService {
       `${this.apiUrl}/register`,
       data,
     );
+  }
+
+  cambiarPass(data: any) {
+    return this.http.post(`${this.apiUrl}/cambiarPassword`, data);
+  }
+
+  actualizarPerfil(data: any) {
+    return this.http.post(`${this.apiUrl}/actualizarUsuario`, data);
+  }
+
+  cargarPerfil(idUsuario: any) {
+    return this.http.post(`${this.apiUrl}/cargarPerfil`, { id: idUsuario });
   }
 }
