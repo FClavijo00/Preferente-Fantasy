@@ -8,7 +8,7 @@ import {
   IonButton
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { triangle, ellipse, square, home, homeOutline, shirt, shirtOutline, reader, readerOutline, podium, podiumOutline, trophy, trophyOutline } from 'ionicons/icons';
+import { triangle, ellipse, square, home, homeOutline, shirt, shirtOutline, reader, readerOutline, podium, podiumOutline, trophy, trophyOutline, personCircle, personCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -34,7 +34,9 @@ export class TabsPage {
       podium,
       podiumOutline,
       trophy,
-      trophyOutline
+      trophyOutline,
+      personCircle,
+      personCircleOutline
      });
   }
 
