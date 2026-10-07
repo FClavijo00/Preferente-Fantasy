@@ -17,8 +17,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
+  add,
   addOutline,
   arrowForwardOutline,
+  close,
   keyOutline,
   lockClosedOutline,
   peopleOutline,
@@ -75,9 +77,12 @@ export class RecepcionPage implements OnInit {
   public user: Usuario | null = this._authService.currentUser();
   public misLigas = signal<Ligas[]>([]);
 
+  public tabButtonOpen = signal<boolean>(false);
+
   constructor() {
     addIcons({
       addOutline,
+      add,
       trophyOutline,
       trophy,
       keyOutline,
@@ -85,7 +90,8 @@ export class RecepcionPage implements OnInit {
       powerOutline,
       peopleOutline,
       sparklesOutline,
-      lockClosedOutline
+      lockClosedOutline,
+      close
     });
   }
 
@@ -155,6 +161,10 @@ export class RecepcionPage implements OnInit {
 
   abrirPanelDeControl() {
     this._navCtrl.navigateRoot(['/panel-control'], { replaceUrl: true });
+  }
+
+  simularTabButton() {
+    this.tabButtonOpen.set(!this.tabButtonOpen());
   }
 
   ngOnInit() {

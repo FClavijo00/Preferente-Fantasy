@@ -31,7 +31,7 @@ ion-content.reception-background {
 }
 
 ion-fab-button.plus-button {
-  --background: rgba(0, 255, 102, 0.15);
+  /* --background: rgba(0, 255, 102, 0.15);
   --background-activated: #00ff66;
   --background-hover: #00ff66;
   --border-radius: 16px;
@@ -40,25 +40,30 @@ ion-fab-button.plus-button {
   --color-hover: #00ff66;
   --border-width: 1px;
   --border-style: solid;
-  --border-color: rgba(0, 255, 102, 0.4);
+  --border-color: rgba(0, 255, 102, 0.4); */
+
+  --background: transparent;
+  --color: var(--ion-color-pitch);
+  --border-radius: 0;
+  --box-shadow: none;
 }
 
 ion-fab-list {
-  left: -75px;
+  //left: -75px;
   ion-button {
-    --background: rgba(0, 255, 102, 0.15);
-  --background-activated: #00ff66;
-  --background-hover: #00ff66;
-  --border-radius: 16px;
-  --color: #00ff66;
-  --color-activated: #00ff66;
-  --color-hover: #00ff66;
-  --border-width: 1px;
-  --border-style: solid;
-  --border-color: rgba(0, 255, 102, 0.4);
+    /* --background: rgba(0, 255, 102, 0.15);
+    --background-activated: #00ff66;
+    --background-hover: #00ff66;
+    --border-radius: 16px;
+    --color: #00ff66;
+    --color-activated: #00ff66;
+    --color-hover: #00ff66;
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: rgba(0, 255, 102, 0.4);
     width: max-content;
     display: flex;
-    align-items: center;
+    align-items: center; */
 
     ion-icon {
       font-size: 20px;
@@ -303,17 +308,79 @@ ion-fab-list {
   }
 }
 
-.btn-logout {
-  --background: transparent;
+.btn-logout-neon {
   position: absolute;
   top: 10px;
   right: 10px;
+  --color: var(--ion-color-red-card);
+  --background: rgba(255, 0, 0, 0.1);
+  --background-activated: var(--ion-color-red-card);
+  --background-hover: var(--ion-color-red-card);
+  --color-activated: var(--ion-color-red-card);
+  --color-hover: var(--ion-color-red-card);
+  --border-radius: 50%;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 0, 0, 0.4);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  --padding-bottom: 10px;
+  --padding-end: 12px;
+  --padding-start: 12px;
+  --padding-top: 10px;
 }
 
-.btn-panel {
-  --background: transparent;
+.btn-fab-neon {
   position: absolute;
   top: 10px;
   left: 10px;
-  --color: var(--ion-color-pitch);
+  --background: rgba(0, 255, 102, 0.15);
+  --background-activated: #00ff66;
+  --background-hover: #00ff66;
+  --color: #00ff66;
+  --color-activated: #00ff66;
+  --color-hover: #00ff66;
+  --border-radius: 50%;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(0, 255, 102, 0.4);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  --padding-bottom: 10px;
+  --padding-end: 12px;
+  --padding-start: 12px;
+  --padding-top: 10px;
+}
+
+.div-simulate-tab-buttons {
+  position: absolute;
+  top: 65px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+
+  ion-button {
+    --background: rgba(15, 20, 25, 0.75);
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --color: #ffffff;
+    --color-activated: #ffffff;
+    --color-hover: #ffffff;
+    --border-radius: 16px;
+    --background-activated: rgba(15, 20, 25, 1);
+    --background-hover: rgba(15, 20, 25, 1);
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(12px);
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+    margin: 0px;
+  }
 }

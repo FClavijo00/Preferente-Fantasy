@@ -1,16 +1,68 @@
 <ion-content class="ion-padding reception-background">
   <!-- Botones de accion - PANEL ADMIN - LOGOUT -->
-  @if (user?.rol_id === 1) {
-  <ion-button mode="ios" fill="clear" (click)="abrirPanelDeControl()" class="btn-panel">
-    <ion-icon slot="icon-only" name="sparkles-outline"></ion-icon>
+
+  <!-- El resto de tu interfaz de selección de ligas -->
+  <!-- <ion-fab class="ion-margin-bottom" vertical="top" horizontal="start" mode="ios">
+    <ion-fab-button class="plus-button">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="bottom">
+      @if (user?.rol_id === 1) {
+      <ion-button (click)="abrirPanelDeControl()">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label>Panel de Control</ion-label>
+      </ion-button>
+      }
+      <ion-button (click)="crearCampeonato()">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <ion-label>Crear Campeonato</ion-label>
+      </ion-button>
+      <ion-button (click)="unirseCampeonato()">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <ion-label>Unirse a Campeonato</ion-label>
+      </ion-button>
+    </ion-fab-list>
+  </ion-fab> -->
+
+  <ion-button
+    mode="ios"
+    class="btn-fab-neon"
+    (click)="simularTabButton()"
+  >
+    @if (tabButtonOpen() === true) {
+    <ion-icon name="close"></ion-icon>
+    } @else {
+    <ion-icon name="add"></ion-icon>
+    }
   </ion-button>
+
+  @if (tabButtonOpen() === true) {
+  <div class="div-simulate-tab-buttons">
+    <ion-button (click)="abrirPanelDeControl()" mode="ios" >
+      <ion-icon slot="start" name="sparkles-outline"></ion-icon>
+      Panel de Control
+    </ion-button>
+    <ion-button (click)="crearCampeonato()" mode="ios">
+      <ion-icon slot="start" name="trophy-outline"></ion-icon>
+      Crear Campeonato
+    </ion-button>
+    <ion-button (click)="unirseCampeonato()" mode="ios">
+      <ion-icon slot="start" name="trophy-outline"></ion-icon>
+      Unirse a Campeonato
+    </ion-button>
+  </div>
+
   }
 
-  <ion-button mode="ios" fill="clear" (click)="logout()" class="btn-logout">
-    <ion-icon color="danger" slot="icon-only" name="power-outline"></ion-icon>
+  <ion-button mode="ios" (click)="logout()" class="btn-logout-neon">
+    <ion-icon name="power-outline"></ion-icon>
   </ion-button>
   <div class="brand-section ion-text-center">
-    <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="auth-logo" />
+    <img
+      src="assets/images/pf-logo-v2.svg"
+      alt="Preferente Fantasy"
+      class="auth-logo"
+    />
     <h1 class="fantasy-title">PREFERENTE FANTASY</h1>
     <p class="auth-subtitle">Crea tu campeonato o únete a uno existente</p>
   </div>
@@ -39,7 +91,8 @@
       <!-- Footer de la tarjeta: Acceso rápido -->
       <div class="card-footer">
         <span class="status-indicator">
-          <span class="dot"></span> Liga {{ liga.privada ? `Privada (Código: ${liga.codigo_acceso})` : 'Publica' }}
+          <span class="dot"></span> Liga {{ liga.privada ? `Privada (Código:
+          ${liga.codigo_acceso})` : 'Publica' }}
         </span>
         <button class="btn-enter">
           Entrar <ion-icon name="arrow-forward-outline"></ion-icon>
@@ -52,21 +105,4 @@
     </div>
     }
   </div>
-
-  <!-- El resto de tu interfaz de selección de ligas -->
-  <ion-fab class="ion-margin-bottom" vertical="bottom" horizontal="center">
-    <ion-fab-button class="plus-button">
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="top">
-      <ion-button (click)="crearCampeonato()">
-        <ion-icon name="trophy-outline"></ion-icon>
-        <ion-label>Crear Campeonato</ion-label>
-      </ion-button>
-      <ion-button (click)="unirseCampeonato()">
-        <ion-icon name="trophy-outline"></ion-icon>
-        <ion-label>Unirse a Campeonato</ion-label>
-      </ion-button>
-    </ion-fab-list>
-  </ion-fab>
 </ion-content>
