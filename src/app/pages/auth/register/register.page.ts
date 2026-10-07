@@ -138,6 +138,7 @@ export class RegisterPage implements OnInit {
     }
 
     this.loadingSpinner.set(true);
+    this._loadingService.show('Registrando usuario...');
 
     try {
       const formData = new FormData();
@@ -161,13 +162,15 @@ export class RegisterPage implements OnInit {
       );
       if (response) {
         this.loadingSpinner.set(false);
+        this._loadingService.hide();
         this._toastService.showSuccessToast('Usuario creado con éxito.');
         this._navCtrl.navigateBack('/login');
       }
-    } catch (error) {
+    } catch (error: any) {
       this.loadingSpinner.set(false);
+      this._loadingService.hide();
       this._toastService.showErrorToast(
-        'Error al registrar el usuario.',
+        error.error.message || 'Ha ocurrido un error.',
       );
     } finally {
       this.loadingSpinner.set(false);
