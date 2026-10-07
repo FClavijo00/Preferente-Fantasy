@@ -4,6 +4,7 @@ ion-header {
   ion-toolbar {
     --background: var(--ion-color-stadium);
     --color: var(--ion-color-pitch);
+    padding: 5px 0px;
     img {
         width: 40px;
       }
@@ -14,6 +15,10 @@ ion-header {
       img {
         width: 40px;
       }
+    }
+
+    span {
+      color: #cecece !important;
     }
   }
 }

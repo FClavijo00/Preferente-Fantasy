@@ -12,8 +12,18 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronBackOutline, informationCircleOutline, trophyOutline } from 'ionicons/icons';
-import { LigasService } from '../../../core/services/ligas.service';
+import { Ligas, LigasService } from '../../../core/services/ligas.service';
 import { InfoPuntuacionComponent } from '../../modals/info-puntuacion/info-puntuacion.component';
+
+interface Liga {
+  id: number;
+  nombre: string;
+  codigo_acceso: string | null;
+  nombre_competicion: string;
+  privada: boolean;
+  total_participantes: number;
+}
+
 
 @Component({
   selector: 'app-header',
@@ -32,6 +42,8 @@ export class HeaderComponent {
   private _navCtrl = inject(NavController);
   private _ligasService = inject(LigasService);
   private _modalCtrl = inject(ModalController);
+
+  public liga: Ligas | null = this._ligasService.ligaSeleccionada();
 
   constructor() {
     addIcons({
