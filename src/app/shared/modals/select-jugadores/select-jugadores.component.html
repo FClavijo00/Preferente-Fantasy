@@ -28,7 +28,7 @@
       <div class="escudo-wrapper">
         <img [src]="equipo.escudo" [alt]="equipo.nombre" />
         @if (conteoPorEquipo().get(equipo.id); as count) {
-        <span class="count-badge" [class.max]="count >= 3">{{ count }}/3</span>
+        <span class="count-badge" [class.max]="count >= 2">{{ count }}/2</span>
         }
       </div>
       <!-- <span class="equipo-label">{{ equipo.nombre }}</span> -->
@@ -67,7 +67,7 @@
         </div>
 
         @if (estaBloqueado) {
-        <span class="blocked-badge">Máx 3/3</span>
+        <span class="blocked-badge">Máx 2/2</span>
         }
       </div>
     </div>

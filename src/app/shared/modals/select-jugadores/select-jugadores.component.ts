@@ -107,12 +107,12 @@ export class SelectJugadoresComponent implements OnInit {
   }
 
   esEquipoBloqueado(equipoId: number): boolean {
-    return (this.conteoPorEquipo().get(equipoId) || 0) >= 3;
+    return (this.conteoPorEquipo().get(equipoId) || 0) >= 2;
   }
 
   seleccionarJugador(jugador: JugadorMercado) {
     if (this.esEquipoBloqueado(jugador.equipo_id)) {
-      return; // Bloqueado si el club ya tiene 3 elegidos
+      return; // Bloqueado si el club ya tiene 2 elegidos
     }
     this._modalCtrl.dismiss(jugador, 'confirm');
   }

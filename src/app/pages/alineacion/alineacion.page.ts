@@ -282,10 +282,10 @@ export class AlineacionPage implements OnInit {
     mensaje?: string;
   } {
     const conteoActual = this.conteoEquipos().get(nuevoJugador.equipo_id) || 0;
-    if (conteoActual >= 3) {
+    if (conteoActual >= 2) {
       return {
         valido: false,
-        mensaje: `Ya tienes 3 jugadores de ${nuevoJugador.equipo_nombre} en tu 11.`,
+        mensaje: `Ya tienes 2 jugadores de ${nuevoJugador.equipo_nombre} en tu 11.`,
       };
     }
     return { valido: true };
