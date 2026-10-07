@@ -13,6 +13,9 @@
  * App Variables
  */
 @forward './theme/index.scss';
+/* Importing Bootstrap SCSS file. */
+
+@use "bootstrap/scss/bootstrap";
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
@@ -41,8 +44,7 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-/* Importing Bootstrap SCSS file. */
-@import "bootstrap/scss/bootstrap";
+
 
 /* ion-content {
   --padding-top: env(safe-area-inset-top);
