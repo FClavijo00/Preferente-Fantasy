@@ -23,11 +23,12 @@
         </ion-button>
       </ion-input>
 
-      <!-- <div class="forgot-password ion-text-end ion-margin-bottom">
-        <a routerLink="/auth/forgot-password">¿Olvidaste tu contraseña?</a>
-      </div> -->
+      <!-- <div class="forgot-password ion-display-flex ion-justify-content-center ion-margin-bottom">
+        <a (click)="cambiarPass()">¿Cambiar contraseña?</a> -->
+        <!-- <a routerLink="/auth/forgot-password">¿Olvidaste tu contraseña?</a> -->
+      <!-- </div> -->
 
-      <ion-button expand="block" (click)="onLogin()" [disabled]="true" class="btn-pitch">
+      <ion-button expand="block" (click)="onLogin()" [disabled]="loginForm.invalid" class="neon-button">
         INICIAR SESIÓN
         @if (loadingSpinner()) {
         <ion-spinner class="ion-margin-start" name="crescent"></ion-spinner>
@@ -45,13 +46,13 @@
 
     <div class="auth-footer ion-text-center ion-margin-top">
       <p>
-        ESTAMOS REALIZANDO LAS ÚLTIMAS PRUEBAS PARA EL LANZAMIENTO. ESTAD ATENTOS A: <a>@preferente-fantasy</a>
+        ESTAMOS REALIZANDO LAS ÚLTIMAS PRUEBAS PARA EL LANZAMIENTO. ESTAD ATENTOS A: <a>@preferentefantasy</a>
       </p>
     </div>
   </div>
 
   <div class="app-footer-credits">
-    <p>Preferente Fantasy © {{ currentYear() }}</p>
+    <p>Preferente Fantasy v1.0 © {{ currentYear() }}</p>
     <p>Desarrollado por Francisco José Clavijo</p>
   </div>
 </ion-content>

@@ -21,6 +21,7 @@ import {
   IonInput,
   NavController,
   IonSpinner,
+  ModalController,
 } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
@@ -34,6 +35,8 @@ import { ToastService } from '../../../core/services/toast.service';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/services/auth-service.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CambiarPasswordComponent } from '../../../shared/modals/cambiar-password/cambiar-password.component';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-login',
@@ -52,14 +55,13 @@ import { HttpErrorResponse } from '@angular/common/http';
   ],
   standalone: true,
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private loadingCtrl = inject(LoadingController);
-  private toastCtrl = inject(ToastController);
   private _navCtrl = inject(NavController);
   private _toastService = inject(ToastService);
   private _authService = inject(AuthService);
+  private _modalCtrl = inject(ModalController);
+  private _loadingService = inject(LoadingService);
 
   loadingSpinner = signal<boolean>(false);
   showPassword = signal<boolean>(false);
@@ -81,6 +83,15 @@ export class LoginPage implements OnInit {
     });
   }
 
+  async cambiarPass() {
+    const modal = await this._modalCtrl.create({
+      component: CambiarPasswordComponent,
+      cssClass: 'card-modal-center',
+      backdropDismiss: true,
+    });
+    await modal.present();
+  }
+
   navRegister() {
     this._navCtrl.navigateForward('/register');
   }
@@ -97,37 +108,48 @@ export class LoginPage implements OnInit {
       );
       return;
     }
+    this._loadingService.show('Iniciando sesión...');
 
     try {
-      this._authService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe({
-        next: async (resp: any) => {
-          if (resp.ok) {
-            this._authService.clearSession();
+      this._authService
+        .login(this.loginForm.value.email, this.loginForm.value.password)
+        .subscribe({
+          next: async (resp: any) => {
+            if (resp.ok) {
+              this._authService.clearSession();
 
-            this._authService.setSession(resp.data.usuario, resp.data.token);
+              this._authService.setSession(resp.data.usuario, resp.data.token);
 
-            this.loadingSpinner.set(false);
+              this.loadingSpinner.set(false);
+              this._loadingService.hide();
 
-            this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
-            this._toastService.showSuccessToast('Inicio de sesión exitoso.');
-          }
-        }, error: (error: HttpErrorResponse | any) => {
-          if (error.status === 401) {
-            this.loadingSpinner.set(false);
-            this._toastService.showErrorToast('Usuario o contraseña incorrectos.. Revisa tus credenciales.');
-          } else {
-            this.loadingSpinner.set(false);
-            this._toastService.showErrorToast('Ha ocurrido un error inesperado. Pruebe de nuevo.');
-          }
-        }
-      });
+              if (resp.data.usuario.rol_id === 1) {
+                this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
+                this._toastService.showSuccessToast(
+                  'Inicio de sesión exitoso.',
+                );
+              }
+            }
+          },
+          error: (error: HttpErrorResponse | any) => {
+            if (error.status === 401) {
+              this.loadingSpinner.set(false);
+              this._loadingService.hide();
+              this._toastService.showErrorToast(
+                error.error.message ||
+                'Credenciales erroneas. Pruebe de nuevo.',
+              );
+            } else {
+              this.loadingSpinner.set(false);
+              this._loadingService.hide();
+              this._toastService.showErrorToast(
+                'Ha ocurrido un error inesperado. Pruebe de nuevo.',
+              );
+            }
+          },
+        });
     } finally {
       this.loadingSpinner.set(false);
     }
-  }
-
-  ngOnInit() {
-    this.loginForm.get('password')?.disable();
-    this.loginForm.get('email')?.disable();
   }
 }

@@ -50,6 +50,23 @@ ion-content {
       --border-radius: 10px;
     }
 
+    ion-button.neon-button {
+      --background: rgba(0, 255, 102, 0.15);
+      --background-activated: #00ff66;
+      --background-hover: #00ff66;
+      --color: #00ff66;
+      --color-activated: #00ff66;
+      --color-hover: #00ff66;
+      --border-width: 1px;
+      --border-style: solid;
+      --border-color: rgba(0, 255, 102, 0.4);
+      font-size: 0.9rem;
+      font-weight: 800;
+      --border-radius: 10px;
+      letter-spacing: 0.5px;
+      height: 40px;
+    }
+
     a {
       color: var(--ion-color-pitch);
       text-decoration: none;
