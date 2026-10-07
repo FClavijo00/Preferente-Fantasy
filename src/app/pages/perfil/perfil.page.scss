@@ -1,0 +1,132 @@
+.perfil-container {
+  --background: var(--ion-color-stadium);
+}
+
+/* 1. Card del Usuario */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  .avatar-container {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border-radius: 50%;
+    padding: 2px;
+    border: 2px solid #00ff66;
+    box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+    background: rgba(0, 0, 0, 0.4);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+
+  .user-details {
+    overflow: hidden;
+
+    .club-name {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-name {
+      margin: 4px 0 0 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #00ff66;
+    }
+  }
+}
+
+/* 2. Titulares de Sección */
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 8px 8px;
+}
+
+/* 3. Lista de Opciones */
+.options-list {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 24px;
+
+  .option-item {
+    --background: rgba(255, 255, 255, 0.03);
+    --border-radius: 14px;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --inner-padding-end: 0;
+    --min-height: 56px;
+    margin-bottom: 8px;
+    //border: 1px solid rgba(255, 255, 255, 0.05);
+
+    .icon-accent {
+      font-size: 1.3rem;
+      color: #00ff66;
+      margin-right: 12px;
+    }
+
+    .icon-instagram {
+      font-size: 1.3rem;
+      color: #e1306c;
+      margin-right: 12px;
+    }
+
+    ion-label {
+      h2 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 2px 0;
+      }
+
+      p {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin: 0;
+      }
+    }
+  }
+}
+
+/* 4. Botón Cerrar Sesión y Versión */
+.logout-container {
+  margin-top: 16px;
+
+  .logout-btn {
+    --border-radius: 14px;
+    --border-width: 1px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+}
+
+.app-version {
+  text-align: center;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 24px;
+  margin-bottom: 12px;
+}

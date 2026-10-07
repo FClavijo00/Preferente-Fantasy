@@ -27,6 +27,11 @@ export const routes: Routes = [
           import('../clasificaciones/clasificaciones.page').then((m) => m.ClasificacionesPage),
       },
       {
+        path: 'perfil',
+        loadComponent: () =>
+          import('../perfil/perfil.page').then((m) => m.PerfilPage),
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full',

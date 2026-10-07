@@ -1,0 +1,74 @@
+<app-header titulo="Perfil"></app-header>
+
+<ion-content class="perfil-container ion-padding">
+
+  <!-- CARD PRINCIPAL DEL USUARIO -->
+  <div class="profile-card">
+    <div class="avatar-container">
+      <img 
+        [src]="user()?.image_url || 'assets/images/default-player.png'" 
+        [alt]="user()?.nombre_club || 'Foto perfil'" />
+    </div>
+    <div class="user-details">
+      <h2 class="club-name">{{ user()?.nombre_club || 'Mi Club' }}</h2>
+      <p class="user-name">&#64;{{ user()?.nombre_usuario || 'usuario' }}</p>
+    </div>
+  </div>
+
+  <!-- SECCIÓN: MI CUENTA -->
+  <div class="section-title">Mi Cuenta</div>
+  <ion-list class="options-list" lines="none">
+    
+    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirEditarPerfil()">
+      <ion-icon name="create-outline" slot="start" class="icon-accent"></ion-icon>
+      <ion-label>
+        <h2>Editar Perfil</h2>
+        <p>Foto, usuario y nombre del club</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirCambiarPassword()">
+      <ion-icon name="lock-closed-outline" slot="start" class="icon-accent"></ion-icon>
+      <ion-label>
+        <h2>Cambiar Contraseña</h2>
+        <p>Actualiza tu clave de acceso</p>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+  <!-- SECCIÓN: COMUNIDAD Y SOPORTE -->
+  <div class="section-title">Comunidad</div>
+  <ion-list class="options-list" lines="none">
+
+    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirInstagram()">
+      <ion-icon name="logo-instagram" slot="start" class="icon-instagram"></ion-icon>
+      <ion-label>
+        <h2>Contacto</h2>
+        <p>&#64;preferentefantasy</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item disabled mode="ios" button detail="true" class="option-item" (click)="abrirBasesReglamento()">
+      <ion-icon name="document-text-outline" slot="start" class="icon-accent"></ion-icon>
+      <ion-label>
+        <h2>Reglamento de la Liga</h2>
+        <p>Sistema de puntos y normas</p>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+  <!-- BOTÓN CERRAR SESIÓN -->
+  <div class="logout-container">
+    <ion-button expand="block" fill="outline" color="danger" class="logout-btn" (click)="cerrarSesion()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar Sesión
+    </ion-button>
+  </div>
+
+  <div class="app-version">
+    Preferente Fantasy v1.0.0
+  </div>
+
+</ion-content>
