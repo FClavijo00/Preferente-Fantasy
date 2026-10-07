@@ -70,7 +70,7 @@ export class EditarPerfilComponent implements OnInit {
         [
           Validators.required,
           Validators.minLength(3),
-          Validators.pattern('^[a-zA-Z0-9_]+$'),
+          /* Validators.pattern('^[a-zA-Z0-9_]+$'), */
         ],
       ],
       foto: [null],
