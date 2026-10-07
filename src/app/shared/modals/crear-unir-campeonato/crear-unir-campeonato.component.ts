@@ -27,6 +27,7 @@ import { LigasService } from '../../../core/services/ligas.service';
 import { AuthService } from '../../../core/services/auth-service.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LoadingService } from '../../../core/services/loading.service';
 
 export interface Ligas {
   id: number;
@@ -62,6 +63,7 @@ export class CrearUnirCampeonatoComponent implements OnInit {
   private _authService = inject(AuthService);
   private _toastService = inject(ToastService);
   private _formBuilder = inject(FormBuilder);
+  private _loadingService = inject(LoadingService);
 
   public user: any | null = null;
 
@@ -98,34 +100,41 @@ export class CrearUnirCampeonatoComponent implements OnInit {
   }
 
   unirseALigaXCodigo(codigo: string) {
+    this._loadingService.show();
     let data = {
       codigo: codigo,
       userId: this.user.id,
     };
     this._ligasService.unirseALiga(data).subscribe({
       next: (data: any) => {
-        console.log(data);
+        this._loadingService.hide();
+        this._toastService.showSuccessToast(data.message);
+        this._modalCtrl.dismiss(data, 'confirm');
       },
       error: (error) => {
         if (error.status === 404) {
           this._toastService.showErrorToast(error.error.message);
+          this.cerrarModal();
         }
       },
     });
   }
 
   unirseALiga(liga: any) {
+    this._loadingService.show();
     let data = {
       ligaId: liga.id,
       userId: this.user.id,
     };
     this._ligasService.unirseALiga(data).subscribe({
       next: (data: any) => {
+        this._loadingService.hide();
         this._toastService.showSuccessToast(data.message);
         this._modalCtrl.dismiss(data, 'confirm');
       },
       error: (error) => {
         if (error.status === 404) {
+          this._loadingService.hide();
           this._toastService.showErrorToast(error.error.message);
           this.cerrarModal();
         }
