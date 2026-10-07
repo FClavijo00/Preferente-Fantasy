@@ -143,6 +143,7 @@ export class CrearUnirCampeonatoComponent implements OnInit {
   }
 
   crearCampeonato() {
+    this._loadingService.show();
     let data = {
       nombre_campeonato: this.campeonatoForm.value.nombre_campeonato,
       privado: this.campeonatoForm.value.privado,
@@ -150,11 +151,13 @@ export class CrearUnirCampeonatoComponent implements OnInit {
     };
     this._ligasService.crearLiga(data).subscribe({
       next: (data: any) => {
+        this._loadingService.hide();
         this._toastService.showSuccessToast(data.message);
         this._modalCtrl.dismiss(data, 'confirm');
       },
       error: (error) => {
         if (error.status === 404) {
+          this._loadingService.hide();
           this._toastService.showErrorToast(error.error.message);
           this.cerrarModal();
         }
