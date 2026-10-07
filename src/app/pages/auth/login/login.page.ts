@@ -123,12 +123,14 @@ export class LoginPage {
               this.loadingSpinner.set(false);
               this._loadingService.hide();
 
-              if (resp.data.usuario.rol_id === 1) {
+              /* if (resp.data.usuario.rol_id === 1) {
                 this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
                 this._toastService.showSuccessToast(
                   'Inicio de sesión exitoso.',
                 );
-              }
+              } */
+              this._navCtrl.navigateRoot('/recepcion', { replaceUrl: true });
+              this._toastService.showSuccessToast('Inicio de sesión exitoso.');
             }
           },
           error: (error: HttpErrorResponse | any) => {
@@ -137,7 +139,7 @@ export class LoginPage {
               this._loadingService.hide();
               this._toastService.showErrorToast(
                 error.error.message ||
-                'Credenciales erroneas. Pruebe de nuevo.',
+                  'Credenciales erroneas. Pruebe de nuevo.',
               );
             } else {
               this.loadingSpinner.set(false);
