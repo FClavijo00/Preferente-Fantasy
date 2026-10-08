@@ -38,10 +38,12 @@
 
   @if (tabButtonOpen() === true) {
   <div class="div-simulate-tab-buttons">
-    <ion-button (click)="abrirPanelDeControl()" mode="ios" >
+    @if (user?.rol_id === 1) {
+    <ion-button (click)="abrirPanelDeControl()" mode="ios">
       <ion-icon slot="start" name="sparkles-outline"></ion-icon>
       Panel de Control
     </ion-button>
+    }
     <ion-button (click)="crearCampeonato()" mode="ios">
       <ion-icon slot="start" name="trophy-outline"></ion-icon>
       Crear Campeonato
