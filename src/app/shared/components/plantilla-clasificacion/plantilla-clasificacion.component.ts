@@ -91,8 +91,9 @@ export class PlantillaClasificacionComponent {
     );
 
     const jornadaCerrada = jornadaActual && jornadaActual.estado === 'CERRADA';
+    const jornadaEnJuego = jornadaActual && jornadaActual.estado === 'EN_JUEGO';
 
-    if (jornadaCerrada) {
+    if (jornadaCerrada || jornadaEnJuego) {
       const modal = await this._modalCtrl.create({
         component: DetalleJugadorJornadaComponent,
         cssClass: 'card-modal-center', // Clase CSS para estilizar el modal
