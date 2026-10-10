@@ -1,0 +1,210 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <div class="brand-header" slot="start">
+      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy Logo" class="brand-logo" />
+      <span class="brand-title">PREFERENTE <span class="highlight">FANTASY</span></span>
+    </div>
+    <!-- <ion-buttons slot="end">
+      <ion-button fill="clear" color="dark" routerLink="/login" class="nav-login-btn">
+        Iniciar Sesión
+      </ion-button>
+    </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="landing-content">
+  <div class="landing-wrapper">
+    <div class="main-body">
+      <!-- HERO SECTION -->
+      <section class="hero-section">
+        <div class="hero-badge">Temporada 2026/2027</div>
+        <h1 class="hero-title">
+          La experiencia Fantasy de tu
+          <span class="text-neon">Fútbol Provincial</span>
+        </h1>
+        <p class="hero-subtitle actualmente">
+          * Actualmente solo disponible para la 1ª Andaluza de Jaén *
+        </p>
+        <p class="hero-subtitle">
+          Únete a una liga pública y crea tu propia liga privada con tus amigos,
+          crea tu 11 ideal cada jornada y demuestra quién sabe más de la categoría.
+        </p>
+
+        <div class="hero-actions">
+          <ion-button (click)="jugarAhora()" color="success" class="cta-btn primary-cta">
+            <ion-icon name="football-outline" slot="start"></ion-icon>
+            Jugar Ahora
+          </ion-button>
+          <!-- Botón Desplegable -->
+          <button type="button" class="saber-mas-btn" (click)="toggleInfo()">
+            <span>{{ mostrarInfo() ? 'Ocultar detalles' : 'Saber más' }}</span>
+            <ion-icon [name]="mostrarInfo() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+          </button>
+        </div>
+      </section>
+
+      @if (mostrarInfo()) {
+      <div class="expandable-content">
+        <!-- FEATURES / CARACTERÍSTICAS -->
+        <section id="features" class="features-section">
+          <div class="section-header">
+            <h2>¿Cómo funciona Preferente Fantasy?</h2>
+            <p>Todo lo que necesitas para dominar tu liga del fútbol de nuestra tierra</p>
+          </div>
+
+          <div class="features-grid">
+
+            <div class="feature-card">
+              <div class="icon-box">
+                <ion-icon name="trophy-outline"></ion-icon>
+              </div>
+              <h3>Ligas Privadas y Públicas</h3>
+              <p>
+                Compite cara a cara contra tus amigos o mide tu rendimiento en la
+                clasificación general de alguna liga pública creada por tu comunidad.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="icon-box">
+                <ion-icon name="home-outline"></ion-icon>
+              </div>
+              <h3>Toda la información aquí</h3>
+              <p>
+                Tendrás al alcance de tu mano toda la información de la competición
+                (calendario, actas, clasificación y rankings de puntos).
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="icon-box">
+                <ion-icon name="people-outline"></ion-icon>
+              </div>
+              <h3>Crea tu Plantilla</h3>
+              <p>
+                Con un límite de 2 jugadores por equipo, y confecciona tu
+                11 ideal para cada jornada demostrando tu conocimiento.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="icon-box">
+                <ion-icon name="stats-chart-outline"></ion-icon>
+              </div>
+              <h3>Puntuaciones</h3>
+              <p>
+                Consigue puntos basados en las actas oficiales con total
+                acceso a las mismas y al detalle de cada jugador.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="icon-box">
+                <ion-icon name="shirt-outline"></ion-icon>
+              </div>
+              <h3>Equipos</h3>
+              <p>
+                Tendrás acceso a una sección con todos los equipos de la
+                competición y sus jugadores.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- DEMO / SCREENSHOTS SECTION -->
+        <section class="preview-section">
+          <div class="preview-card">
+            <div class="preview-info">
+              <h2>Diseñado para móviles y web</h2>
+              <p>
+                Accede desde tu navegador o instálalo como App en tu dispositivo
+                móvil sin necesidad de descargas pesadas.
+              </p>
+              <ul class="check-list">
+                <li>
+                  <ion-icon name="checkmark-circle-outline"></ion-icon> Campo
+                  interactivo para organizar tu 11 titular
+                </li>
+                <li>
+                  <ion-icon name="checkmark-circle-outline"></ion-icon> Seguimiento
+                  de actas y jornadas al detalle
+                </li>
+                <li>
+                  <ion-icon name="checkmark-circle-outline"></ion-icon> Interfaz
+                  rápida optimizada con diseño neón oscuro
+                </li>
+              </ul>
+            </div>
+            <div class="preview-mockup">
+              <div class="mockup-screen">
+                <div class="mockup-pitch">
+                  <div class="pitch-dots">
+
+                    <!-- Delanteros (1-4-4-2: 2 Jugadores) -->
+                    <div class="line-row row-fw">
+                      <div class="dot dot-fw1"></div>
+                      <div class="dot dot-fw2"></div>
+                    </div>
+
+                    <!-- Centrocampistas (1-4-4-2: 4 Jugadores) -->
+                    <div class="line-row row-mf">
+                      <div class="dot dot-mf1"></div>
+                      <div class="dot dot-mf2"></div>
+                      <div class="dot dot-mf3"></div>
+                      <div class="dot dot-mf4"></div>
+                    </div>
+
+                    <!-- Defensas (1-4-4-2: 4 Jugadores) -->
+                    <div class="line-row row-df">
+                      <div class="dot dot-df1"></div>
+                      <div class="dot dot-df2"></div>
+                      <div class="dot dot-df3"></div>
+                      <div class="dot dot-df4"></div>
+                    </div>
+
+                    <!-- Portero (1 Jugador) -->
+                    <div class="line-row row-gk">
+                      <div class="dot dot-gk"></div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SOBRE NOSOTROS Y REGLAMENTO -->
+        <section class="about-section">
+          <h2>Transparencia y Comunidad</h2>
+          <p>
+            Preferente Fantasy nace del sueño de un futbolista de la provincia de
+            aparecer en una aplicación Fantasy, y de la pasión por el fútbol modesto y regional.
+            Nuestra misión es dar visibilidad a los clubes y jugadores de la
+            categoría mediante una plataforma interactiva, gratuita y divertida.
+          </p>
+        </section>
+      </div>
+
+      }
+    </div>
+  </div>
+
+  <!-- FOOTER (IMPRESCINDIBLE PARA GOOGLE ADSENSE) -->
+  <footer class="landing-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <p class="brand-text">PREFERENTE <span>FANTASY</span></p>
+        <p class="copyright">&copy; 2026 Preferente Fantasy. Todos los derechos reservados.</p>
+      </div>
+
+      <div class="footer-links">
+        <a (click)="abrirPolitica()">Política de Privacidad</a>
+        <a (click)="abrirTerminos()">Términos de Servicio</a>
+        <a href=" https://instagram.com/preferentefantasy" target="_blank" rel="noopener">
+          <ion-icon name="logo-instagram"></ion-icon> &#64;preferentefantasy
+        </a>
+      </div>
+    </div>
+  </footer>
+</ion-content>

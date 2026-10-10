@@ -1,0 +1,593 @@
+ion-toolbar {
+  --background: #0d1117;
+  --color: #ffffff;
+}
+
+.landing-content {
+  --background: #0d1117;
+  color: #ffffff;
+}
+
+/* Layout para Footer siempre abajo */
+.landing-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 79%;
+}
+
+.main-body {
+  flex: 1 0 auto;
+}
+
+/* Header */
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+
+  .brand-logo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-title {
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+
+    .highlight {
+      color: #00ff66;
+    }
+  }
+}
+
+.nav-login-btn {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* 1. Hero Section */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px 20px 30px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(0, 255, 102, 0.1);
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    border-radius: 20px;
+    color: #00ff66;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin: 0 0 16px 0;
+
+    .text-neon {
+      color: #00ff66;
+      text-shadow: 0 0 16px rgba(0, 255, 102, 0.3);
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    max-width: 600px;
+
+    &.actualmente {
+      margin: 0 0 6px 0 !important;
+      font-size: 0.8rem;
+    }
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 280px;
+
+    .primary-cta {
+      width: 100%;
+      --border-radius: 14px;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      --box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+    }
+
+    .cta-link {
+      color: rgba(255, 255, 255, 0.5);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #00ff66;
+      }
+    }
+
+    /* Botón Saber Más */
+    .saber-mas-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 20px;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease;
+
+      ion-icon {
+        font-size: 1.1rem;
+        color: #00ff66;
+      }
+
+      &:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+}
+
+/* Animación del contenido desplegable */
+.expandable-content {
+  animation: expandFade 0.4s ease-out forwards;
+}
+
+@keyframes expandFade {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 2. Features Grid */
+.features-section {
+  padding: 0px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 36px;
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 24px;
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        border-color: rgba(0, 255, 102, 0.3);
+      }
+
+      .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(0, 255, 102, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+
+        ion-icon {
+          font-size: 1.5rem;
+          color: #00ff66;
+        }
+      }
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin: 0 0 8px 0;
+      }
+
+      p {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.4;
+        margin: 0;
+      }
+    }
+  }
+}
+
+/* 3. Preview Section */
+.preview-section {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto 40px auto;
+
+  .preview-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 48px;
+    }
+
+    .preview-info {
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0 0 12px 0;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+
+      .check-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 10px;
+
+          ion-icon {
+            color: #00ff66;
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+
+    /* .preview-mockup {
+      display: flex;
+      justify-content: center;
+
+      .mockup-screen {
+        width: 100%;
+        max-width: 260px;
+        height: 320px;
+        background: #161b22;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+        .mockup-pitch {
+          width: 100%;
+          height: 100%;
+          background: #112818;
+          border: 1px solid rgba(0, 255, 102, 0.3);
+          border-radius: 14px;
+          position: relative;
+          padding: 10px;
+
+          .pitch-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #00ff66;
+            text-transform: uppercase;
+          }
+
+          .pitch-dots {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+
+            .dot {
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+              background: #00ff66;
+              box-shadow: 0 0 8px #00ff66;
+            }
+          }
+        }
+      }
+    } */
+
+    .preview-mockup {
+      display: flex;
+      justify-content: center;
+
+      .mockup-screen {
+        width: 100%;
+        max-width: 260px;
+        height: 320px;
+        background: #161b22;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+        .mockup-pitch {
+          width: 100%;
+          height: 100%;
+          background: #112818;
+          border: 1px solid rgba(0, 255, 102, 0.3);
+          border-radius: 14px;
+          position: relative;
+          padding: 16px 12px;
+          box-sizing: border-box;
+
+          /* Contenedor Grid táctico (4 líneas de juego) */
+          .pitch-dots {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: repeat(
+              4,
+              1fr
+            ); /* 4 filas: Delanteros, Medios, Defensas, Portero */
+            align-items: center;
+            justify-items: center;
+
+            .line-row {
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              width: 100%;
+
+              &.row-fw {
+                padding: 0 24%; /* Junta un poco más a los dos delanteros centro */
+              }
+
+              &.row-gk {
+                justify-content: center;
+              }
+            }
+
+            /* Estilo general para cada ficha/punto */
+            .dot {
+              width: 14px;
+              height: 14px;
+              border-radius: 50%;
+              background: #00ff66;
+              box-shadow: 0 0 10px #00ff66;
+            }
+
+            /* FILA 1: Delanteros (4-4-2) */
+            .dot-fw1,
+            .dot-fw2 {
+              grid-row: 1;
+            }
+
+            /* FILA 2: Centrocampistas */
+            .dot-mf1,
+            .dot-mf2,
+            .dot-mf3,
+            .dot-mf4 {
+              grid-row: 2;
+            }
+
+            /* FILA 3: Defensas */
+            .dot-df1,
+            .dot-df2,
+            .dot-df3,
+            .dot-df4 {
+              grid-row: 3;
+            }
+
+            /* FILA 4: Portero */
+            .dot-gk {
+              grid-row: 4;
+              grid-column: 1 / -1; /* Centrado en toda la fila */
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 4. About Section */
+.about-section {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px 48px 20px;
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+  }
+}
+
+/* 5. Footer (Crítico para AdSense) */
+/* .landing-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 32px 20px;
+  background: #080b0f;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .footer-brand {
+    .brand-text {
+      font-size: 0.9rem;
+      font-weight: 900;
+      margin: 0 0 4px 0;
+
+      span {
+        color: #00ff66;
+      }
+    }
+
+    .copyright {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin: 0;
+    }
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+
+    a {
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      &:hover {
+        color: #00ff66;
+      }
+    }
+  } 
+} */
+
+/* Footer siempre fijado al fondo */
+.landing-footer {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px 20px;
+  background: #080b0f;
+
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+    max-width: 1000px;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+
+  .footer-brand {
+    .brand-text {
+      font-size: 0.9rem;
+      font-weight: 900;
+      margin: 0 0 4px 0;
+
+      span {
+        color: #00ff66;
+      }
+    }
+
+    .copyright {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin: 0;
+    }
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+
+    a {
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      &:hover {
+        color: #00ff66;
+      }
+    }
+  }
+}
