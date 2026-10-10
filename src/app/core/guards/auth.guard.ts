@@ -1,15 +1,21 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth-service.service';
+import { NavController } from '@ionic/angular';
 
 export const authGuard: CanActivateFn = () => {
-  const _authService = inject(AuthService);
-  const router = inject(Router);
 
-  if (_authService.isAuthenticated()) {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const navCtrl = inject(NavController);
+
+  if (authService.isAuthenticated()) {
     return true; // Permite el acceso
+  } else {
+    navCtrl.navigateRoot('/landing-page', { replaceUrl: true });
   }
 
-  // Si no hay usuario en la Signal, redirige al login
-  return router.createUrlTree(['/login']);
+  // Si intenta entrar a una ruta protegida sin token, al login
+  router.navigate(['/login']);
+  return false;
 };
