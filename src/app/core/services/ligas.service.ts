@@ -15,6 +15,7 @@ export interface Ligas {
   codigo_acceso: string | null;
   nombre_competicion: string;
   total_participantes: number;
+  creado_por: number;
 }
 
 
@@ -26,6 +27,14 @@ export class LigasService {
   private readonly STORAGE_KEY = 'pf_liga_session';
 
   public ligaSeleccionada = signal<Ligas | null>(this.obtenerLigaSeleccionada());
+
+  abandonarLiga(data: any) {
+    return this.http.post(`${this.apiUrl}/abandonarLiga`, data);
+  }
+
+  eliminarLiga(data: any) {
+    return this.http.post(`${this.apiUrl}/eliminarLiga`, data);
+  }
 
   crearLiga(data: any) {
     return this.http.post(`${this.apiUrl}/crearLiga`, data);
