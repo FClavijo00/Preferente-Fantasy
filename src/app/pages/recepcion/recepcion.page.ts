@@ -50,6 +50,7 @@ export interface Ligas {
   codigo_acceso: string | null;
   nombre_competicion: string;
   total_participantes: number;
+  creado_por: number;
 }
 
 @Component({
@@ -58,15 +59,11 @@ export interface Ligas {
   styleUrls: ['./recepcion.page.scss'],
   imports: [
     IonButton,
-    IonLabel,
-    IonFabList,
     IonIcon,
-    IonFabButton,
-    IonFab,
     IonContent,
     CommonModule,
-    FormsModule,
-  ],
+    FormsModule
+],
 })
 export class RecepcionPage implements OnInit {
   private _modalCtrl = inject(ModalController);
