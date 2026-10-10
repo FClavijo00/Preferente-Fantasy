@@ -1,12 +1,10 @@
 <app-header titulo="Perfil"></app-header>
 
 <ion-content class="perfil-container ion-padding">
-
   <!-- CARD PRINCIPAL DEL USUARIO -->
   <div class="profile-card">
     <div class="avatar-container">
-      <img 
-        [src]="user()?.image_url || 'assets/images/default-player.png'" 
+      <img [src]="user()?.image_url || 'assets/images/default-player.png'"
         [alt]="user()?.nombre_club || 'Foto perfil'" />
     </div>
     <div class="user-details">
@@ -18,7 +16,6 @@
   <!-- SECCIÓN: MI CUENTA -->
   <div class="section-title">Mi Cuenta</div>
   <ion-list class="options-list" lines="none">
-    
     <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirEditarPerfil()">
       <ion-icon name="create-outline" slot="start" class="icon-accent"></ion-icon>
       <ion-label>
@@ -34,13 +31,11 @@
         <p>Actualiza tu clave de acceso</p>
       </ion-label>
     </ion-item>
-
   </ion-list>
 
   <!-- SECCIÓN: COMUNIDAD Y SOPORTE -->
   <div class="section-title">Comunidad</div>
   <ion-list class="options-list" lines="none">
-
     <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirInstagram()">
       <ion-icon name="logo-instagram" slot="start" class="icon-instagram"></ion-icon>
       <ion-label>
@@ -56,7 +51,27 @@
         <p>Sistema de puntos y normas</p>
       </ion-label>
     </ion-item>
+  </ion-list>
 
+  <!-- SECCIÓN: LIGA -->
+  <div class="section-title">Liga</div>
+  <ion-list class="options-list" lines="none">
+    @if (user()?.id === liga?.creado_por) {
+    <ion-item disabled mode="ios" button detail="true" class="option-item" (click)="abrirEditarLiga()">
+      <ion-icon name="trophy-outline" slot="start" class="icon-accent"></ion-icon>
+      <ion-label>
+        <h2>Editar Liga</h2>
+        <p>Nombre, eliminar equipos y eliminar liga</p>
+      </ion-label>
+    </ion-item>
+    }
+    <ion-item disabled mode="ios" button detail="true" class="option-item" (click)="abrirAbandonarLiga()">
+      <ion-icon name="trophy-outline" slot="start" color="danger" class="icon-accent"></ion-icon>
+      <ion-label>
+        <h2>Abandonar Liga</h2>
+        <p>Eliminar a mi equipo de esta liga</p>
+      </ion-label>
+    </ion-item>
   </ion-list>
 
   <!-- BOTÓN CERRAR SESIÓN -->
@@ -67,8 +82,5 @@
     </ion-button>
   </div>
 
-  <div class="app-version">
-    Preferente Fantasy v1.0.0
-  </div>
-
+  <div class="app-version">Preferente Fantasy v1.1</div>
 </ion-content>
