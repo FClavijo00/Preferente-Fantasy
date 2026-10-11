@@ -5,9 +5,9 @@
     <ion-segment-button value="jornada_mi_equipo">
       <ion-label>Mi Equipo</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="clasificacion_jornadas">
+    <!-- <ion-segment-button value="clasificacion_jornadas">
       <ion-label>Jornadas</ion-label>
-    </ion-segment-button>
+    </ion-segment-button> -->
     <ion-segment-button value="clasificacion_general">
       <ion-label>General</ion-label>
     </ion-segment-button>
@@ -31,6 +31,10 @@
   <app-plantilla-clasificacion [user]="user" [liga]="liga" [miEquipo]="true"></app-plantilla-clasificacion>
   }
 
+  <!-- @if (tabActivo() === 'clasificacion_jornadas') {
+    
+  }
+ -->
   @if (tabActivo() === 'clasificacion_general') {
   <ion-list class="ranking-list">
     @for (user of rankingGeneral(); track user.usuario_id) {
