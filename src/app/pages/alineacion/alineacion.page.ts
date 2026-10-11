@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -39,11 +39,12 @@ export interface JugadorSlot {
     IonButton,
     IonIcon,
     IonContent,
-    CommonModule,
     FormsModule,
     HeaderComponent,
     IonSelect,
     IonSelectOption,
+    DatePipe,
+    NgTemplateOutlet,
     MiniCalendarioComponent,
   ],
 })
