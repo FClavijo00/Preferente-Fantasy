@@ -25,6 +25,7 @@ import { warning } from 'ionicons/icons';
 import { DetalleJugadorJornadaComponent } from '../../shared/modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
 import { ClasificacionesService } from '../../core/services/clasificaciones.service';
 import { PlantillaClasificacionComponent } from '../../shared/components/plantilla-clasificacion/plantilla-clasificacion.component';
+import { JornadasService } from '../../core/services/jornadas-service';
 
 export interface JugadorSlot {
   index: number;
@@ -49,7 +50,9 @@ export interface JugadorSlot {
     CommonModule,
     FormsModule,
     HeaderComponent,
-    PlantillaClasificacionComponent
+    PlantillaClasificacionComponent,
+    IonSelect,
+    IonSelectOption,
 ],
 })
 export class ClasificacionesPage {
@@ -60,6 +63,7 @@ export class ClasificacionesPage {
   private _authService = inject(AuthService);
   private _alineacionesService = inject(AlineacionesService);
   private _clasificacionesService = inject(ClasificacionesService);
+  private _jornadasService = inject(JornadasService);
 
   public liga = this._ligasService.ligaSeleccionada();
   public user = this._authService.currentUser();
@@ -105,7 +109,7 @@ export class ClasificacionesPage {
 
   constructor() {
     addIcons({
-      warning,
+      warning
     });
   }
 
@@ -139,11 +143,15 @@ export class ClasificacionesPage {
     if (this.tabActivo() === 'clasificacion_general') {
       this.getRankingGeneral();
     }
+
+    if (this.tabActivo() === 'clasificacion_jornadas') {
+      this.getJornadas();
+    }
   }
 
   async cambiarJornadaFiltro(event: any) {
     this.jornadaSeleccionadaId.set(event.detail.value);
-    await this.cargarDatosTabActual();
+    await this.getClasificacionJornada(event.detail.value);
   }
 
   async cargarDatosIniciales() {
@@ -324,5 +332,43 @@ export class ClasificacionesPage {
     });
 
     await modal.present();
+  }
+
+  getJornadas() {
+    this._loadingService.show();
+    this._jornadasService.getJornadasDisputadas().subscribe({
+      next: async (resp: any) => {
+        if (resp.ok) {
+          this.jornadasDisponibles.set(resp.data || []);
+          this.jornadaSeleccionadaId.set(resp.data[0].id);
+
+          await this.getClasificacionJornada(resp.data[0].id);
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar jornadas:', err);
+        this._loadingService.hide();
+      },
+    })
+  }
+
+  async getClasificacionJornada(jornadaId: number) {
+    this._loadingService.show();
+    let data =  {
+      liga_id: this.liga?.id,
+      jornada_id: jornadaId
+    }
+    this._clasificacionesService.getClasificacionPorJornada(data).subscribe({
+      next: (resp: any) => {
+        if (resp.ok) {
+          this.rankingJornada.set(resp.data || []);
+          this._loadingService.hide();
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar jornadas:', err);
+        this._loadingService.hide();
+      },
+    })
   }
 }

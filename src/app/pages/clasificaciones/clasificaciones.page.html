@@ -5,36 +5,64 @@
     <ion-segment-button value="jornada_mi_equipo">
       <ion-label>Mi Equipo</ion-label>
     </ion-segment-button>
-    <!-- <ion-segment-button value="clasificacion_jornadas">
+    <ion-segment-button value="clasificacion_jornadas">
       <ion-label>Jornadas</ion-label>
-    </ion-segment-button> -->
+    </ion-segment-button>
     <ion-segment-button value="clasificacion_general">
       <ion-label>General</ion-label>
     </ion-segment-button>
   </ion-segment>
-
-  <!-- Selector de Jornada Filtro (Para Tab 1 y Tab 2) -->
-  <!-- @if (tabActivo() !== 'clasificacion_general') {
-  <div class="jornada-selector-bar">
-    <span class="label">Jornada:</span>
-    <ion-select [value]="jornadaSeleccionadaId()" (ionChange)="cambiarJornadaFiltro($event)" interface="popover"
-      class="custom-select">
-      @for (j of jornadasDisponibles(); track j.id) {
-      <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
-      }
-    </ion-select>
-  </div>
-  } -->
 
   <!-- TAB 1: Mi Alineación en la Jornada + Puntos obtenidos -->
   @if (tabActivo() === 'jornada_mi_equipo') {
   <app-plantilla-clasificacion [user]="user" [liga]="liga" [miEquipo]="true"></app-plantilla-clasificacion>
   }
 
-  <!-- @if (tabActivo() === 'clasificacion_jornadas') {
-    
+  @if (tabActivo() === 'clasificacion_jornadas') {
+  <div class="jornada-selector-row">
+    <div class="jornada-selector-bar">
+      <ion-select mode="ios" [value]="jornadaSeleccionadaId()" (ionChange)="cambiarJornadaFiltro($event)"
+        interface="popover" class="custom-jornada-select">
+        @for (j of jornadasDisponibles(); track j.id) {
+        <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
+        }
+      </ion-select>
+    </div>
+  </div>
+
+  <ion-list class="ranking-list">
+    @for (user of rankingJornada(); track user.usuario_id) {
+    <ion-item mode="ios" lines="none" button (click)="verAlineacionUsuario(user)" detail="false">
+      <!-- Posición en la tabla -->
+      <div slot="start" class="posicion-badge" [class.top3]="user.posicion <= 3">
+        {{ user.posicion }}
+      </div>
+
+      <!-- Avatar del usuario -->
+      <ion-avatar slot="start">
+        <img [src]="user.image_url || 'assets/images/default-player.png'" alt="Avatar" />
+      </ion-avatar>
+
+      <!-- Nombre y puntos -->
+      <ion-label class="nombre-usuario-club">
+        <h2>{{ user.nombre_club }}</h2>
+        <span>{{ user.nombre_usuario }}</span>
+      </ion-label>
+
+      <div slot="end" class="puntos-container">
+        <span class="puntos-val">{{ user.puntos_totales }}</span>
+        <span class="puntos-lbl">PTS</span>
+      </div>
+    </ion-item>
+    } @empty {
+    <div class="empty-state">
+      <p>No se encontraron datos en la clasificación.</p>
+    </div>
+    }
+  </ion-list>
+
   }
- -->
+
   @if (tabActivo() === 'clasificacion_general') {
   <ion-list class="ranking-list">
     @for (user of rankingGeneral(); track user.usuario_id) {

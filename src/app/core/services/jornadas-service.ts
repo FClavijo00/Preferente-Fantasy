@@ -41,6 +41,10 @@ export class JornadasService {
     return this.http.post(`${this.apiUrl}/getPuntuacionesJornadas`, data);
   }
 
+  getJornadasDisputadas() {
+    return this.http.get(`${this.apiUrl}/getJornadasDisputadas`);
+  }
+
   cargarPartidosJornada(jornada: number) {
     return this.http.post(`${this.apiUrl}/cargarPartidosJornada`, {jornadaId: jornada});
   }

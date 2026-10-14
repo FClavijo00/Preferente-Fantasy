@@ -11,5 +11,9 @@ export class ClasificacionesService {
     getClasificacion(data: any) {
         return this.http.post(`${this.apiUrl}/getClasificacionLiga`, data);
     }
+
+    getClasificacionPorJornada(data: any) {
+        return this.http.post(`${this.apiUrl}/getClasificacionPorJornada`, data);
+    }
   
 }
