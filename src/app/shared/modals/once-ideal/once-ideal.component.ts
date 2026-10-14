@@ -39,15 +39,12 @@ interface JugadorSlot {
   templateUrl: './once-ideal.component.html',
   styleUrls: ['./once-ideal.component.scss'],
   imports: [
-    IonPopover,
-    IonList,
-    IonItem,
     IonIcon,
     IonButton,
     IonContent,
     IonHeader,
-    NgTemplateOutlet,
-  ],
+    NgTemplateOutlet
+],
 })
 export class OnceIdealComponent implements OnInit {
   @Input() jornada: any;
