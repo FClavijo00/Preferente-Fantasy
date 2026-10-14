@@ -13,10 +13,21 @@ import { AuthService } from '../../../core/services/auth-service.service';
 import { ClasificacionesService } from '../../../core/services/clasificaciones.service';
 import { LigasService } from '../../../core/services/ligas.service';
 import { LoadingService } from '../../../core/services/loading.service';
-import { IonIcon } from '@ionic/angular';
+import {
+  IonIcon,
+  IonPopover,
+  IonButton,
+  IonContent,
+  IonList,
+  IonLabel,
+  IonItem,
+} from '@ionic/angular';
 import { DetalleJugadorJornadaComponent } from '../../modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
 import { JornadasService } from '../../../core/services/jornadas-service';
 import { NgTemplateOutlet } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { ellipsisVertical, starOutline } from 'ionicons/icons';
+import { OnceIdealComponent } from '../../modals/once-ideal/once-ideal.component';
 
 interface JugadorSlot {
   index: number;
@@ -30,7 +41,16 @@ interface JugadorSlot {
   selector: 'app-plantilla-clasificacion',
   templateUrl: './plantilla-clasificacion.component.html',
   styleUrls: ['./plantilla-clasificacion.component.scss'],
-  imports: [IonIcon, NgTemplateOutlet],
+  imports: [
+    IonItem,
+    IonLabel,
+    IonList,
+    IonContent,
+    IonButton,
+    IonPopover,
+    IonIcon,
+    NgTemplateOutlet,
+  ],
 })
 export class PlantillaClasificacionComponent {
   @Input({ required: true }) set user(user: any) {
@@ -55,7 +75,7 @@ export class PlantillaClasificacionComponent {
 
   @Input() miEquipo: boolean = false;
 
-  private _usuario: any;
+  public _usuario: any;
   private _liga: any;
 
   private _loadingService = inject(LoadingService);
@@ -69,6 +89,7 @@ export class PlantillaClasificacionComponent {
   //public liga = this._ligasService.ligaSeleccionada();
 
   jornadaSeleccionadaId = signal<number | null>(null);
+  jornadaSeleccionada = signal<any | null>(null);
   jornadasDisponibles = signal<any[]>([]);
 
   slots = signal<JugadorSlot[]>([]);
@@ -77,7 +98,12 @@ export class PlantillaClasificacionComponent {
   defensas = computed(() => this.slots().filter((s) => s.rol === 'DEF'));
   portero = computed(() => this.slots().filter((s) => s.rol === 'POR'));
 
-  constructor() {}
+  constructor() {
+    addIcons({
+      ellipsisVertical,
+      starOutline
+    });
+  }
 
   private comprobarIniciar() {
     if (this._usuario && this._liga) {
@@ -111,6 +137,7 @@ export class PlantillaClasificacionComponent {
   }
 
   seleccionarJornada(jornada: any) {
+    this.jornadaSeleccionada.set(jornada);
     this.jornadaSeleccionadaId.set(jornada.jornada_id);
     this.cargarAlineacionJornada();
   }
@@ -177,22 +204,24 @@ export class PlantillaClasificacionComponent {
     this._loadingService.show();
     let data = {
       liga_id: this.liga?.id,
-      usuario_id : this.user.id || this.user.usuario_id
-    }
+      usuario_id: this.user.id || this.user.usuario_id,
+    };
     this._jornadasService.getPuntuacionesJornadas(data).subscribe({
       next: (res: any) => {
         if (res.ok) {
           this.jornadasDisponibles.set(res.data || []);
           if (res.data.length > 0) {
+            this.jornadaSeleccionada.set(res.data[0]);
             this.jornadaSeleccionadaId.set(res.data[0].jornada_id);
             this.cargarAlineacionJornada();
           }
           this._loadingService.hide();
         }
-      }, error: (error: any) => {
+      },
+      error: (error: any) => {
         this._loadingService.hide();
-      }
-    })
+      },
+    });
   }
 
   async cargarAlineacionJornada() {
@@ -200,17 +229,36 @@ export class PlantillaClasificacionComponent {
     let data = {
       liga_id: this.liga?.id,
       jornada_id: this.jornadaSeleccionadaId(),
-      usuario_id : this.user.usuario_id || this.user.id
-    }
+      usuario_id: this.user.usuario_id || this.user.id,
+    };
     this._alineacionesService.cargarAlineacionesJornadas(data).subscribe({
       next: (res: any) => {
         if (res.ok && res.data.length > 0) {
           this.reconstuirSlots(res.data[0].formacion, res.data[0].jugadores);
           this._loadingService.hide();
+        } else {
+          this.slots.set([]);
+          this._loadingService.hide();
         }
-      }, error: (error: any) => {
+      },
+      error: (error: any) => {
         this._loadingService.hide();
-      }
-    })
+      },
+    });
+  }
+
+  async abrir11Ideal() {
+    const modal = await this._modalCtrl.create({
+      component: OnceIdealComponent,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.5, 0.75, 1],
+      handle: false,
+      mode: 'md',
+      componentProps: {
+        jornada: this.jornadaSeleccionada(),
+      },
+    });
+
+    await modal.present();
   }
 }
