@@ -1,5 +1,5 @@
 <ion-menu contentId="main-content">
-  <app-header></app-header>
+  <app-header titulo="Panel de Control"></app-header>
   <ion-content class="ion-padding menu-content">
     <ion-list mode="ios" [inset]="true" lines="full" class="menu-list">
       <ion-item mode="ios" button="true" detail="true" (click)="abrirMainContent('calendario')">
@@ -91,7 +91,7 @@
             {{ partido.local_nombre }} ({{ partido.goles_local}}) - ({{
             partido.goles_visitante}}) {{partido.visitante_nombre}}
           </h3>
-          <p>{{ partido.fecha_partido | date: "dd/MM/yyyy - H:mm" }}</p>
+          <p>{{ partido.fecha }} - {{ partido.hora }}</p>
         </ion-label>
         <ion-button mode="ios" fill="clear" slot="end" color="medium" (click)="editarPartido(partido)">
           <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>

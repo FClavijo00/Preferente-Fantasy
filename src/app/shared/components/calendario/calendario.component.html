@@ -20,9 +20,7 @@
         <!-- Fecha u Hora -->
         <div class="partido-meta">
           @if (partido.fecha_partido) {
-          <span>{{
-            partido.fecha_partido | date: "dd/MM/yyyy - H:mm"
-            }}</span>
+          <span>{{ partido.fecha }} - {{ partido.hora }}</span>
           } @else {
           <span>Horario por confirmar</span>
           }
@@ -73,9 +71,9 @@
       }
     </div>
     } @else {
-      <div class="empty-state">
-        <p>No hay partidos programados en esta jornada.</p>
-      </div>
+    <div class="empty-state">
+      <p>No hay partidos programados en esta jornada.</p>
+    </div>
     }
   </ion-card-content>
 </ion-card>

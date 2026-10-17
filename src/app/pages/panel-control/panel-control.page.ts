@@ -64,6 +64,8 @@ interface Partido {
   visitante_nombre: string;
   jugado: boolean;
   tiene_acta: boolean;
+  fecha: string;
+  hora: string;
 }
 
 export interface Equipo {
@@ -150,6 +152,8 @@ export class PanelControlPage {
     visitante_nombre: '',
     jugado: false,
     tiene_acta: false,
+    fecha: '',
+    hora: '',
   });
 
   equipos = signal<Equipo[]>([]);

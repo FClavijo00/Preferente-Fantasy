@@ -32,6 +32,8 @@ export interface Partido {
   visitante: Equipo;
   jugado: boolean;
   tiene_acta: boolean;
+  fecha: string;
+  hora: string;
 }
 
 export interface Jornada {

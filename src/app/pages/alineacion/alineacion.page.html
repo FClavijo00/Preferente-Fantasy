@@ -9,7 +9,7 @@
       <div class="jornada-info">
         <span class="badge-jornada">Alineación J{{ j.numero_jornada }}</span>
         @if (j.estado === 'PENDIENTE') {
-        <span class="fecha-limite">Fecha Limite: {{ j.fecha_inicio | date: "dd/MM/yyyy - H:mm" }}</span>
+        <span class="fecha-limite">Fecha Limite: {{ j.fecha_inicio_formateada}} - {{ j.hora_inicio_formateada }}</span>
         }
       </div>
       <div class="guardar-div">
