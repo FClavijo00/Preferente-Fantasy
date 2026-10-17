@@ -24,7 +24,7 @@
           track $index
           ) {
           <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
+            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
               <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
               @for (j of plantillaLocal; track j.id) {
               <ion-select-option [value]="j.id">{{
@@ -50,7 +50,7 @@
           track $index
           ) {
           <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
+            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
               <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
               @for (j of plantillaLocal; track j.id) {
               <ion-select-option [value]="j.id">{{
@@ -82,7 +82,7 @@
           track $index
           ) {
           <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
+            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
               <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
               @for (j of plantillaVisitante; track j.id) {
               <ion-select-option [value]="j.id">{{
@@ -108,7 +108,7 @@
           track $index
           ) {
           <div [formGroupName]="$index" class="player-row">
-            <ion-select formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
+            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
               <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
               @for (j of plantillaVisitante; track j.id) {
               <ion-select-option [value]="j.id">{{
@@ -141,7 +141,7 @@
             track $index
             ) {
             <div [formGroupName]="$index" class="goal-row">
-              <ion-select formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
+              <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
                 <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
                 @for (
                 j of control.get("tipo")?.value === "PROPIA"
@@ -155,7 +155,7 @@
                 }
               </ion-select>
 
-              <ion-select formControlName="tipo" interface="popover" class="tipo-gol-select">
+              <ion-select mode="ios" formControlName="tipo" interface="popover" class="tipo-gol-select">
                 <ion-select-option value="NORMAL">Normal</ion-select-option>
                 <ion-select-option value="PENALTI">Penalti</ion-select-option>
                 <ion-select-option value="PROPIA">En propia</ion-select-option>
@@ -175,7 +175,7 @@
             track $index
             ) {
             <div [formGroupName]="$index" class="goal-row">
-              <ion-select formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
+              <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
                 <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
                 @for (
                 j of control.get("tipo")?.value === "PROPIA"
@@ -189,7 +189,7 @@
                 }
               </ion-select>
 
-              <ion-select formControlName="tipo" interface="popover" class="tipo-gol-select">
+              <ion-select mode="ios" formControlName="tipo" interface="popover" class="tipo-gol-select">
                 <ion-select-option value="NORMAL">Normal</ion-select-option>
                 <ion-select-option value="PENALTI">Penalti</ion-select-option>
                 <ion-select-option value="PROPIA">En propia</ion-select-option>
@@ -205,7 +205,7 @@
       <h3 class="section-title">⭐ JUGADOR DESTACADO</h3>
       <div class="player-list">
         <div class="player-row">
-          <ion-select formControlName="jugador_destacado_id" interface="popover">
+          <ion-select mode="ios" formControlName="jugador_destacado_id" interface="popover">
             <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
             @for (jugador of plantillasJuntas; track jugador.id) {
             <ion-select-option [value]="jugador.id">{{
