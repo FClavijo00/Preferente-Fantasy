@@ -568,8 +568,6 @@ export class CrearEditarActaPartidoComponent implements OnInit {
       jugador_destacado_id: jugadorDestacado,
     };
 
-    console.log('Payload a enviar al Backend:', payloadActa);
-
     this._partidosService.cerrarActa(payloadActa).subscribe({
       next: (data: any) => {
         this._modalCtrl.dismiss(data, 'confirm');
