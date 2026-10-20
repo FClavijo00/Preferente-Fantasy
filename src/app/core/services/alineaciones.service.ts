@@ -22,4 +22,8 @@ export class AlineacionesService {
     cargarOnceIdeal(jornadaID: number) {
         return this.http.post(`${this.apiUrl}/cargarOnceIdeal`, { jornada_id: jornadaID });
     }
+
+    guardarOnceIdeal(payload: any) {
+        return this.http.post(`${this.apiUrl}/guardarOnceIdeal`, payload);
+    }
 }
