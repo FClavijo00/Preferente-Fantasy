@@ -29,6 +29,7 @@
     "@ng-bootstrap/ng-bootstrap": "^21.0.0",
     "@popperjs/core": "^2.11.8",
     "@primeuix/themes": "^3.0.0",
+    "@vercel/analytics": "^1.4.1",
     "bootstrap": "^5.3.8",
     "date-fns": "^4.4.0",
     "ionicons": "^8.1.0",
