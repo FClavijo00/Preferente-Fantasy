@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { JornadasService } from '../../../core/services/jornadas-service';
 import {
   IonCard,
@@ -54,6 +54,9 @@ export interface Jornada {
   ],
 })
 export class CalendarioComponent implements OnInit {
+
+  scrollContainer = viewChild<ElementRef<HTMLElement>>('scrollJornadasRef');
+
   private _jornadasService = inject(JornadasService);
   private _toastService = inject(ToastService);
   private _modalCtrl = inject(ModalController);
@@ -68,7 +71,22 @@ export class CalendarioComponent implements OnInit {
   });
   public jornadasTotales = signal<number[]>(Array.from({ length: 0 }, (_, i) => i + 1));
 
-  constructor() { }
+  constructor() {}
+
+  centrarJornadaActiva(jornada: number) {
+    const container = this.scrollContainer()?.nativeElement;
+    if (!container) return;
+
+    // Buscamos el botón activo dentro del contenedor
+    const botonActivo = container.querySelector(`.btn-jornada:nth-child(${jornada})`) as HTMLElement;
+    if (botonActivo) {
+      // Calculamos la posición para centrarlo horizontalmente en el scroll
+      container.scrollTo({
+        left: botonActivo.offsetLeft - container.offsetWidth / 2 + botonActivo.offsetWidth / 2,
+        behavior: 'smooth'
+      });
+    }
+  }
 
   async abrirActaPartido(partido: Partido) {
     if (partido.tiene_acta === true && partido.jugado === true) {
@@ -106,6 +124,7 @@ export class CalendarioComponent implements OnInit {
           );
         if (jornadaEnCurso) {
           this.jornadaSeleccionada.set(jornadaEnCurso.numero_jornada);
+          this.centrarJornadaActiva(jornadaEnCurso.numero_jornada);
         }
       },
       error: (error) => {

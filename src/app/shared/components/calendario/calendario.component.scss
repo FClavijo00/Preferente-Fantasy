@@ -30,6 +30,7 @@
   scrollbar-width: none;
 
   .btn-jornada {
+    flex-shrink: 0;
     flex: 0 0 auto; // Evita que los botones se deformen o aplasten
     width: 35px;
     height: 35px;
