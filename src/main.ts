@@ -16,6 +16,10 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { importProvidersFrom } from '@angular/core';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Web Analytics
+inject();
 
 bootstrapApplication(AppComponent, {
   providers: [
