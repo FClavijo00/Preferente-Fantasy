@@ -36,6 +36,7 @@ import {
   documentTextOutline,
   pencilOutline,
   personCircleOutline,
+  starOutline,
 } from 'ionicons/icons';
 import { JornadasService } from '../../core/services/jornadas-service';
 import { CrearJornadaComponent } from '../../shared/modals/crear-jornada/crear-jornada.component';
@@ -43,6 +44,8 @@ import { CrearEditarPartidoComponent } from '../../shared/modals/crear-editar-pa
 import { EquiposService } from '../../core/services/equipos-service';
 import { CrearEditarJugadorComponent } from '../../shared/modals/crear-editar-jugador/crear-editar-jugador.component';
 import { CrearEditarActaPartidoComponent } from '../../shared/modals/crear-editar-acta-partido/crear-editar-acta-partido.component';
+import { LoadingService } from '../../core/services/loading.service';
+import { OnceIdealComponent } from '../../shared/modals/once-ideal/once-ideal.component';
 
 interface Jornada {
   id: number;
@@ -115,8 +118,7 @@ export interface Jugador {
     CommonModule,
     FormsModule,
     HeaderComponent,
-    DatePipe
-],
+  ],
 })
 export class PanelControlPage {
   private _menuCtrl = inject(MenuController);
@@ -124,6 +126,7 @@ export class PanelControlPage {
   private _modalCtrl = inject(ModalController);
   private _navCtrl = inject(NavController);
   private _equiposService = inject(EquiposService);
+  private _loadingService = inject(LoadingService);
 
   public content = signal<string>('');
   public jornadas = signal<Jornada[]>([]);
@@ -160,6 +163,11 @@ export class PanelControlPage {
   equipoSeleccionado = signal<Equipo | null>(null);
   jugadores = signal<Jugador[]>([]);
 
+  /**
+   * ONCE IDEAL
+   */
+  public jornadasOnceIdeal = signal<Jornada[]>([]);
+
   constructor() {
     addIcons({
       calendarOutline,
@@ -169,7 +177,8 @@ export class PanelControlPage {
       checkmarkCircleOutline,
       addOutline,
       arrowBackOutline,
-      documentTextOutline
+      documentTextOutline,
+      starOutline
     });
   }
 
@@ -179,6 +188,8 @@ export class PanelControlPage {
       await this.getJornadas();
     } else if (content === 'jugadores') {
       await this.cargarEquipos();
+    } else if (content === 'onceideal') {
+      await this.cargarJornadasOnceIdeal();
     }
     await this._menuCtrl.close();
   }
@@ -420,6 +431,37 @@ export class PanelControlPage {
         console.log(error);
       },
     });
+  }
+
+  async cargarJornadasOnceIdeal() {
+    this._loadingService.show();
+    this._jornadasService.getJornadasOnceIdeal().subscribe({
+      next: async (resp: any) => {
+        if (resp.ok) {
+          this.jornadasOnceIdeal.set(resp.data || []);
+          this._loadingService.hide();
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al cargar jornadas:', err);
+        this._loadingService.hide();
+      },
+    })
+  }
+
+  async addOnceIdeal() {
+    const modal = await this._modalCtrl.create({
+      component: OnceIdealComponent,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.5, 0.75, 1],
+      handle: false,
+      mode: 'md',
+      componentProps: {
+        jornadasConOnceIdeal: this.jornadasOnceIdeal(),
+      }
+    });
+
+    await modal.present();
   }
 
   volverRecepcion() {

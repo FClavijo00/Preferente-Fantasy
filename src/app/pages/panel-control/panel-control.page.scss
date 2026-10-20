@@ -246,3 +246,13 @@ ion-list.fantasy-player-list {
 .partido-item {
   --background: transparent;
 }
+
+.jornadas-once-ideal-list {
+  --background: transparent;
+  ion-list-header {
+    ion-label {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
+}

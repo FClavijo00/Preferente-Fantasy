@@ -53,4 +53,8 @@ export class JugadoresService {
       idsExcluidos
     });
   }
+
+  getJugadoresPorJornada(data: any) {
+    return this.http.post(`${this.apiUrl}/getJugadoresPorJornada`, data);
+  }
 }

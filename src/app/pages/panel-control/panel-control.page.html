@@ -10,6 +10,10 @@
         <ion-icon slot="start" name="person-circle-outline"></ion-icon>
         <ion-label>Jugadores</ion-label>
       </ion-item>
+      <ion-item mode="ios" button="true" detail="true" (click)="abrirMainContent('onceideal')">
+        <ion-icon slot="start" name="star-outline"></ion-icon>
+        <ion-label>11 Ideal</ion-label>
+      </ion-item>
 
       <ion-item mode="ios" button="true" detail="false" (click)="volverRecepcion()">
         <ion-icon color="danger" slot="start" name="arrow-back-outline"></ion-icon>
@@ -161,6 +165,31 @@
       }
     </ion-list>
 
+    } @else if (content() === 'onceideal') {
+    <ion-list mode="ios" [inset]="true" lines="full" class="jornadas-once-ideal-list">
+      <ion-list-header>
+        <ion-label>JORNADAS 11 IDEAL</ion-label>
+      </ion-list-header>
+      @for (jornada of jornadasOnceIdeal(); track jornada.id) {
+      <ion-item mode="ios" class="jornada-item">
+        <ion-label>
+          <h3>
+            Jornada {{ jornada.numero_jornada }}
+          </h3>
+        </ion-label>
+        <ion-button mode="ios" fill="clear" slot="end" color="medium" >
+          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+      }
+    </ion-list>
+
+    <div class="add-jornada-div ion-margin-top">
+      <ion-button mode="md" fill="clear" shape="round" (click)="addOnceIdeal()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Añadir 11 Ideal
+      </ion-button>
+    </div>
     } @else {
     <ion-label class="ion-padding">Seleccione una sección en el menú.</ion-label>
     }

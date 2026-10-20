@@ -18,13 +18,19 @@ import {
   IonItem,
   IonList,
   IonPopover,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { closeOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, closeOutline, warning } from 'ionicons/icons';
 import { NgTemplateOutlet } from '@angular/common';
 import { LoadingService } from '../../../core/services/loading.service';
 import { AlineacionesService } from '../../../core/services/alineaciones.service';
 import { DetalleJugadorJornadaComponent } from '../detalle-jugador-jornada/detalle-jugador-jornada.component';
+import { JornadasService } from '../../../core/services/jornadas-service';
+import { FormacionesService } from '../../../core/services/formaciones.service';
+import { SelectJugadoresOnceIdealComponent } from '../select-jugadores-once-ideal/select-jugadores-once-ideal.component';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface JugadorSlot {
   index: number;
@@ -39,19 +45,27 @@ interface JugadorSlot {
   templateUrl: './once-ideal.component.html',
   styleUrls: ['./once-ideal.component.scss'],
   imports: [
+    IonItem,
+    IonLabel,
     IonIcon,
     IonButton,
     IonContent,
     IonHeader,
-    NgTemplateOutlet
-],
+    NgTemplateOutlet,
+    IonSelect,
+    IonSelectOption,
+  ],
 })
 export class OnceIdealComponent implements OnInit {
   @Input() jornada: any;
+  @Input() jornadasConOnceIdeal: any;
 
   private _modalCtrl = inject(ModalController);
   private _loadingService = inject(LoadingService);
   private _alineacionesService = inject(AlineacionesService);
+  private _jornadasService = inject(JornadasService);
+  private _formacionesService = inject(FormacionesService);
+  private _toastService = inject(ToastService);
 
   slots = signal<JugadorSlot[]>([]);
   delanteros = computed(() => this.slots().filter((s) => s.rol === 'DEL'));
@@ -59,9 +73,27 @@ export class OnceIdealComponent implements OnInit {
   defensas = computed(() => this.slots().filter((s) => s.rol === 'DEF'));
   portero = computed(() => this.slots().filter((s) => s.rol === 'POR'));
 
+  jornadasDisputadas = signal<any[]>([]);
+  formaciones = signal<any[]>([]);
+  jornadaSeleccionada = signal<any>(null);
+  formacionSeleccionada = signal<any>(null);
+
+  jornadasDisponibles = computed(() => {
+    const conOnce = this.jornadasConOnceIdeal;
+    const todas = this.jornadasDisputadas();
+
+    // Si no hay elementos que eliminar, devolvemos todas
+    if (!conOnce || conOnce.length === 0) return todas;
+
+    // Creamos un Set con los IDs de las jornadas que tienen once ideal para una búsqueda ultra rápida (O(1))
+    const idsExcluir = new Set(conOnce.map((jornada: { id: number; }) => jornada.id));
+
+    // Filtramos la lista completa descartando las que coincidan por ID
+    return todas.filter(jornada => !idsExcluir.has(jornada.id));
+  });
 
   constructor() {
-    addIcons({ closeOutline });
+    addIcons({ closeOutline, warning, checkmarkCircleOutline });
   }
 
   async abrirDetalleJugador(jugador: JugadorSlot) {
@@ -78,23 +110,56 @@ export class OnceIdealComponent implements OnInit {
     await modal.present();
   }
 
+  async abrirSelectJugador(slot: JugadorSlot) {
+    const modal = await this._modalCtrl.create({
+      component: SelectJugadoresOnceIdealComponent,
+      cssClass: 'card-modal-center', // Clase CSS para estilizar el modal
+      backdropDismiss: true,
+      componentProps: {
+        posicion: slot.rol,
+        jornada: this.jornadaSeleccionada(),
+        alineacionActual: this.slots()
+      },
+    });
+
+    await modal.present();
+
+    const { data: jugadorElegido, role } = await modal.onDidDismiss();
+
+    if (jugadorElegido !== null && role === 'confirm') {
+      this.asignarJugadorASlot(slot.index, jugadorElegido);
+    } else if (jugadorElegido === null && role === 'confirm') {
+      this.asignarJugadorASlot(slot.index, null);
+    }
+  }
+
+  private asignarJugadorASlot(index: number, jugador: any) {
+    this.slots.update((lista) => {
+      const copy = [...lista];
+      copy[index].jugador = jugador;
+      return copy;
+    });
+  }
+
   async cargarOnceIdealJornada() {
     this._loadingService.show();
 
-    this._alineacionesService.cargarOnceIdeal(this.jornada.jornada_id).subscribe({
-      next: (res: any) => {
-        if (res.existe) {
-          this.reconstruirSlots(res.once_ideal_info.formacion, res.jugadores);
+    this._alineacionesService
+      .cargarOnceIdeal(this.jornada.jornada_id)
+      .subscribe({
+        next: (res: any) => {
+          if (res.existe) {
+            this.reconstruirSlots(res.once_ideal_info.formacion, res.jugadores);
+            this._loadingService.hide();
+          } else {
+            this.slots.set([]);
+            this._loadingService.hide();
+          }
+        },
+        error: (error: any) => {
           this._loadingService.hide();
-        } else {
-          this.slots.set([]);
-          this._loadingService.hide();
-        }
-      },
-      error: (error: any) => {
-        this._loadingService.hide();
-      },
-    })
+        },
+      });
   }
 
   cerrarModal() {
@@ -159,9 +224,101 @@ export class OnceIdealComponent implements OnInit {
     }
   }
 
+  private cargarNuevoOnceIdeal() {
+    this._loadingService.show();
+    this.cargarJornadas();
+    this.cargarFormaciones();
+  }
+
+  cargarJornadas() {
+    this._jornadasService.getJornadasDisputadas().subscribe({
+      next: async (resp: any) => {
+        if (resp.ok) {
+          this.jornadasDisputadas.set(resp.data || []);
+        }
+      },
+      error: (err: any) => {
+        this.jornadasDisputadas.set([]);
+        console.error('Error al cargar jornadas:', err);
+      },
+    });
+  }
+
+  cargarFormaciones() {
+    this._formacionesService.getFormaciones().subscribe({
+      next: async (resp: any) => {
+        if (resp.ok) {
+          this.formaciones.set(resp.data || []);
+          this._loadingService.hide();
+        }
+      },
+      error: (err: any) => {
+        this._loadingService.hide();
+        this.formaciones.set([]);
+        console.error('Error al cargar formaciones:', err);
+      },
+    });
+  }
+
+  cambiarJornada(event: any) {
+    this.jornadasDisponibles().forEach((jornada) => {
+      if (jornada.id === Number(event.detail.value)) {
+        this.jornadaSeleccionada.set(jornada);
+      }
+    })
+  }
+
+  cambiarFormacion(event: any) {
+    this.formaciones().forEach((formacion) => {
+      if (formacion.id === Number(event.detail.value)) {
+        this.formacionSeleccionada.set(formacion);
+      }
+    })
+    this.reconstruirSlots(this.formacionSeleccionada().formacion);
+  }
+
+  guardarOnceIdeal() {
+    this._loadingService.show();
+    const jugadoresOnceIdeal = this.slots()
+    .filter((slot) => slot.jugador !== null)
+    .map((slot) => ({
+      jugador_id: slot.jugador.id,
+      hueco_index: slot.index
+    }));
+
+    if (jugadoresOnceIdeal.length !== 11) {
+      this._loadingService.hide();
+      this._toastService.showErrorToast(
+        'Debes completar los 11 jugadores de la alineación.',
+      );
+      return;
+    }
+
+    const payload = {
+      jornada_id: this.jornadaSeleccionada().id,
+      formacion_id: this.formacionSeleccionada().id,
+      jugadores: jugadoresOnceIdeal
+    };
+    
+    this._alineacionesService.guardarOnceIdeal(payload).subscribe({
+      next: async (resp: any) => {
+        if (resp.ok) {
+          this._loadingService.hide();
+          this._toastService.showSuccessToast(resp.message);
+        }
+      }, 
+      error: (err: any) => {
+        this._loadingService.hide();
+        console.error('Error al guardar once ideal:', err);
+      }
+    })
+  }
+
   ngOnInit() {
     if (this.jornada) {
       this.cargarOnceIdealJornada();
+    } else {
+      this.cargarNuevoOnceIdeal();
     }
   }
 }

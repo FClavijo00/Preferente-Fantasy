@@ -34,102 +34,208 @@
 </ion-header>
 
 <ion-content fullscreen="true" class="once-ideal-content">
-<!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
-    <div class="pitch-container">
-      <!-- Terreno de juego con las filas generadas dinámicamente -->
-      <div class="pitch-grass">
-        <!-- Líneas decorativas del campo -->
-        <div class="pitch-lines">
-          <div class="center-circle"></div>
-          <div class="center-line"></div>
-          <div class="penalty-box top"></div>
-          <div class="penalty-box bottom"></div>
-        </div>
-
-        <!-- Jugadores renderizados con Flexbox -->
-        <div class="players-grid">
-          <!-- Línea de Delanteros -->
-          <div class="pitch-row">
-            @for (slot of delanteros(); track slot.index) {
-              <ng-container
-                *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"
-              ></ng-container>
-            }
-          </div>
-
-          <!-- Línea de Mediocampistas -->
-          <div class="pitch-row">
-            @for (slot of medios(); track slot.index) {
-              <ng-container
-                *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"
-              ></ng-container>
-            }
-          </div>
-
-          <!-- Línea de Defensas -->
-          <div class="pitch-row">
-            @for (slot of defensas(); track slot.index) {
-              <ng-container
-                *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"
-              ></ng-container>
-            }
-          </div>
-
-          <!-- Portero -->
-          <div class="pitch-row">
-            @for (slot of portero(); track slot.index) {
-              <ng-container
-                *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"
-              ></ng-container>
-            }
-          </div>
-        </div>
+  <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
+  <div class="pitch-container">
+    <!-- Terreno de juego con las filas generadas dinámicamente -->
+    <div class="pitch-grass">
+      <!-- Líneas decorativas del campo -->
+      <div class="pitch-lines">
+        <div class="center-circle"></div>
+        <div class="center-line"></div>
+        <div class="penalty-box top"></div>
+        <div class="penalty-box bottom"></div>
       </div>
-      <!-- Template reutilizable para cada slot de jugador -->
-      <ng-template #slotTemplate let-slot>
-        <div class="player-slot">
-          @if (slot.jugador) {
-            <div
-              class="player-card"
-              [class]="slot.rol !== slot.jugador.posicion ? 'out-position' : ''"
-              (click)="abrirDetalleJugador(slot)"
-            >
-              <!-- Badge de Puntos sobre el jugador -->
-              <div
-                class="puntos-badge"
-                [class.negative]="slot.jugador.puntos_jornada < 0"
-                [class.neutral]="slot.jugador.puntos_jornada === 0"
-              >
-                {{ slot.jugador.puntos_jornada }}
-              </div>
-              <img
-                [src]="slot.jugador.foto || 'assets/images/default-player.png'"
-                class="player-img"
-              />
-              @if (slot.rol !== slot.jugador.posicion) {
-                <ion-icon class="warning-icon" name="warning"></ion-icon>
-              }
-              <span class="player-name">{{
-                slot.jugador.apodo || slot.jugador.nombre
-              }}</span>
-              <img
-                [src]="slot.jugador.equipo_escudo"
-                [alt]="slot.jugador.equipo_nombre"
-                class="player-equipo-img"
-              />
-            </div>
-          } @else {
-            <div class="empty-slot">
-              <img
-                src="assets/images/default-player.png"
-                class="empty-slot-img"
-              />
-              <span class="rol-badge">{{ slot.rol }}</span>
-            </div>
+
+      <!-- Jugadores renderizados con Flexbox -->
+      <div class="players-grid">
+        <!-- Línea de Delanteros -->
+        <div class="pitch-row">
+          @for (slot of delanteros(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
           }
         </div>
-      </ng-template>
-      
+
+        <!-- Línea de Mediocampistas -->
+        <div class="pitch-row">
+          @for (slot of medios(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+
+        <!-- Línea de Defensas -->
+        <div class="pitch-row">
+          @for (slot of defensas(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+
+        <!-- Portero -->
+        <div class="pitch-row">
+          @for (slot of portero(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+      </div>
     </div>
+    <!-- Template reutilizable para cada slot de jugador -->
+    <ng-template #slotTemplate let-slot>
+      <div class="player-slot">
+        @if (slot.jugador) {
+        <div class="player-card" (click)="abrirDetalleJugador(slot)">
+          <!-- Badge de Puntos sobre el jugador -->
+          <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
+            [class.neutral]="slot.jugador.puntos_jornada === 0">
+            {{ slot.jugador.puntos_jornada }}
+          </div>
+          <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
+          <!-- @if (slot.rol !== slot.jugador.posicion) {
+          <ion-icon class="warning-icon" name="warning"></ion-icon>
+          } -->
+          <span class="player-name">{{
+            slot.jugador.apodo || slot.jugador.nombre
+            }}</span>
+          <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
+        </div>
+        } @else {
+        <div class="empty-slot">
+          <img src="assets/images/default-player.png" class="empty-slot-img" />
+          <span class="rol-badge">{{ slot.rol }}</span>
+        </div>
+        }
+      </div>
+    </ng-template>
+  </div>
+</ion-content>
+} @else {
+<ion-header class="ion-no-border once-ideal-header">
+  <div class="header-banner">
+    <!-- Botón de cerrar modal flotante -->
+    <ion-button fill="clear" class="close-btn" (click)="cerrarModal()">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+
+    <!-- Fondo de brochazo neón (efecto gráfico) -->
+    <div class="brush-bg"></div>
+
+    <!-- Logos Solapados -->
+    <div class="logos-container">
+      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="logo-pf" />
+      <img src="assets/images/albero-y-mikasa.png" alt="Albero y Mikasa" class="logo-aym" />
+    </div>
+
+    <!-- Título Tipográfico Dinámico -->
+    <div class="title-container">
+      <div class="top-row">
+        <span class="txt-el">EL</span>
+        <span class="txt-11">11</span>
+        <span class="txt-ideal">IDEAL</span>
+      </div>
+      <div class="middle-row">
+        <span class="txt-de">DE</span>
+        <span class="txt-brand">PREFERENTE <span class="highlight">FANTASY</span></span>
+      </div>
+      <div class="bottom-row">
+        <ion-item>
+          <ion-label>Jornada:</ion-label>
+          <ion-select mode="ios" interface="popover" [value]="jornadasDisponibles()"
+            (ionChange)="cambiarJornada($event)">
+            @for (j of jornadasDisponibles(); track j.id) {
+            <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </div>
+      <div class="bottom-row">
+        <ion-item>
+          <ion-label>Formación:</ion-label>
+          <ion-select mode="ios" interface="popover" [value]="formaciones()" (ionChange)="cambiarFormacion($event)">
+            @for (f of formaciones(); track f.id) {
+            <ion-select-option [value]="f.id">{{ f.formacion }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      </div>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content fullscreen="true" class="once-ideal-content">
+  <div class="btn-div-guardar">
+    <ion-button class="btn-guardar" fill="clear" shape="round" (click)="guardarOnceIdeal()">
+      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+      Guardar 11 Ideal
+    </ion-button>
+  </div>
+  <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
+  <div class="pitch-container">
+    <!-- Terreno de juego con las filas generadas dinámicamente -->
+    <div class="pitch-grass">
+      <!-- Líneas decorativas del campo -->
+      <div class="pitch-lines">
+        <div class="center-circle"></div>
+        <div class="center-line"></div>
+        <div class="penalty-box top"></div>
+        <div class="penalty-box bottom"></div>
+      </div>
+
+      <!-- Jugadores renderizados con Flexbox -->
+      <div class="players-grid">
+        <!-- Línea de Delanteros -->
+        <div class="pitch-row">
+          @for (slot of delanteros(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+
+        <!-- Línea de Mediocampistas -->
+        <div class="pitch-row">
+          @for (slot of medios(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+
+        <!-- Línea de Defensas -->
+        <div class="pitch-row">
+          @for (slot of defensas(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+
+        <!-- Portero -->
+        <div class="pitch-row">
+          @for (slot of portero(); track slot.index) {
+          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
+          }
+        </div>
+      </div>
+    </div>
+    <!-- Template reutilizable para cada slot de jugador -->
+    <ng-template #slotTemplate let-slot>
+      <div class="player-slot">
+        @if (slot.jugador) {
+        <div class="player-card" (click)="abrirSelectJugador(slot)">
+          <!-- Badge de Puntos sobre el jugador -->
+          <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
+            [class.neutral]="slot.jugador.puntos_jornada === 0">
+            {{ slot.jugador.puntos_jornada }}
+          </div>
+          <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
+          <!-- @if (slot.rol !== slot.jugador.posicion) {
+          <ion-icon class="warning-icon" name="warning"></ion-icon>
+          } -->
+          <span class="player-name">{{
+            slot.jugador.apodo || slot.jugador.nombre
+            }}</span>
+          <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
+        </div>
+        } @else {
+        <div class="empty-slot" (click)="abrirSelectJugador(slot)">
+          <img src="assets/images/default-player.png" class="empty-slot-img" />
+          <span class="rol-badge">{{ slot.rol }}</span>
+        </div>
+        }
+      </div>
+    </ng-template>
+  </div>
 </ion-content>
 }

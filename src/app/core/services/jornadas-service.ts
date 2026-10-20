@@ -45,6 +45,10 @@ export class JornadasService {
     return this.http.get(`${this.apiUrl}/getJornadasDisputadas`);
   }
 
+  getJornadasOnceIdeal() {
+    return this.http.get(`${this.apiUrl}/getJornadasOnceIdeal`);
+  }
+
   cargarPartidosJornada(jornada: number) {
     return this.http.post(`${this.apiUrl}/cargarPartidosJornada`, {jornadaId: jornada});
   }

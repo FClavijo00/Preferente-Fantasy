@@ -1,0 +1,50 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="modal-toolbar" mode="md">
+    <ion-title>Seleccionar {{ posicion }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="vaciarHueco()" class="btn-vaciar" mode="ios">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-button>
+      <ion-button (click)="cerrarModal()" class="btn-close" mode="ios">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<div class="modal-container">
+  <div class="jugadores-list">
+    @for (jugador of jugadoresFiltrados(); track jugador.id) {
+
+    <div class="jugador-item-card" (click)="seleccionarJugador(jugador)">
+      <!-- Foto Jugador -->
+      <ion-avatar class="jugador-avatar">
+        <img [src]="jugador.foto || 'assets/images/default-player.png'" />
+      </ion-avatar>
+
+      <!-- Detalle Jugador -->
+      <div class="jugador-info">
+        <span class="jugador-nombre">
+          {{ jugador.apodo || jugador.nombre }}
+        </span>
+        <div class="equipo-row">
+          <img [src]="jugador.equipo_escudo" class="mini-escudo" />
+          <span class="equipo-nombre">{{ jugador.equipo_nombre }}</span>
+        </div>
+      </div>
+
+      <!-- Puntos Totales y Estado -->
+      <div class="jugador-stats">
+        <div class="pts-box">
+          <span class="pts-val">{{ jugador.puntos_jornada }}</span>
+          <span class="pts-lbl">PTS</span>
+        </div>
+      </div>
+    </div>
+    } @empty {
+    <div class="empty-state">
+      <p>No hay futbolistas disponibles para esta posición.</p>
+    </div>
+    }
+  </div>
+</div>
