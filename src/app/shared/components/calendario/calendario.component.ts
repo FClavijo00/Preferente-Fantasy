@@ -51,7 +51,6 @@ export interface Jornada {
     IonCardContent,
     IonCardHeader,
     IonCard,
-    DatePipe
   ],
 })
 export class CalendarioComponent implements OnInit {

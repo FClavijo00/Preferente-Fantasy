@@ -43,7 +43,6 @@ export interface JugadorSlot {
     HeaderComponent,
     IonSelect,
     IonSelectOption,
-    DatePipe,
     NgTemplateOutlet,
     MiniCalendarioComponent,
   ],
