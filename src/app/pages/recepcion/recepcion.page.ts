@@ -143,7 +143,9 @@ export class RecepcionPage implements OnInit {
         if (res.ok) {
           this.misLigas.set(res.data);
         }
-      },
+      }, error: (err: any) => {
+        this.logout();
+      }
     });
   }
 
