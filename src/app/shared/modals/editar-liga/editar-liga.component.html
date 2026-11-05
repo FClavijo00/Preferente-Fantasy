@@ -1,3 +1,88 @@
-<p>
-  editar-liga works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrarModal()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Editar Liga</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="success" class="save-btn" (click)="guardarCambios()" [disabled]="!ligaForm.valid">
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="edit-modal-container ion-padding">
+  <form [formGroup]="ligaForm" class="edit-form">
+    <div class="input-group">
+      <ion-input class="outline-input" mode="md" label="Nombre de Liga" label-placement="stacked" fill="outline"
+        type="text" formControlName="nombre_liga">
+        <ion-icon name="trophy-outline" slot="start" class="input-icon"></ion-icon>
+      </ion-input>
+      @if (
+      ligaForm.get("nombre_liga")?.touched &&
+      ligaForm.get("nombre_liga")?.invalid
+      ) {
+      <span class="error-msg">El nombre de la liga es obligatorio (mínimo 3 caracteres).</span>
+      }
+    </div>
+
+    <div class="input-group">
+      <ion-toggle formControlName="privada" helperText="Activa para hacer tu liga privada" justify="space-between"
+        (ionChange)="onChangePrivada($event)">
+        Liga Privada
+      </ion-toggle>
+    </div>
+
+    @if (ligaForm.get("privada")?.value) {
+    <div class="input-group">
+      <ion-input class="outline-input" mode="md" label="Codigo de Acceso" label-placement="stacked" fill="outline"
+        type="text" formControlName="codigo_acceso">
+        <ion-icon name="key-outline" slot="start" class="input-icon"></ion-icon>
+      </ion-input>
+      @if (
+      ligaForm.get("codigo_acceso")?.touched &&
+      ligaForm.get("codigo_acceso")?.invalid
+      ) {
+      <span class="error-msg">El codigo de acceso es obligatorio y debe empezar por "PF-" + 4 números o caracteres en mayúsculas.</span>
+      }
+    </div>
+    }
+  </form>
+
+  <div class="usuarios-container">
+    <ion-list lines="full">
+      @for (usuario of listaUsuarios(); track usuario.usuario_id) {
+      <ion-item>
+        <!-- Avatar o icono opcional del usuario -->
+        <ion-avatar slot="start">
+          <img [src]="usuario.image_url" alt="Avatar" />
+        </ion-avatar>
+
+        <ion-label>
+          <h2>{{ usuario.nombre_usuario }}</h2>
+          <p>{{ usuario.email }}</p>
+          <p>
+            @if (usuario.usuario_id === creadorLigaId()) {
+            <ion-badge color="success">Creador</ion-badge>
+            } @else {
+            <ion-badge color="primary">Miembro</ion-badge>
+            }
+          </p>
+        </ion-label>
+
+        <!-- Botón para expulsar / eliminar usuario -->
+        @if (usuario.usuario_id !== creadorLigaId()) {
+        <ion-button slot="end" fill="clear" color="danger" mode="ios" (click)="confirmarEliminarUsuario(usuario)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        }
+      </ion-item>
+      } @empty {
+      <ion-item>
+        <ion-label class="ion-text-center text-muted">No hay usuarios en esta liga.</ion-label>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+</ion-content>

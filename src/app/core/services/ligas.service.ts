@@ -52,6 +52,18 @@ export class LigasService {
     return this.http.post(`${this.apiUrl}/unirseALiga`, data);
   }
 
+  cargarUsuariosLiga(data: any) {
+    return this.http.post(`${this.apiUrl}/cargarUsuariosLiga`, data);
+  }
+
+  eliminarUsuarioLiga(data: any) {
+    return this.http.post(`${this.apiUrl}/eliminarUsuarioLiga`, data);
+  }
+
+  editarLiga(data: any) {
+    return this.http.post(`${this.apiUrl}/editarLiga`, data);
+  }
+
   private obtenerLigaSeleccionada(): Ligas | null {
     const data = localStorage.getItem(this.STORAGE_KEY);
     if (!data) return null;

@@ -31,6 +31,8 @@ import { EditarPerfilComponent } from '../../shared/modals/editar-perfil/editar-
 import { LoadingService } from '../../core/services/loading.service';
 import { LigasService } from '../../core/services/ligas.service';
 import { ToastService } from '../../core/services/toast.service';
+import { asyncScheduler } from 'rxjs';
+import { EditarLigaComponent } from '../../shared/modals/editar-liga/editar-liga.component';
 
 @Component({
   selector: 'app-perfil',
@@ -59,6 +61,7 @@ export class PerfilPage implements OnInit {
 
   user = signal<any>(null);
   liga = this._ligasService.ligaSeleccionada();
+  usersLiga = signal<any>([]);
 
   constructor() {
     addIcons({
@@ -97,6 +100,34 @@ export class PerfilPage implements OnInit {
     }
   }
 
+  async abrirEditarLiga() {
+    const modal = await this._modalCtrl.create({
+      component: EditarLigaComponent,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.5, 0.75, 1],
+      handle: false,
+      mode: 'md',
+      componentProps: {
+        userData: this.user(),
+        ligaData: this.liga,
+        ligaUsers: this.usersLiga(),
+      },
+    });
+
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'confirm' && data) {
+      this._loadingService.show();
+      console.log(data);
+      this._ligasService.clearLigaSeleccionada();
+      this._navCtrl.navigateBack(['recepcion']);
+      this._loadingService.hide();
+    } else if (role === 'cancel') {
+      this.cargarUsuariosLiga();
+    }
+  }
+
   async abrirCambiarPassword() {
     const modal = await this._modalCtrl.create({
       component: CambiarPasswordComponent,
@@ -111,38 +142,60 @@ export class PerfilPage implements OnInit {
     // Abrir modal con las normas/puntuación de Preferente Fantasy
   }
 
-  abrirEditarLiga() {}
-
   async abrirAbandonarLiga() {
-    const alert = await this._alertCtrl.create({
-      mode: 'ios',
-      backdropDismiss: false,
-      header: `Abandonar "${this.liga?.nombre_liga}"`,
-      message:
-        'Perderás todas tus alineaciones y puntos. ¿Deseas abandonar la liga?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Abandonar',
-          handler: () => {
-            this.abandonarLiga();
+    if (this.usersLiga().length > 1) {
+      const alert = await this._alertCtrl.create({
+        mode: 'ios',
+        backdropDismiss: false,
+        header: `Abandonar "${this.liga?.nombre_liga}"`,
+        message:
+          'Perderás todas tus alineaciones y puntos. ¿Deseas abandonar la liga?',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
           },
-        },
-      ],
-    });
+          {
+            text: 'Abandonar',
+            handler: () => {
+              this.abandonarLiga();
+            },
+          },
+        ],
+      });
 
-    await alert.present();
+      await alert.present();
+    } else {
+      const alert = await this._alertCtrl.create({
+        mode: 'ios',
+        backdropDismiss: false,
+        header: `Abandonar "${this.liga?.nombre_liga}"`,
+        message:
+          `Eres el unico usuario en la liga. Si abandonas la liga, perderas tu equipo y puntos y además, desaparecerá tu liga. ¿Deseas abandonar la liga?`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+          },
+          {
+            text: 'Abandonar',
+            handler: () => {
+              this.abandonarLiga();
+            },
+          },
+        ],
+      });
+
+      await alert.present();
+    }
   }
 
   private abandonarLiga() {
     this._loadingService.show();
-    let data ={
+    let data = {
       liga_id: this.liga?.id,
       user_id: this.user()?.id,
-    }
+    };
     this._ligasService.abandonarLiga(data).subscribe({
       next: (resp: any) => {
         if (resp.ok) {
@@ -151,10 +204,11 @@ export class PerfilPage implements OnInit {
           this._navCtrl.navigateBack(['recepcion']);
           this._toastService.showSuccessToast(resp.message);
         }
-      }, error: (error: any) => {
+      },
+      error: (error: any) => {
         this._loadingService.hide();
         this._toastService.showErrorToast('Error al abandonar liga');
-      }
+      },
     });
   }
 
@@ -177,11 +231,28 @@ export class PerfilPage implements OnInit {
     );
   }
 
+  cargarUsuariosLiga() {
+    let data = {
+      liga_id: this.liga?.id,
+    };
+    this._ligasService.cargarUsuariosLiga(data).subscribe({
+      next: (resp: any) => {
+        if (resp.ok) {
+          this.usersLiga.set(resp.data);
+        }
+      },
+      error: (error: any) => {
+        this._toastService.showErrorToast(error.message);
+      },
+    });
+  }
+
   cerrarSesion() {
     this._authService.logout();
   }
 
   ngOnInit() {
     this.cargarDatosUsuario();
+    this.cargarUsuariosLiga();
   }
 }
