@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonButtons, NavController, IonFooter} from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, chevronDownOutline, chevronUpOutline, footballOutline, homeOutline, logoInstagram, peopleOutline, shirtOutline, statsChartOutline, trophyOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, chevronDownOutline, chevronUpOutline, footballOutline, homeOutline, logoInstagram, mailOutline, peopleOutline, shirtOutline, statsChartOutline, trophyOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-landing-page',
@@ -15,7 +15,7 @@ export class LandingPagePage {
 
   private _navCtrl = inject(NavController);
 
-  public mostrarInfo = signal<boolean>(false);
+  public mostrarInfo = signal<boolean>(true);
 
   constructor() {
     addIcons({
@@ -28,12 +28,13 @@ export class LandingPagePage {
       chevronUpOutline,
       chevronDownOutline,
       homeOutline,
-      shirtOutline
+      shirtOutline,
+      mailOutline
     });
   }
 
   toggleInfo() {
-    this.mostrarInfo.set(!this.mostrarInfo());
+    /* this.mostrarInfo.set(!this.mostrarInfo()); */
   }
 
   jugarAhora() {

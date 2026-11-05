@@ -36,10 +36,10 @@
             Jugar Ahora
           </ion-button>
           <!-- Botón Desplegable -->
-          <button type="button" class="saber-mas-btn" (click)="toggleInfo()">
+          <!-- <button type="button" class="saber-mas-btn" (click)="toggleInfo()">
             <span>{{ mostrarInfo() ? 'Ocultar detalles' : 'Saber más' }}</span>
             <ion-icon [name]="mostrarInfo() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-          </button>
+          </button> -->
         </div>
       </section>
 
@@ -202,8 +202,9 @@
         <a (click)="abrirPolitica()">Política de Privacidad</a>
         <a (click)="abrirTerminos()">Términos de Servicio</a>
         <a href=" https://instagram.com/preferentefantasy" target="_blank" rel="noopener">
-          <ion-icon name="logo-instagram"></ion-icon> &#64;preferentefantasy
+          Contacto: <ion-icon name="logo-instagram"></ion-icon>&#64;preferentefantasy
         </a>
+        <!-- <a><ion-icon name="mail-outline"></ion-icon> contacto.preferentefantasy&#64;gmail.com</a> -->
       </div>
     </div>
   </footer>
