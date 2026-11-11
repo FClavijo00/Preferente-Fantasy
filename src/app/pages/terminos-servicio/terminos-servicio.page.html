@@ -1,56 +1,195 @@
 <ion-header>
   <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-button (click)="volver()" fill="clear" color="success">
-        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>Volver
-      </ion-button>
+      <ion-back-button defaultHref="/landing-page" text="Volver"></ion-back-button>
     </ion-buttons>
-    <ion-title>Términos de Servicio</ion-title>
+    <ion-title>Términos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="legal-content ion-padding">
-  <div class="legal-container">
-    <h1>Términos y Condiciones de Uso</h1>
-    <p class="updated-date">Última actualización: Octubre 2026</p>
+<ion-content class="legal-content">
+  <main class="legal-container">
+    <h1>Términos y condiciones de uso</h1>
+    <p class="updated-date">Última actualización: 9 de noviembre de 2026</p>
 
-    <section>
-      <h2>1. Aceptación de los Términos</h2>
-      <p>
-        Al acceder o utilizar <strong>Preferente Fantasy</strong>, el usuario acepta quedar vinculado por los presentes Términos de Servicio. Si no está de acuerdo con alguno de los términos, no deberá utilizar la plataforma.
-      </p>
-    </section>
-
-    <section>
-      <h2>2. Naturaleza del Juego y Carácter Gratuito</h2>
-      <p>
-        Preferente Fantasy es un juego de simulación deportiva de entretenimiento para aficionados al fútbol regional. La participación es <strong>completamente gratuita</strong>. La plataforma no realiza ni promueve apuestas deportivas, juegos de azar ni transacciones monetarias por puntos o premios en metálico.
-      </p>
-    </section>
-
-    <section>
-      <h2>3. Normas de Conducta y Cuentas</h2>
-      <p>Queda estrictamente prohibido:</p>
+    <aside class="legal-summary" aria-labelledby="resumen-titulo">
+      <h2 id="resumen-titulo">En resumen</h2>
       <ul>
-        <li>Crear múltiples cuentas automáticas o bots para alterar las clasificaciones.</li>
-        <li>Utilizar nombres de usuario o escudos ofensivos, difamatorios o vejatorios.</li>
-        <li>Realizar ingeniería inversa o explotar vulnerabilidades de la aplicación.</li>
+        <li>Preferente Fantasy es un juego gratuito: no hay apuestas, pagos ni premios en dinero.</li>
+        <li>Necesitas tener al menos 14 años y una sola cuenta por persona.</li>
+        <li>Las puntuaciones salen de las actas oficiales; si un acta tiene un error, puede corregirse después.</li>
+        <li>Juega limpio y con respeto: podemos suspender cuentas que incumplan estas normas.</li>
       </ul>
-      <p>Nos reservamos el derecho de suspender o eliminar cuentas que incumplan estas normas.</p>
-    </section>
+    </aside>
 
-    <section>
-      <h2>4. Propiedad Intelectual y Exención de Afiliación</h2>
+    <nav class="legal-toc" aria-label="Índice">
+      <h2>Índice</h2>
+      <ol>
+        @for (item of indice; track item.id) {
+          <li><button type="button" (click)="irA(item.id)">{{ item.titulo }}</button></li>
+        }
+      </ol>
+    </nav>
+
+    <section id="titular">
+      <h2>1. Titular y contacto</h2>
       <p>
-        Preferente Fantasy es una iniciativa independiente creada por y para aficionados. Los nombres de los futbolistas, clubes y competiciones se citan con fines exclusivamente informativos y de entretenimiento dentro del contexto del juego simulación fantasy.
+        <strong>Preferente Fantasy</strong> es una plataforma creada y gestionada por <strong>Francisco José
+        Clavijo</strong> (datos completos en el <a routerLink="/aviso-legal">Aviso legal</a>). Puedes contactar con nosotros en
+        <a href="mailto:contacto.preferentefantasy@gmail.com">contacto.preferentefantasy&#64;gmail.com</a> o en
+        Instagram, <a href="https://instagram.com/preferentefantasy" target="_blank" rel="noopener">&#64;preferentefantasy</a>.
       </p>
     </section>
 
-    <section>
-      <h2>5. Limitación de Responsabilidad</h2>
+    <section id="aceptacion">
+      <h2>2. Aceptación</h2>
       <p>
-        Preferente Fantasy se esfuerza por mantener el servicio disponible y libre de errores, pero no garantiza la disponibilidad ininterrumpida de la plataforma ni la exactitud en tiempo real de las actas u oficiales de los partidos.
+        Al crear una cuenta o usar Preferente Fantasy aceptas estos términos y nuestra
+        <a routerLink="/politica-privacidad">Política de privacidad</a>. Si no estás de acuerdo con ellos, no debes
+        utilizar la plataforma.
       </p>
     </section>
-  </div>
+
+    <section id="servicio">
+      <h2>3. Qué es Preferente Fantasy</h2>
+      <p>
+        Preferente Fantasy es un juego de fútbol fantasy de entretenimiento sobre el fútbol provincial. Los usuarios
+        confeccionan plantillas con jugadores reales, alinean un once cada jornada y suman puntos según lo ocurrido en
+        los partidos.
+      </p>
+      <p>
+        La participación es <strong>completamente gratuita</strong>. La plataforma no realiza ni promueve apuestas, juegos
+        de azar ni transacciones económicas, y los puntos no tienen valor monetario ni pueden canjearse por dinero o
+        premios.
+      </p>
+    </section>
+
+    <section id="cuenta">
+      <h2>4. Tu cuenta</h2>
+      <ul>
+        <li>Debes tener al menos <strong>14 años</strong>, o contar con la autorización de tu madre, padre o tutor legal.</li>
+        <li>Solo puedes tener <strong>una cuenta por persona</strong>.</li>
+        <li>Los datos que facilites deben ser veraces, en especial tu correo electrónico, que es la vía para recuperar el acceso y ejercer tus derechos.</li>
+        <li>Eres responsable de mantener en secreto tu contraseña y de la actividad que se realice con tu cuenta. Si sospechas que alguien ha accedido a ella, cámbiala y avísanos.</li>
+      </ul>
+    </section>
+
+    <section id="puntuaciones">
+      <h2>5. Puntuaciones y actas</h2>
+      <p>
+        Los puntos se calculan a partir de las actas oficiales de cada partido siguiendo el sistema de puntuación
+        publicado en la aplicación. Ten en cuenta que:
+      </p>
+      <ul>
+        <li>Las puntuaciones se publican cuando hay acta disponible, por lo que pueden sufrir retrasos.</li>
+        <li>Si un acta contiene errores o es modificada, podemos corregir las puntuaciones y clasificaciones afectadas, incluso después de publicadas.</li>
+        <li>Podemos ajustar el sistema de puntuación entre temporadas; los cambios se publicarán antes de aplicarse.</li>
+        <li>En caso de discrepancia, la puntuación que figure en la plataforma tras su revisión será la definitiva.</li>
+      </ul>
+    </section>
+
+    <section id="ligas">
+      <h2>6. Ligas privadas</h2>
+      <p>
+        Cualquier usuario puede crear una liga privada e invitar a otros participantes. Quien crea la liga puede editar
+        sus datos, expulsar a participantes y eliminarla. Las normas internas y posibles acuerdos entre los miembros de
+        una liga privada son responsabilidad exclusiva de sus participantes; Preferente Fantasy no interviene en ellos.
+      </p>
+    </section>
+
+    <section id="conducta">
+      <h2>7. Normas de conducta</h2>
+      <p>Queda prohibido:</p>
+      <ul>
+        <li>Crear varias cuentas, usar bots o cualquier medio automatizado para alterar las clasificaciones.</li>
+        <li>Usar nombres de usuario, nombres de club o imágenes ofensivos, discriminatorios, difamatorios o que suplanten a otra persona.</li>
+        <li>Subir imágenes de terceros sin su permiso o contenidos que infrinjan derechos de otras personas.</li>
+        <li>Intentar acceder a cuentas ajenas, explotar vulnerabilidades, hacer ingeniería inversa o sobrecargar la plataforma.</li>
+      </ul>
+    </section>
+
+    <section id="contenido">
+      <h2>8. Contenido que subes</h2>
+      <p>
+        Sigues siendo titular de la foto de perfil y de los nombres que eliges. Al subirlos, nos permites mostrarlos
+        dentro de Preferente Fantasy a los demás participantes de tus ligas, únicamente para prestar el servicio y
+        mientras tu cuenta esté activa. Garantizas que tienes derecho a usar ese contenido. Podemos retirar cualquier
+        contenido que incumpla estos términos.
+      </p>
+    </section>
+
+    <section id="propiedad">
+      <h2>9. Propiedad intelectual y no afiliación</h2>
+      <p>
+        El diseño, el código, el logotipo y los textos de Preferente Fantasy pertenecen a su titular y no pueden copiarse
+        ni reutilizarse sin autorización.
+      </p>
+      <p>
+        Preferente Fantasy es una iniciativa <strong>independiente</strong> creada por y para aficionados. No está
+        afiliada, patrocinada ni respaldada por la Real Federación Andaluza de Fútbol, ni por los clubes o competiciones
+        que aparecen en ella. Los nombres de futbolistas, clubes y competiciones se usan con fines informativos dentro
+        del juego, y sus marcas y escudos pertenecen a sus respectivos titulares. Si eres titular de algún derecho y
+        quieres que retiremos un contenido, escríbenos.
+      </p>
+    </section>
+
+    <section id="publicidad">
+      <h2>10. Publicidad</h2>
+      <p>
+        Preferente Fantasy se mantiene gracias a la publicidad, que puede mostrarse dentro de la plataforma a través de
+        Google AdSense. No somos responsables del contenido de los anuncios ni de los sitios a los que enlazan. Más
+        información sobre cookies publicitarias en la <a routerLink="/politica-privacidad">Política de privacidad</a>.
+      </p>
+    </section>
+
+    <section id="responsabilidad">
+      <h2>11. Disponibilidad y responsabilidad</h2>
+      <p>
+        Hacemos lo posible por mantener el servicio disponible y sin errores, pero no podemos garantizar que funcione de
+        forma ininterrumpida, ni la exactitud o actualización inmediata de los datos de partidos y actas, que dependen
+        de fuentes externas. Podemos interrumpir temporalmente el servicio por mantenimiento o mejoras.
+      </p>
+      <p>
+        Al tratarse de un servicio gratuito de entretenimiento, y en la medida permitida por la ley, no respondemos de
+        los daños derivados de interrupciones, errores en las puntuaciones o pérdida de datos de juego. Nada de lo
+        anterior limita los derechos que te reconoce la normativa de consumidores.
+      </p>
+    </section>
+
+    <section id="baja">
+      <h2>12. Suspensión y baja</h2>
+      <p>
+        Puedes dejar de usar Preferente Fantasy cuando quieras y eliminar tu cuenta desde
+        <strong>Perfil → Eliminar cuenta</strong>. Se borrarán tu perfil, tus equipos y tus puntuaciones; las ligas
+        privadas que hayas creado pasarán al siguiente miembro más antiguo o se eliminarán si eras su único
+        participante. Esta acción no se puede deshacer.
+      </p>
+      <p>
+        Podemos suspender o eliminar cuentas que incumplan estos términos. Salvo en casos graves o de urgencia, te
+        avisaremos previamente indicando el motivo.
+      </p>
+    </section>
+
+    <section id="cambios">
+      <h2>13. Cambios en los términos</h2>
+      <p>
+        Podemos modificar estos términos para adaptarlos a cambios del servicio o de la normativa. Publicaremos aquí la
+        versión vigente con su fecha y, si los cambios son relevantes, te avisaremos dentro de la aplicación. Si sigues
+        usando la plataforma después, se entenderá que los aceptas.
+      </p>
+    </section>
+
+    <section id="ley">
+      <h2>14. Ley aplicable</h2>
+      <p>
+        Estos términos se rigen por la legislación española. Cualquier controversia se someterá a los juzgados y
+        tribunales que correspondan conforme a la ley; si actúas como consumidor, serán los de tu domicilio.
+      </p>
+    </section>
+
+    <p class="legal-footer">
+      Consulta también nuestra <a routerLink="/politica-privacidad">Política de privacidad</a> y el
+      <a routerLink="/aviso-legal">Aviso legal</a>.
+    </p>
+  </main>
 </ion-content>

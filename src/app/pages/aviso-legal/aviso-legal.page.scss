@@ -1,0 +1,10 @@
+@use '../legal';
+
+.datos-titular {
+  list-style: none;
+  padding: 0 !important;
+
+  li {
+    margin-bottom: 4px;
+  }
+}

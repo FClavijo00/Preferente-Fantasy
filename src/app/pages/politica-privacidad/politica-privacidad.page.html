@@ -1,63 +1,234 @@
 <ion-header>
   <ion-toolbar mode="md">
     <ion-buttons slot="start">
-      <ion-button (click)="volver()" fill="clear" color="success">
-        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>Volver
-      </ion-button>
+      <ion-back-button defaultHref="/landing-page" text="Volver"></ion-back-button>
     </ion-buttons>
-    <ion-title>Política de Privacidad</ion-title>
+    <ion-title>Privacidad</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="legal-content ion-padding">
-  <div class="legal-container">
-    <h1>Política de Privacidad</h1>
-    <p class="updated-date">Última actualización: Octubre 2026</p>
+<ion-content class="legal-content">
+  <main class="legal-container">
+    <h1>Política de privacidad</h1>
+    <p class="updated-date">Última actualización: 9 de noviembre de 2026</p>
 
-    <section>
-      <h2>1. Responsable del Tratamiento</h2>
+    <aside class="legal-summary" aria-labelledby="resumen-titulo">
+      <h2 id="resumen-titulo">En resumen</h2>
+      <ul>
+        <li>Solo pedimos lo necesario para jugar: nombre de usuario, nombre de tu club, correo, contraseña y, si quieres, una foto.</li>
+        <li>No vendemos tus datos. Los usamos para que funcione el juego y para mantener la plataforma segura.</li>
+        <li>La web se financia con publicidad de Google; los anuncios personalizados solo se muestran si das tu consentimiento.</li>
+        <li>Puedes borrar tu cuenta cuando quieras desde <strong>Perfil → Eliminar cuenta</strong>, y pedirnos una copia
+          de tus datos en <a href="mailto:contacto.preferentefantasy@gmail.com">contacto.preferentefantasy&#64;gmail.com</a>.</li>
+      </ul>
+    </aside>
+
+    <nav class="legal-toc" aria-label="Índice">
+      <h2>Índice</h2>
+      <ol>
+        @for (item of indice; track item.id) {
+          <li><button type="button" (click)="irA(item.id)">{{ item.titulo }}</button></li>
+        }
+      </ol>
+    </nav>
+
+    <section id="responsable">
+      <h2>1. Responsable del tratamiento</h2>
       <p>
-        En cumplimiento del Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD), le informamos que los datos personales recogidos en <strong>Preferente Fantasy</strong> serán tratados con la máxima confidencialidad.
+        El responsable del tratamiento de los datos personales recogidos en <strong>Preferente Fantasy</strong> es
+        <strong>Francisco José Clavijo</strong>, creador y titular de la plataforma. Sus datos identificativos completos
+        figuran en el <a routerLink="/aviso-legal">Aviso legal</a>.
+      </p>
+      <p>
+        Contacto para cualquier cuestión sobre privacidad:
+        <a href="mailto:contacto.preferentefantasy@gmail.com">contacto.preferentefantasy&#64;gmail.com</a>.
+      </p>
+      <p>
+        Esta política se rige por el Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 de Protección de Datos
+        Personales y garantía de los derechos digitales (LOPDGDD).
       </p>
     </section>
 
-    <section>
-      <h2>2. Datos que Recopilamos</h2>
-      <p>Para la prestación del servicio de la plataforma fantasy recopilamos únicamente:</p>
+    <section id="datos">
+      <h2>2. Qué datos tratamos</h2>
+
+      <h3>Datos que nos das al registrarte</h3>
       <ul>
-        <li>Nombre de usuario / Apodo.</li>
-        <li>Correo electrónico (para la creación de cuenta y recuperación de acceso).</li>
-        <li>Fotografía o avatar de perfil (opcional).</li>
-        <li>Datos de navegación e interacción dentro de la aplicación.</li>
+        <li>Nombre de usuario y nombre de tu club fantasy.</li>
+        <li>Correo electrónico.</li>
+        <li>Contraseña, que guardamos cifrada: ni siquiera nosotros podemos verla.</li>
+        <li>Foto de perfil, solo si decides subirla.</li>
+      </ul>
+
+      <h3>Datos que se generan al jugar</h3>
+      <ul>
+        <li>Las ligas a las que perteneces o que creas.</li>
+        <li>Tus plantillas, alineaciones, puntuaciones y posiciones en las clasificaciones.</li>
+      </ul>
+
+      <h3>Datos técnicos</h3>
+      <ul>
+        <li>
+          Estadísticas de uso agregadas y anónimas (páginas visitadas, tipo de dispositivo, país), obtenidas con Vercel
+          Web Analytics, que no usa cookies ni permite identificarte.
+        </li>
+        <li>Los datos que Google recoge para mostrar publicidad, descritos en el apartado de cookies.</li>
       </ul>
     </section>
 
-    <section>
-      <h2>3. Finalidad del Tratamiento</h2>
-      <p>Sus datos personales se utilizan exclusivamente para:</p>
+    <section id="finalidades">
+      <h2>3. Para qué usamos tus datos y con qué base legal</h2>
       <ul>
-        <li>Gestionar su registro, cuenta de usuario y ligas en Preferente Fantasy.</li>
-        <li>Calcular puntuaciones, clasificaciones y rendimiento de plantillas.</li>
-        <li>Garantizar la seguridad de la plataforma y evitar conductas fraudulentas.</li>
+        <li>
+          <strong>Prestarte el servicio</strong> (crear y gestionar tu cuenta, tus ligas, plantillas, alineaciones y
+          puntuaciones, y mostrar tu nombre de usuario, club y foto al resto de participantes de tus ligas). Base legal:
+          la ejecución del contrato que aceptas al registrarte (art. 6.1.b RGPD).
+        </li>
+        <li>
+          <strong>Mantener la plataforma segura</strong>, prevenir fraudes, cuentas duplicadas o abusos. Base legal:
+          nuestro interés legítimo en proteger el servicio y a sus usuarios (art. 6.1.f RGPD).
+        </li>
+        <li>
+          <strong>Conocer cómo se usa la web</strong> mediante estadísticas anónimas para mejorarla. Base legal: interés
+          legítimo (art. 6.1.f RGPD).
+        </li>
+        <li>
+          <strong>Mostrar publicidad personalizada</strong>. Base legal: tu consentimiento (art. 6.1.a RGPD), que puedes
+          retirar cuando quieras.
+        </li>
+        <li>
+          <strong>Responder a tus mensajes</strong> cuando nos escribes. Base legal: tu consentimiento al contactarnos.
+        </li>
       </ul>
+      <p>No tomamos decisiones automatizadas que produzcan efectos jurídicos sobre ti ni elaboramos perfiles propios.</p>
     </section>
 
-    <!-- CLÁUSULA IMPRESCINDIBLE PARA GOOGLE ADSENSE -->
-    <section>
-      <h2>4. Publicidad y Cookies de Terceros (Google AdSense)</h2>
+    <section id="futbolistas">
+      <h2>4. Datos de futbolistas</h2>
       <p>
-        Este sitio web utiliza servicios publicitarios prestados por <strong>Google AdSense</strong>. Google utiliza cookies para publicar anuncios basados en las visitas previas del usuario a este u otros sitios web.
+        Para que el juego funcione, Preferente Fantasy muestra información de los jugadores de las competiciones
+        incluidas: nombre, apellidos o apodo, club, posición, estadísticas de los partidos y, en algunos casos, una
+        fotografía. Estos datos proceden de las actas oficiales y de información deportiva públicamente disponible.
       </p>
       <p>
-        Los usuarios pueden inhabilitar la publicidad personalizada dirigiéndose a la <a href="https://adssettings.google.com" target="_blank" rel="noopener">Configuración de anuncios de Google</a>. Asimismo, proveedores y redes publicitarias de terceros pueden servir anuncios en nuestra plataforma.
+        Los tratamos sobre la base de nuestro interés legítimo en ofrecer un juego sobre el fútbol provincial y dar
+        visibilidad a sus jugadores (art. 6.1.f RGPD), limitándonos a datos deportivos.
+      </p>
+      <p>
+        Si eres futbolista y quieres que corrijamos tus datos, retiremos tu fotografía o te opongas a aparecer en la
+        plataforma, escríbenos a
+        <a href="mailto:contacto.preferentefantasy@gmail.com">contacto.preferentefantasy&#64;gmail.com</a> y lo
+        atenderemos lo antes posible.
       </p>
     </section>
 
-    <section>
-      <h2>5. Sus Derechos</h2>
+    <section id="conservacion">
+      <h2>5. Cuánto tiempo guardamos tus datos</h2>
       <p>
-        Como usuario, tiene derecho a acceder, rectificar, suprimir o limitar el tratamiento de sus datos personales. Puede solicitar la eliminación de su cuenta y datos enviando un correo a <strong>contacto.preferentefantasy&#64;gmail.com</strong> o desde el apartado de perfil en la aplicación.
+        Conservamos los datos de tu cuenta mientras la mantengas activa. Si la eliminas desde
+        <strong>Perfil → Eliminar cuenta</strong>, tus datos se borran en ese momento. Si nos pides la eliminación por
+        correo, lo haremos en un plazo máximo de 30 días. Las ligas privadas que hayas creado pasan al siguiente
+        miembro más antiguo, o se eliminan si eras su único participante.
+      </p>
+      <p>Las estadísticas de uso son anónimas y no están vinculadas a tu cuenta.</p>
+    </section>
+
+    <section id="destinatarios">
+      <h2>6. Con quién compartimos tus datos</h2>
+      <p>No vendemos ni cedemos tus datos a terceros. Solo acceden a ellos los proveedores que necesitamos para funcionar, que actúan como encargados del tratamiento:</p>
+      <ul>
+        <li><strong>Vercel Inc.</strong>: alojamiento de la web y estadísticas anónimas de uso.</li>
+        <li><strong>Railway Corporation</strong>: servidor, base de datos y almacenamiento de imágenes.</li>
+        <li><strong>Google Ireland Ltd.</strong>: publicidad (Google AdSense).</li>
+      </ul>
+      <p>
+        Algunos de estos proveedores pueden tratar datos fuera del Espacio Económico Europeo, principalmente en Estados
+        Unidos. Estas transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas
+        contractuales tipo aprobadas por la Comisión Europea.
+      </p>
+      <p>
+        Además, tu nombre de usuario, el nombre de tu club, tu foto y tus puntuaciones son visibles para los demás
+        participantes de las ligas en las que juegas.
       </p>
     </section>
-  </div>
+
+    <section id="cookies">
+      <h2>7. Cookies y almacenamiento local</h2>
+      <h3>Almacenamiento técnico</h3>
+      <p>
+        Guardamos en tu navegador (almacenamiento local) la sesión iniciada para que no tengas que identificarte cada vez.
+        Es imprescindible para el funcionamiento del servicio, por lo que no requiere consentimiento. Se elimina al
+        cerrar sesión.
+      </p>
+      <h3>Publicidad de Google</h3>
+      <p>
+        Este sitio utiliza <strong>Google AdSense</strong>. Google y sus socios pueden usar cookies e identificadores
+        para mostrar anuncios, medir su rendimiento y, si lo aceptas, personalizarlos según tus visitas a este y otros
+        sitios web. Te pediremos tu consentimiento antes de usar cookies publicitarias no esenciales, y podrás cambiar
+        tu elección en cualquier momento.
+      </p>
+      <p>
+        Puedes gestionar la personalización de anuncios en la
+        <a href="https://adssettings.google.com" target="_blank" rel="noopener">Configuración de anuncios de Google</a>
+        y consultar
+        <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">cómo usa Google la información de los sitios que utilizan sus servicios</a>.
+      </p>
+    </section>
+
+    <section id="menores">
+      <h2>8. Menores de edad</h2>
+      <p>
+        Para registrarte debes tener al menos <strong>14 años</strong>, edad mínima que establece la LOPDGDD para
+        consentir el tratamiento de datos personales. Si eres menor de 14 años, necesitas que tu madre, padre o tutor
+        legal cree la cuenta o autorice su uso. Si detectamos una cuenta de un menor de 14 años sin dicha autorización,
+        la eliminaremos.
+      </p>
+    </section>
+
+    <section id="seguridad">
+      <h2>9. Seguridad</h2>
+      <p>
+        Aplicamos medidas técnicas razonables para proteger tus datos: las comunicaciones viajan cifradas (HTTPS), las
+        contraseñas se almacenan cifradas mediante un algoritmo de hash y el acceso a los datos de tu cuenta requiere
+        haber iniciado sesión. Ningún sistema es infalible; si detectamos una brecha de seguridad que te afecte, te lo
+        comunicaremos según lo previsto en el RGPD.
+      </p>
+    </section>
+
+    <section id="derechos">
+      <h2>10. Tus derechos</h2>
+      <p>Puedes ejercer en cualquier momento los siguientes derechos:</p>
+      <ul>
+        <li><strong>Acceso</strong>: saber qué datos tenemos sobre ti y obtener una copia.</li>
+        <li><strong>Rectificación</strong>: corregir datos inexactos. Puedes editar tu nombre de usuario, club y foto desde tu perfil.</li>
+        <li><strong>Supresión</strong>: borrar tu cuenta y tus datos desde <strong>Perfil → Eliminar cuenta</strong>, o pedírnoslo por correo.</li>
+        <li><strong>Oposición</strong> y <strong>limitación</strong> del tratamiento.</li>
+        <li><strong>Portabilidad</strong>: recibir tus datos en un formato estructurado.</li>
+        <li><strong>Retirar tu consentimiento</strong> cuando el tratamiento se base en él, sin que afecte a lo anterior.</li>
+      </ul>
+      <p>
+        Para ejercerlos, escríbenos a
+        <a href="mailto:contacto.preferentefantasy@gmail.com">contacto.preferentefantasy&#64;gmail.com</a> desde el
+        correo asociado a tu cuenta. Te responderemos en el plazo máximo de un mes.
+      </p>
+      <p>
+        Si consideras que no hemos atendido correctamente tu solicitud, puedes presentar una reclamación ante la
+        <a href="https://www.aepd.es" target="_blank" rel="noopener">Agencia Española de Protección de Datos</a>.
+      </p>
+    </section>
+
+    <section id="cambios">
+      <h2>11. Cambios en esta política</h2>
+      <p>
+        Podemos actualizar esta política para adaptarla a cambios en el servicio o en la normativa. Publicaremos aquí
+        la versión vigente con su fecha de actualización y, si los cambios son relevantes, te avisaremos dentro de la
+        aplicación.
+      </p>
+    </section>
+
+    <p class="legal-footer">
+      Consulta también nuestros <a routerLink="/terminos-servicio">Términos de servicio</a> y el
+      <a routerLink="/aviso-legal">Aviso legal</a>.
+    </p>
+  </main>
 </ion-content>
