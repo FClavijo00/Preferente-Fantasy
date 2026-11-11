@@ -5,21 +5,19 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { cameraOutline, shieldOutline, atOutline } from 'ionicons/icons';
 import { LoadingService } from '../../../core/services/loading.service';
 import { AuthService } from '../../../core/services/auth-service.service';
-import {
-  IonContent,
-  IonItem,
-  IonInput,
-  IonIcon,
-  IonHeader,
-  IonButtons,
-  IonButton,
-  IonTitle,
-  IonToolbar,
-} from '@ionic/angular';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonItem } from '@ionic/angular/ion-item';
+import { IonInput } from '@ionic/angular/ion-input';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonButtons } from '@ionic/angular/ion-buttons';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
 import { addIcons } from 'ionicons';
 import { CropModalComponent } from '../../components/crop-modal/crop-modal.component';
 import { ToastService } from '../../../core/services/toast.service';
@@ -134,7 +132,7 @@ export class EditarPerfilComponent implements OnInit {
           this._loadingService.hide();
           if (resp.ok) {
             // Devolvemos el usuario actualizado al cerrar el modal
-            this._authService.setCurrentUser(resp.data);
+            this._authService.setSession(resp.data);
             this._modalCtrl.dismiss(resp.data, 'confirm');
             this._toastService.showSuccessToast(resp.message);
           }
