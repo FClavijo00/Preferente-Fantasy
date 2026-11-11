@@ -1,7 +1,8 @@
 {
   "name": "Preferente Fantasy",
   "short_name": "Preferente Fantasy",
-  "description": "Fantasy para mánagers de Jaén",
+  "description": "Fantasy del fútbol provincial de Jaén: plantillas, 11 ideal y ligas con tus amigos",
+  "lang": "es",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -10,14 +11,8 @@
   "icons": [
     {
       "src": "./icon/favicon.svg",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon/favicon.svg",
-      "sizes": "512x512",
-      "type": "image/png",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]

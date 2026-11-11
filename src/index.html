@@ -1,9 +1,46 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="utf-8" />
-  <title>Preferente Fantasy</title>
+  <title>Preferente Fantasy · Fantasy del fútbol provincial de Jaén</title>
+  <meta name="description"
+    content="Fantasy gratuito del fútbol provincial de Jaén. Crea tu plantilla con jugadores de la 1ª Andaluza, alinea tu 11 ideal cada jornada y compite en ligas públicas o privadas con tus amigos." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://preferente-fantasy.vercel.app/" />
+
+  <!-- Open Graph / redes sociales (vista previa al compartir en WhatsApp, Instagram, X...) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Preferente Fantasy" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:title" content="Preferente Fantasy · Fantasy del fútbol provincial de Jaén" />
+  <meta property="og:description"
+    content="Ficha jugadores reales de la 1ª Andaluza de Jaén, alinea tu 11 ideal y compite con tus amigos." />
+  <meta property="og:url" content="https://preferente-fantasy.vercel.app/" />
+  <meta property="og:image" content="https://preferente-fantasy.vercel.app/assets/images/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Logo de Preferente Fantasy" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://preferente-fantasy.vercel.app/assets/images/og-image.png" />
+  <meta name="twitter:title" content="Preferente Fantasy · Fantasy del fútbol provincial de Jaén" />
+  <meta name="twitter:description"
+    content="Ficha jugadores reales de la 1ª Andaluza de Jaén, alinea tu 11 ideal y compite con tus amigos." />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Preferente Fantasy",
+      "url": "https://preferente-fantasy.vercel.app/",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web, Android, iOS",
+      "inLanguage": "es",
+      "description": "Fantasy gratuito del fútbol provincial de Jaén (1ª Andaluza): plantillas, 11 ideal por jornada y ligas públicas y privadas.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+    }
+  </script>
 
   <base href="/" />
 
@@ -13,7 +50,7 @@
   <meta name="format-detection" content="telephone=no" />
   <meta name="msapplication-tap-highlight" content="no" />
 
-  <link rel="icon" type="image/png" href="assets/icon/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/icon/favicon.svg" />
 
   <!-- add to homescreen for ios -->
   <meta name="mobile-web-app-capable" content="yes" />
@@ -27,7 +64,35 @@
 </head>
 
 <body class="dark">
-  <app-root></app-root>
+  <app-root>
+    <!--
+      Contenido estático para buscadores y para el rastreador de AdSense.
+      Angular lo reemplaza en cuanto arranca la app, pero así la página nunca
+      llega "vacía" a quien no ejecuta JavaScript. Mantenlo alineado con la landing.
+    -->
+    <main style="max-width:760px;margin:0 auto;padding:32px 20px;font-family:system-ui,sans-serif;color:#fff;background:#0d1117;line-height:1.5">
+      <h1>Preferente Fantasy: el fantasy del fútbol provincial de Jaén</h1>
+      <p>Temporada 2026/2027 · Actualmente disponible para la 1ª Andaluza de Jaén.</p>
+      <p>Únete a una liga pública o crea tu propia liga privada con tus amigos, ficha jugadores reales de la
+        categoría, alinea tu 11 ideal cada jornada y demuestra quién sabe más del fútbol de nuestra tierra.</p>
+      <h2>Cómo se juega</h2>
+      <ol>
+        <li>Crea tu cuenta gratis y únete a una liga pública o privada.</li>
+        <li>Confecciona tu plantilla, con un máximo de 2 jugadores por equipo.</li>
+        <li>Alinea tu 11 ideal antes de cada jornada y suma puntos según las actas oficiales.</li>
+      </ol>
+      <h2>Sistema de puntuación</h2>
+      <p>Los puntos se calculan a partir del acta oficial de cada partido: titularidad, goles (más valiosos cuanto
+        más atrasada es la posición del goleador), portería a cero, resultado del equipo y tarjetas.</p>
+      <p>
+        <a href="/landing-page" style="color:#00ff66">Más información</a> ·
+        <a href="/register" style="color:#00ff66">Crear cuenta</a> ·
+        <a href="/politica-privacidad" style="color:#00ff66">Política de privacidad</a> ·
+        <a href="/terminos-servicio" style="color:#00ff66">Términos de servicio</a> ·
+        <a href="/aviso-legal" style="color:#00ff66">Aviso legal</a>
+      </p>
+    </main>
+  </app-root>
 </body>
 
 </html>

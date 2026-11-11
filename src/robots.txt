@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /tabs/
+Disallow: /recepcion
+Disallow: /panel-control
+
+# Los rastreadores de AdSense deben poder ver todo
+User-agent: Mediapartners-Google
+Allow: /
+
+Sitemap: https://preferente-fantasy.vercel.app/sitemap.xml

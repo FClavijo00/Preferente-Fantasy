@@ -7,16 +7,17 @@ import {
   withComponentInputBinding,
   withPreloading,
   PreloadAllModules,
+  TitleStrategy,
 } from '@angular/router';
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
+import { IonicRouteStrategy } from '@ionic/angular/ionic-route-strategy';
+import { provideIonicAngular } from '@ionic/angular/provide';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { importProvidersFrom } from '@angular/core';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { inject } from '@vercel/analytics';
+import { SeoTitleStrategy } from './app/core/seo/seo-title.strategy';
 
 // Initialize Vercel Web Analytics
 inject();
@@ -24,6 +25,7 @@ inject();
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: TitleStrategy, useClass: SeoTitleStrategy },
     provideIonicAngular(),
     provideRouter(
       routes,
@@ -33,6 +35,5 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
-    importProvidersFrom(NgbModule),
   ],
 });
