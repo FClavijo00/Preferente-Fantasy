@@ -1,58 +1,100 @@
 <ion-content>
-  <div class="auth-container">
-    <!-- Header / Branding -->
-    <div class="brand-section ion-text-center">
-      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="auth-logo" />
-      <h1 class="fantasy-title">PREFERENTE FANTASY</h1>
-      <p class="auth-subtitle">Inicia sesión para gestionar tus campeonatos</p>
-    </div>
+  <div class="auth-page">
+    <a routerLink="/landing-page" class="auth-back">
+      <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      Inicio
+    </a>
 
-    <!-- Formulario de Login -->
-    <form [formGroup]="loginForm">
-      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Correo Electrónico"
-        label-placement="stacked" fill="outline" type="text" formControlName="email">
-        <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
+    <main class="auth-card">
+      <header class="auth-brand">
+        <img
+          src="assets/images/pf-logo-v2.svg"
+          alt=""
+          class="auth-logo auth-logo-lg"
+          width="120"
+          height="120"
+        />
+        <h1 class="brand-title">
+          PREFERENTE <span class="highlight">FANTASY</span>
+        </h1>
+        <p>Inicia sesión para gestionar tus campeonatos</p>
+      </header>
 
-      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Contraseña" label-placement="stacked"
-        fill="outline" [type]="showPassword() ? 'text' : 'password'" formControlName="password">
-        <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
-        <ion-button mode="ios" slot="end" fill="clear" (click)="toggleShowPassword()">
-          <ion-icon slot="icon-only" class="input-icon"
-            [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" novalidate>
+        <ion-input
+          class="auth-input"
+          mode="md"
+          fill="outline"
+          label="Correo electrónico"
+          label-placement="stacked"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          formControlName="email"
+          errorText="Introduce un correo electrónico válido"
+        >
+          <ion-icon
+            [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            name="mail-outline"
+            slot="start"
+            class="input-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </ion-input>
+
+        <ion-input
+          class="auth-input"
+          mode="md"
+          fill="outline"
+          label="Contraseña"
+          label-placement="stacked"
+          type="password"
+          autocomplete="current-password"
+          formControlName="password"
+          errorText="Introduce tu contraseña"
+        >
+          <ion-icon
+            [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            name="lock-closed-outline"
+            slot="start"
+            class="input-icon"
+            aria-hidden="true"
+          ></ion-icon>
+          <ion-input-password-toggle
+            slot="end"
+            color="medium"
+          ></ion-input-password-toggle>
+        </ion-input>
+
+        <ion-button
+          type="submit"
+          expand="block"
+          class="auth-submit"
+          [disabled]="enviando()"
+        >
+          Iniciar sesión
         </ion-button>
-      </ion-input>
+      </form>
 
-      <div class="forgot-password ion-display-flex ion-justify-content-center ion-margin-bottom">
-        <a (click)="cambiarPass()">¿Cambiar contraseña?</a>
-        <!-- <a routerLink="/auth/forgot-password">¿Olvidaste tu contraseña?</a> -->
-      </div>
+      <p class="auth-help">
+        ¿Has olvidado tu contraseña?
+        <a
+          href="https://instagram.com/preferentefantasy"
+          target="_blank"
+          rel="noopener"
+          >Escríbenos</a
+        >
+      </p>
 
-      <ion-button expand="block" (click)="onLogin()" [disabled]="loginForm.invalid" class="neon-button">
-        INICIAR SESIÓN
-        @if (loadingSpinner()) {
-        <ion-spinner class="ion-margin-start" name="crescent"></ion-spinner>
-        }
-      </ion-button>
-    </form>
-
-    <!-- Footer / Acceso a Registro -->
-    <div class="auth-footer ion-text-center ion-margin-top">
-      <p>
+      <p class="auth-switch">
         ¿Aún no tienes equipo?
-        <a (click)="navRegister()">Regístrate aquí</a>
+        <a routerLink="/register">Regístrate gratis</a>
       </p>
-    </div>
+    </main>
 
-    <!-- <div class="auth-footer ion-text-center ion-margin-top">
-      <p>
-        ESTAMOS REALIZANDO LAS ÚLTIMAS PRUEBAS PARA EL LANZAMIENTO. ESTAD ATENTOS A: <a>@preferentefantasy</a>
-      </p>
-    </div> -->
-  </div>
-
-  <div class="app-footer-credits">
-    <p>Preferente Fantasy v1.2 © {{ currentYear() }}</p>
-    <p>Desarrollado por Francisco José Clavijo</p>
+    <footer class="auth-credits">
+      <p>Preferente Fantasy v2.0 © {{ anioActual }}</p>
+      <p>Desarrollado por Francisco José Clavijo</p>
+    </footer>
   </div>
 </ion-content>

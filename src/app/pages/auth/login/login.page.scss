@@ -1,92 +1,22 @@
-/* Estilos para el contenedor de Auth */
-ion-content {
-  --background: var(--ion-color-stadium);
+@use '../auth';
 
-  .auth-container {
-    padding: 35px 20px;
-
-    .auth-logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 10px;
-    }
-
-    .fantasy-title {
-      color: var(--ion-color-pitch);
-      font-size: 1.7rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-      margin-top: 0;
-    }
-
-    .auth-subtitle {
-      color: var(--ion-color-slate-muted);
-      font-size: 0.9rem;
-      margin-top: 4px;
-      margin-bottom: 20px;
-    }
-
-    ion-input.login-outline-input {
-      --border-color: var(--ion-color-pitch);
-      --border-radius: 10px;
-      --highlight-color-focused: #ffffff;
-      --highlight-color-valid: #ffffff;
-      --highlight-color-invalid: var(--ion-color-red-card);
-
-      ion-icon.input-icon {
-        color: var(--ion-color-pitch);
-        font-size: 1.5rem;
-      }
-    }
-
-    .btn-pitch {
-      --background: var(--ion-color-pitch);
-      --background-activated: var(--ion-color-pitch-shade);
-      --color: var(--ion-color-pitch-contrast);
-      font-family: "Titillium Web", sans-serif;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      height: 48px;
-      --border-radius: 10px;
-    }
-
-    ion-button.neon-button {
-      --background: rgba(0, 255, 102, 0.15);
-      --background-activated: #00ff66;
-      --background-hover: #00ff66;
-      --color: #00ff66;
-      --color-activated: #00ff66;
-      --color-hover: #00ff66;
-      --border-width: 1px;
-      --border-style: solid;
-      --border-color: rgba(0, 255, 102, 0.4);
-      font-size: 0.9rem;
-      font-weight: 800;
-      --border-radius: 10px;
-      letter-spacing: 0.5px;
-      height: 40px;
-    }
-
-    a {
-      color: var(--ion-color-pitch);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
+/* Cabecera del login: logo grande + marca con el estilo del header de la landing */
+.auth-brand {
+  .auth-logo-lg {
+    width: 120px;
+    height: 120px;
   }
-}
 
-.app-footer-credits {
- position: absolute;
- bottom: 0;
- width: 100%;
- padding: 20px;
- text-align: center;
-  
-  p {
-    font-size: 12px;
-    color: var(--ion-color-muted);
-    opacity: 0.6;
-    margin: 0;
+  .brand-title {
+    /* Siempre en una línea: se reduce en pantallas muy estrechas */
+    font-size: clamp(1.3rem, 7vw, 1.7rem);
+    white-space: nowrap;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+
+    .highlight {
+      color: #00ff66;
+    }
   }
 }

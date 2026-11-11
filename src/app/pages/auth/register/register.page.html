@@ -1,66 +1,154 @@
 <ion-content>
-  <div class="auth-container">
-    <!-- Header / Branding -->
-    <div class="brand-section ion-text-center">
-      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="auth-logo" />
-      <h1 class="fantasy-title">PREFERENTE FANTASY</h1>
-      <p class="auth-subtitle">
-        Crea tu perfil de mánager y sé el mejor de la provincia
-      </p>
-    </div>
+  <div class="auth-page">
+    <!-- <a routerLink="/landing-page" class="auth-back">
+      <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      Inicio
+    </a> -->
 
-    <!-- Formulario de Login -->
-    <form [formGroup]="registerForm">
-      <div class="avatar-upload-container ion-margin-bottom">
-        <label for="avatarInput" class="avatar-label">
-          <div class="avatar-preview"
-            [style.background-image]="avatarPreview() ? 'url(' + avatarPreview() + ')' : null">
-            @if (!avatarPreview()) {
-            <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
-            }
-          </div>
-          <span class="upload-hint">{{ avatarPreview() ? 'Cambiar foto' : 'Añadir foto' }}</span>
-        </label>
-        <input type="file" id="avatarInput" accept="image/*" (change)="onFileSelected($event)" hidden />
-      </div>
+    <main class="auth-card">
+      <header class="auth-brand">
+        <h1>Crea tu cuenta</h1>
+        <p>Crea tu perfil de mánager y sé el mejor de la provincia</p>
+      </header>
 
-      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Nombre Usuario"
-        label-placement="stacked" fill="outline" type="text" formControlName="username">
-        <ion-icon name="person-circle-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()" novalidate>
+        <div class="avatar-upload">
+          <button
+            type="button"
+            class="avatar-button"
+            (click)="avatarInput.click()"
+            [attr.aria-label]="avatarPreview() ? 'Cambiar foto de perfil' : 'Añadir foto de perfil (opcional)'"
+          >
+            <span
+              class="avatar-preview"
+              [style.background-image]="avatarPreview() ? 'url(' + avatarPreview() + ')' : null"
+            >
+              @if (!avatarPreview()) {
+              <ion-icon name="camera-outline" aria-hidden="true"></ion-icon>
+              }
+            </span>
+            <span class="avatar-hint" aria-hidden="true"
+              >{{ avatarPreview() ? 'Cambiar foto' : 'Añadir foto (opcional)'
+              }}</span
+            >
+          </button>
+          <input
+            #avatarInput
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            hidden
+          />
+        </div>
 
-      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Nombre Club" label-placement="stacked"
-        fill="outline" type="text" formControlName="club">
-        <ion-icon name="football-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
+        <ion-input
+          class="auth-input"
+          mode="md"
+          fill="outline"
+          label="Nombre de usuario"
+          label-placement="stacked"
+          type="text"
+          autocomplete="username"
+          autocapitalize="off"
+          formControlName="username"
+          errorText="Mínimo 3 caracteres"
+        >
+          <ion-icon
+            [class.is-invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+            name="person-circle-outline"
+            slot="start"
+            class="input-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </ion-input>
 
-      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Correo Electrónico"
-        label-placement="stacked" fill="outline" type="email" formControlName="email">
-        <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
+        <ion-input
+          class="auth-input"
+          mode="md"
+          fill="outline"
+          label="Nombre de tu club"
+          label-placement="stacked"
+          type="text"
+          autocomplete="off"
+          formControlName="club"
+          helperText="El nombre de tu equipo en el fantasy"
+          errorText="Mínimo 3 caracteres"
+        >
+          <ion-icon
+            [class.is-invalid]="registerForm.get('club')?.invalid && registerForm.get('club')?.touched"
+            name="football-outline"
+            slot="start"
+            class="input-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </ion-input>
 
-      <ion-input class="login-outline-input ion-margin-bottom" mode="md" label="Contraseña" label-placement="stacked"
-        fill="outline" [type]="showPassword() ? 'text' : 'password'" formControlName="password">
-        <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
-        <ion-button mode="ios" slot="end" fill="clear" (click)="toggleShowPassword()">
-          <ion-icon slot="icon-only" class="input-icon"
-            [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        <ion-input
+          class="auth-input"
+          mode="md"
+          fill="outline"
+          label="Correo electrónico"
+          label-placement="stacked"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          formControlName="email"
+          errorText="Introduce un correo electrónico válido"
+        >
+          <ion-icon
+            [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            name="mail-outline"
+            slot="start"
+            class="input-icon"
+            aria-hidden="true"
+          ></ion-icon>
+        </ion-input>
+
+        <ion-input
+          class="auth-input"
+          mode="md"
+          fill="outline"
+          label="Contraseña"
+          label-placement="stacked"
+          type="password"
+          autocomplete="new-password"
+          formControlName="password"
+          helperText="Mínimo 6 caracteres"
+          errorText="Mínimo 6 caracteres"
+        >
+          <ion-icon
+            [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+            name="lock-closed-outline"
+            slot="start"
+            class="input-icon"
+            aria-hidden="true"
+          ></ion-icon>
+          <ion-input-password-toggle
+            slot="end"
+            color="medium"
+          ></ion-input-password-toggle>
+        </ion-input>
+
+        <ion-button
+          type="submit"
+          expand="block"
+          class="auth-submit"
+          [disabled]="enviando()"
+        >
+          Crear cuenta
         </ion-button>
-      </ion-input>
 
-      <ion-button expand="block" [disabled]="registerForm.invalid" class="neon-button" (click)="onRegister()">
-        @if (loadingSpinner()) {
-        <ion-spinner name="crescent"></ion-spinner>
-        } REGISTRAR
-      </ion-button>
-    </form>
+        <p class="auth-legal">
+          Al crear tu cuenta aceptas los
+          <a routerLink="/terminos-servicio">Términos de servicio</a>
+          y la <a routerLink="/politica-privacidad">Política de privacidad</a>.
+        </p>
+      </form>
 
-    <!-- Footer / Acceso a Registro -->
-    <div class="auth-footer ion-text-center ion-margin-top">
-      <p>
-        ¿Ya tienes cuenta creada?
-        <a (click)="backLogin()">Volver al login</a>
+      <p class="auth-switch">
+        ¿Ya tienes cuenta?
+        <a routerLink="/login">Inicia sesión</a>
       </p>
-    </div>
+    </main>
   </div>
 </ion-content>

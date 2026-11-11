@@ -1,15 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { NavController } from '@ionic/angular/nav-controller';
 import { environment } from '../../../environments/environment';
-import { map, Observable, tap } from 'rxjs';
-import { NavController } from '@ionic/angular';
 
 interface ApiResponse<T> {
   ok: boolean;
   data: T;
+  message?: string;
 }
 
-interface Usuario {
+export interface Usuario {
   id: number;
   email: string;
   nombre_usuario: string;
@@ -19,18 +20,24 @@ interface Usuario {
   rol_id: number;
 }
 
+interface LoginData {
+  token: string;
+  usuario: Usuario;
+}
+
+const USER_KEY = 'pf_user_session';
+const TOKEN_KEY = 'pf_token';
+
 @Service()
 export class AuthService {
   private http = inject(HttpClient);
   private _navCtrl = inject(NavController);
   private apiUrl = `${environment.apiBaseURL}/auth`;
 
-  private readonly STORAGE_KEY = 'pf_user_session';
+  public currentUser = signal<Usuario | null>(this.leerUsuarioGuardado());
 
-  public currentUser = signal<Usuario | null>(this.obtenerUsuarioInicial());
-
-  private obtenerUsuarioInicial(): Usuario | null {
-    const data = localStorage.getItem(this.STORAGE_KEY);
+  private leerUsuarioGuardado(): Usuario | null {
+    const data = localStorage.getItem(USER_KEY);
     if (!data) return null;
     try {
       return JSON.parse(data);
@@ -39,32 +46,62 @@ export class AuthService {
     }
   }
 
-  // Guardar la sesión de forma síncrona en memoria y almacenamiento
-  setSession(user: Usuario, token?: string) {
-    if (token) {
-      localStorage.setItem('pf_token', token);
-    }
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
-    this.currentUser.set(user); // Actualiza la Signal inmediatamente
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
   }
 
-  // Cerrar sesión limpiando todo
+  /**
+   * Guarda la sesión en memoria (signal) y en localStorage.
+   * Sin token solo actualiza los datos del usuario (p. ej. tras editar el perfil).
+   */
+  setSession(user: Usuario, token?: string) {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.currentUser.set(user);
+  }
+
   clearSession() {
-    localStorage.removeItem(this.STORAGE_KEY);
-    localStorage.removeItem('pf_token');
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     this.currentUser.set(null);
   }
 
+  /** Hay sesión si tenemos usuario y un token que no ha caducado. */
   isAuthenticated(): boolean {
-    return this.currentUser() !== null;
+    return this.currentUser() !== null && !this.tokenCaducado();
   }
 
-  login(email: string, password: string) {
-    return this.http.post<ApiResponse<Usuario>>(`${this.apiUrl}/login`, {email, password});
+  /**
+   * Lee la fecha de caducidad (exp) del token. No valida la firma (eso lo hace el
+   * backend); solo sirve para no dar por buena una sesión que el servidor ya rechaza.
+   */
+  tokenCaducado(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now();
+    } catch {
+      return true;
+    }
   }
 
   getUser(): Usuario | null {
     return this.currentUser();
+  }
+
+  login(email: string, password: string) {
+    return this.http.post<ApiResponse<LoginData>>(`${this.apiUrl}/login`, { email, password });
+  }
+
+  /** Hace login y deja la sesión guardada. Lanza el HttpErrorResponse si falla. */
+  async iniciarSesion(email: string, password: string): Promise<Usuario> {
+    const resp = await firstValueFrom(this.login(email, password));
+    this.clearSession();
+    this.setSession(resp.data.usuario, resp.data.token);
+    return resp.data.usuario;
   }
 
   logout() {
@@ -72,31 +109,24 @@ export class AuthService {
     this._navCtrl.navigateRoot(['/login'], { replaceUrl: true });
   }
 
-  private getUserFromStorage(): Usuario | null {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+  register(data: FormData) {
+    return this.http.post<ApiResponse<Usuario>>(`${this.apiUrl}/register`, data);
   }
 
-  setCurrentUser(user: any) {
-    localStorage.setItem('pf_user_session', JSON.stringify(user));
+  cambiarPass(data: { passwordActual: string; passwordNueva: string }) {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/cambiarPassword`, data);
   }
 
-  register(data: any) {
-    return this.http.post<ApiResponse<Usuario>>(
-      `${this.apiUrl}/register`,
-      data,
-    );
+  actualizarPerfil(data: FormData) {
+    return this.http.post<ApiResponse<Usuario>>(`${this.apiUrl}/actualizarUsuario`, data);
   }
 
-  cambiarPass(data: any) {
-    return this.http.post(`${this.apiUrl}/cambiarPassword`, data);
+  eliminarCuenta(password: string) {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/eliminarCuenta`, { password });
   }
 
-  actualizarPerfil(data: any) {
-    return this.http.post(`${this.apiUrl}/actualizarUsuario`, data);
-  }
-
-  cargarPerfil(idUsuario: any) {
-    return this.http.post(`${this.apiUrl}/cargarPerfil`, { id: idUsuario });
+  /** Perfil del usuario de la sesión (el backend lo saca del token). */
+  cargarPerfil() {
+    return this.http.post<ApiResponse<Usuario>>(`${this.apiUrl}/cargarPerfil`, {});
   }
 }
