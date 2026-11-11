@@ -1,0 +1,22 @@
+/* Etiqueta de entorno (solo en local y en la web de pruebas) */
+.entorno-badge {
+  position: fixed;
+  top: calc(6px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #6b7280;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  pointer-events: none;
+  opacity: 0.9;
+
+  &.staging {
+    background: #f59e0b;
+    color: #111111;
+  }
+}

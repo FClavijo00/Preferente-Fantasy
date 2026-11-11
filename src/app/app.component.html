@@ -3,4 +3,11 @@
 
   <!-- Loader global -->
   <app-loading></app-loading>
+
+  <!-- Etiqueta de entorno: solo fuera de producción, para no confundir webs -->
+  @if (entorno !== 'produccion') {
+    <div class="entorno-badge" [class.staging]="entorno === 'staging'" aria-hidden="true">
+      {{ entorno === 'staging' ? 'PRUEBAS' : 'LOCAL' }}
+    </div>
+  }
 </ion-app>

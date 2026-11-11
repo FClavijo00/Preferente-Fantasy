@@ -4,8 +4,10 @@
 
 export const environment = {
   production: false,
+  entorno: 'local' as 'local' | 'staging' | 'produccion',
   apiBaseURL: 'http://localhost:3000/api',
   storageBucket: 'https://t3.storageapi.dev/integrated-shoebox-gfnvqe/',
+  siteUrl: 'https://preferente-fantasy.vercel.app',
 };
 
 /*
