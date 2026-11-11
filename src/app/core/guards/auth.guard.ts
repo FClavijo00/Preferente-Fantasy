@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth-service.service';
-import { NavController } from '@ionic/angular';
+import { NavController } from '@ionic/angular/nav-controller';
 
 export const authGuard: CanActivateFn = () => {
 
