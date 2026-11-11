@@ -31,6 +31,14 @@
         <p>Actualiza tu clave de acceso</p>
       </ion-label>
     </ion-item>
+
+    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirEliminarCuenta()">
+      <ion-icon name="trash-outline" slot="start" color="danger" class="icon-accent"></ion-icon>
+      <ion-label>
+        <h2>Eliminar Cuenta</h2>
+        <p>Borra tu cuenta y todos tus datos</p>
+      </ion-label>
+    </ion-item>
   </ion-list>
 
   <!-- SECCIÓN: COMUNIDAD Y SOPORTE -->
@@ -82,5 +90,5 @@
     </ion-button>
   </div>
 
-  <div class="app-version">Preferente Fantasy v1.2</div>
+  <div class="app-version">Preferente Fantasy v2.0</div>
 </ion-content>

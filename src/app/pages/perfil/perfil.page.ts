@@ -1,20 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonList,
-  IonIcon,
-  IonLabel,
-  IonItem,
-  IonButton,
-  ModalController,
-  AlertController,
-  NavController,
-} from '@ionic/angular';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonList } from '@ionic/angular/ion-list';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonItem } from '@ionic/angular/ion-item';
+import { IonButton } from '@ionic/angular/ion-button';
+import { ModalController } from '@ionic/angular/modal-controller';
+import { AlertController } from '@ionic/angular/alert-controller';
+import { NavController } from '@ionic/angular/nav-controller';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { AuthService } from '../../core/services/auth-service.service';
 import {
@@ -23,6 +21,7 @@ import {
   logoInstagram,
   documentTextOutline,
   logOutOutline,
+  trashOutline,
   trophyOutline,
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
@@ -70,6 +69,7 @@ export class PerfilPage implements OnInit {
       logoInstagram,
       documentTextOutline,
       logOutOutline,
+      trashOutline,
       trophyOutline,
     });
   }
@@ -213,15 +213,12 @@ export class PerfilPage implements OnInit {
   }
 
   cargarDatosUsuario() {
-    /* const usuarioActual = this._authService.getUser();
-    this.user.set(usuarioActual); */
     this._loadingService.show();
-    let userID = this._authService.getUser()?.id;
-    this._authService.cargarPerfil(userID).subscribe(
+    this._authService.cargarPerfil().subscribe(
       (resp: any) => {
         if (resp.ok) {
           this.user.set(resp.data);
-          this._authService.setCurrentUser(resp.data);
+          this._authService.setSession(resp.data);
           this._loadingService.hide();
         }
       },
@@ -249,6 +246,58 @@ export class PerfilPage implements OnInit {
 
   cerrarSesion() {
     this._authService.logout();
+  }
+
+  async abrirEliminarCuenta() {
+    const alert = await this._alertCtrl.create({
+      mode: 'ios',
+      backdropDismiss: false,
+      header: 'Eliminar cuenta',
+      message:
+        'Se borrarán tu perfil, tus equipos y tus puntos en todas tus ligas. Las ligas que creaste pasarán al siguiente miembro, o se borrarán si estás solo. Esta acción no se puede deshacer.',
+      inputs: [
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Tu contraseña',
+          attributes: { autocomplete: 'current-password' },
+        },
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: (data: { password: string }) => {
+            if (!data.password) {
+              this._toastService.showErrorToast('Introduce tu contraseña para confirmar.');
+              return false; // mantiene el aviso abierto
+            }
+            this.eliminarCuenta(data.password);
+            return true;
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  private eliminarCuenta(password: string) {
+    this._loadingService.show('Eliminando cuenta...');
+    this._authService.eliminarCuenta(password).subscribe({
+      next: () => {
+        this._loadingService.hide();
+        this._authService.clearSession();
+        this._ligasService.clearLigaSeleccionada();
+        this._navCtrl.navigateRoot('/landing-page', { replaceUrl: true });
+        this._toastService.showSuccessToast('Tu cuenta se ha eliminado. ¡Gracias por jugar!');
+      },
+      error: (error) => {
+        this._loadingService.hide();
+        this._toastService.showErrorToast(error.error?.message || 'No se ha podido eliminar la cuenta.');
+      },
+    });
   }
 
   ngOnInit() {
