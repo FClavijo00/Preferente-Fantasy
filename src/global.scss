@@ -15,7 +15,7 @@
 @forward './theme/index.scss';
 /* Importing Bootstrap SCSS file. */
 
-@use "bootstrap/scss/bootstrap";
+@use "./theme/bootstrap-lite";
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";

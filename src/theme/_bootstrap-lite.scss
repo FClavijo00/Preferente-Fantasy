@@ -1,0 +1,35 @@
+// Bootstrap a la carta: solo las piezas que usa la app.
+// Antes se importaba Bootstrap completo (~230 kB de CSS). Si empiezas a usar
+// otra parte de Bootstrap (grid, botones, formularios...), añade aquí su import
+// o, en el caso de utilidades, su clave dentro de $utilities.
+
+@use "sass:map";
+
+// 1. Configuración (no genera CSS)
+// Bootstrap 5.3 solo se puede cargar por piezas con @import (no soporta @use).
+// El aviso de deprecación de @import está silenciado en angular.json
+// (stylePreprocessorOptions.sass.silenceDeprecations); revisar al migrar a Bootstrap 6.
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// 2. Base global
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+
+// 3. Componentes usados: .table (clasificación), .card-header/.card-footer, .btn-close
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/close";
+
+// 4. Utilidades usadas: .text-center, .text-muted, .align-middle
+$utilities: (
+  "align": map.get($utilities, "align"),
+  "text-align": map.get($utilities, "text-align"),
+  "color": map.get($utilities, "color"),
+);
+@import "bootstrap/scss/utilities/api";
