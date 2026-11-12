@@ -1,0 +1,116 @@
+<section class="seccion">
+  <header class="seccion-cabecera">
+    <div>
+      <h2>Jornadas</h2>
+      @if (estado() === 'listo') {
+      <p>{{ jornadas().length }} {{ jornadas().length === 1 ? 'jornada' : 'jornadas' }} en la temporada</p>
+      }
+    </div>
+    <ion-button mode="md" class="btn-principal" (click)="nuevaJornada()" [disabled]="estado() === 'cargando'">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Nueva jornada
+    </ion-button>
+  </header>
+
+  @switch (estado()) {
+  @case ('cargando') {
+  <div class="lista" aria-busy="true">
+    @for (i of [1, 2, 3]; track i) {
+    <div class="jornada esqueleto">
+      <ion-skeleton-text animated class="sk-numero"></ion-skeleton-text>
+      <div class="sk-textos">
+        <ion-skeleton-text animated style="width: 55%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 35%"></ion-skeleton-text>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se han podido cargar las jornadas.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargar()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+
+  @default {
+  <ol class="lista">
+    @for (j of jornadas(); track j.id) {
+    <li
+      class="jornada"
+      [class.siguiente]="j.id === idSiguiente()"
+      [class.cerrada]="j.estado === 'CERRADA'"
+    >
+      <div class="numero" aria-hidden="true">J{{ j.numero_jornada }}</div>
+
+      <div class="info">
+        <div class="titulo">
+          <h3>Jornada {{ j.numero_jornada }}</h3>
+          <button
+            type="button"
+            [class]="'chip chip-estado ' + j.estado.toLowerCase()"
+            (click)="cambiarEstado(j)"
+            [attr.aria-label]="'Estado: ' + textoEstado[j.estado] + '. Cambiar estado'"
+            title="Cambiar estado"
+          >
+            {{ textoEstado[j.estado] }}
+            <ion-icon name="chevron-down" aria-hidden="true"></ion-icon>
+          </button>
+          @if (j.id === idSiguiente()) {
+          <span class="chip siguiente-chip">Siguiente</span>
+          }
+        </div>
+
+        <p class="fechas">
+          <span class="fecha-inicio" title="Inicio (fecha límite para alinear)">
+            <ion-icon name="flag-outline" aria-hidden="true"></ion-icon>
+            {{ formatearFecha(j.fecha_inicio) }}
+          </span>
+          <span class="fecha-fin">hasta {{ formatearFecha(j.fecha_fin) }}</span>
+        </p>
+
+        <p class="contadores">
+          <span><ion-icon name="football-outline" aria-hidden="true"></ion-icon>{{ j.num_partidos }} partidos</span>
+          <span><ion-icon name="people-outline" aria-hidden="true"></ion-icon>{{ j.num_alineaciones }} alineaciones</span>
+          @if (j.tiene_once_ideal) {
+          <span><ion-icon name="star-outline" aria-hidden="true"></ion-icon>11 ideal</span>
+          }
+        </p>
+      </div>
+
+      <div class="acciones">
+        <button
+          type="button"
+          class="btn-icono"
+          (click)="editarJornada(j)"
+          [attr.aria-label]="'Editar jornada ' + j.numero_jornada"
+          title="Editar"
+        >
+          <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button
+          type="button"
+          class="btn-icono peligro"
+          [class.bloqueado]="!esEliminable(j)"
+          (click)="eliminarJornada(j)"
+          [attr.aria-label]="'Eliminar jornada ' + j.numero_jornada"
+          [title]="esEliminable(j) ? 'Eliminar' : 'Tiene datos: no se puede eliminar'"
+        >
+          <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </li>
+    } @empty {
+    <li class="estado-vacio">
+      <ion-icon name="calendar-number-outline" aria-hidden="true"></ion-icon>
+      <p>Todavía no hay jornadas. Crea la primera para empezar la temporada.</p>
+    </li>
+    }
+  </ol>
+  }
+  }
+</section>

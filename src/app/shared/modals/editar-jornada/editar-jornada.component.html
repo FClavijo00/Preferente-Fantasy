@@ -1,0 +1,103 @@
+<div class="pf-modal">
+  <header class="cabecera">
+    <h2>{{ esEdicion ? 'Editar Jornada ' + jornada.numero_jornada : 'Nueva Jornada' }}</h2>
+    <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+
+  <form class="pf-modal-cuerpo" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <div class="campo campo-numero">
+      <label for="numero-jornada">Número</label>
+      <input
+        id="numero-jornada"
+        class="input-relleno"
+        type="number"
+        inputmode="numeric"
+        min="1"
+        step="1"
+        formControlName="numero_jornada"
+        [class.invalido]="form.controls.numero_jornada.touched && form.controls.numero_jornada.invalid"
+      />
+      @if (form.controls.numero_jornada.touched && form.controls.numero_jornada.invalid) {
+      <span class="campo-error">Un número entero mayor que 0</span>
+      }
+    </div>
+
+    <!-- Fechas: tarjetas que abren el calendario (ion-datetime) -->
+    @for (campo of camposFecha; track campo.control) {
+    <div class="campo">
+      <span class="etiqueta" [id]="'etiqueta-' + campo.control">{{ campo.etiqueta }}</span>
+      <button
+        type="button"
+        class="fecha-boton"
+        [class.invalido]="fechaInvalida(campo.control)"
+        [attr.aria-labelledby]="'etiqueta-' + campo.control"
+        (click)="abrirSelector(campo.control)"
+      >
+        <span class="fecha-icono" aria-hidden="true">
+          <ion-icon [name]="campo.icono"></ion-icon>
+        </span>
+        @if (partes(campo.control); as p) {
+        <span class="fecha-texto">
+          <span class="fecha-dia">{{ p.dia }}</span>
+          <span class="fecha-hora">{{ p.hora }} h</span>
+        </span>
+        } @else {
+        <span class="fecha-texto vacia">Elegir fecha y hora</span>
+        }
+        <ion-icon class="fecha-flecha" name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+    </div>
+    }
+
+    <!-- Calendario: un único modal para inicio y fin -->
+    <ion-modal
+      class="pf-datetime-modal"
+      [isOpen]="selector() !== null"
+      (didDismiss)="selector.set(null)"
+    >
+      <ng-template>
+        <ion-datetime
+          mode="ios"
+          presentation="date-time"
+          locale="es-ES"
+          hourCycle="h23"
+          [firstDayOfWeek]="1"
+          [showDefaultButtons]="true"
+          doneText="Aceptar"
+          cancelText="Cancelar"
+          [value]="valorSelector()"
+          [min]="selector() === 'fecha_fin' ? form.controls.fecha_inicio.value || undefined : undefined"
+          (ionChange)="elegirFecha($event.detail.value)"
+          (ionCancel)="selector.set(null)"
+        >
+          <span slot="title">{{ selector() === 'fecha_inicio' ? 'Inicio de la jornada' : 'Fin de la jornada' }}</span>
+          <span slot="time-label">Hora</span>
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+
+    @if (form.hasError('finAntesDeInicio')) {
+    <span class="campo-error">El fin no puede ser anterior al inicio</span>
+    } @else if (form.touched && (form.controls.fecha_inicio.invalid || form.controls.fecha_fin.invalid)) {
+    <span class="campo-error">Indica las fechas de inicio y fin</span>
+    }
+
+    <p class="ayuda">
+      <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon>
+      <span>
+        El <strong>inicio</strong> es la fecha límite para hacer la alineación: es la que ven los
+        usuarios. Hora de España.
+      </span>
+    </p>
+
+    <ion-button type="submit" mode="md" expand="block" class="btn-principal" [disabled]="enviando()">
+      @if (enviando()) {
+      <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+      {{ esEdicion ? 'Guardar cambios' : 'Crear jornada' }}
+      }
+    </ion-button>
+  </form>
+</div>

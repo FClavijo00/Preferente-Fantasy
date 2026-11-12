@@ -1,0 +1,341 @@
+:host {
+  display: block;
+}
+
+.seccion {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 16px 32px;
+  color: #ffffff;
+}
+
+/* ---------- Cabecera ---------- */
+.seccion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+ion-button {
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.btn-principal {
+  --background: var(--ion-color-pitch);
+  --background-activated: var(--ion-color-pitch-shade);
+  --background-hover: var(--ion-color-pitch-tint);
+  --color: var(--ion-color-pitch-contrast);
+  --border-radius: 12px;
+  font-weight: 800;
+  min-height: 42px;
+  flex-shrink: 0;
+}
+
+.btn-secundario {
+  --color: var(--ion-color-pitch);
+  --border-color: rgba(0, 230, 118, 0.55);
+  --border-radius: 12px;
+  font-weight: 700;
+}
+
+/* ---------- Lista ---------- */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jornada {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  /* La próxima jornada que jugarán los usuarios, destacada */
+  &.siguiente {
+    border-color: rgba(0, 230, 118, 0.5);
+    background: rgba(0, 230, 118, 0.06);
+
+    .numero {
+      background: var(--ion-color-pitch);
+      color: var(--ion-color-pitch-contrast);
+      border-color: transparent;
+    }
+  }
+
+  /* Las ya jugadas, en segundo plano */
+  &.cerrada {
+    .numero,
+    .info {
+      opacity: 0.6;
+    }
+  }
+}
+
+.numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  h3 {
+    margin: 0 4px 0 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+}
+
+.chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+
+  &.pendiente {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.3);
+  }
+
+  &.en_juego {
+    color: var(--ion-color-pitch);
+    background: rgba(0, 230, 118, 0.12);
+    border-color: rgba(0, 230, 118, 0.35);
+  }
+
+  &.cerrada {
+    color: var(--ion-color-slate-muted);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &.siguiente-chip {
+    color: var(--ion-color-pitch-contrast);
+    background: var(--ion-color-pitch);
+  }
+}
+
+/* El chip de estado es un botón: al pulsarlo se cambia el estado */
+.chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+
+  ion-icon {
+    font-size: 0.8rem;
+  }
+
+  &:hover {
+    filter: brightness(1.25);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+.fechas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 0.85rem;
+
+  .fecha-inicio {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+
+    ion-icon {
+      color: var(--ion-color-pitch);
+    }
+  }
+
+  .fecha-fin {
+    font-size: 0.78rem;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.contadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+/* ---------- Acciones ---------- */
+.acciones {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+
+  &.peligro {
+    color: var(--ion-color-red-card);
+
+    &:hover {
+      background: rgba(255, 82, 82, 0.12);
+      border-color: rgba(255, 82, 82, 0.4);
+    }
+  }
+
+  /* Se puede pulsar (explica por qué no se borra), pero se ve apagado */
+  &.bloqueado {
+    opacity: 0.35;
+  }
+}
+
+/* En móvil estrecho, las acciones bajan bajo la info */
+@media (max-width: 420px) {
+  .jornada {
+    flex-wrap: wrap;
+  }
+
+  .acciones {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* ---------- Carga / vacío ---------- */
+.esqueleto {
+  .sk-numero {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .sk-textos {
+    flex: 1;
+
+    ion-skeleton-text {
+      height: 12px;
+      border-radius: 6px;
+    }
+  }
+
+  ion-skeleton-text {
+    --background: rgba(255, 255, 255, 0.08);
+    --background-rgb: 255, 255, 255;
+  }
+}
+
+.estado-vacio {
+  text-align: center;
+  padding: 32px 20px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+
+  ion-icon {
+    font-size: 2rem;
+    color: var(--ion-color-pitch);
+  }
+
+  p {
+    color: var(--ion-color-slate-muted);
+    font-size: 0.9rem;
+    margin: 8px 0 14px;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
