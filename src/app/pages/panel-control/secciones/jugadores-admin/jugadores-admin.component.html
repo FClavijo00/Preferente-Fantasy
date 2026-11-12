@@ -1,0 +1,166 @@
+<!-- ===== Barra de equipos (scroll horizontal) ===== -->
+<nav class="equipos" aria-label="Equipos">
+  @switch (estadoEquipos()) {
+  @case ('cargando') {
+  @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+  <div class="equipo esqueleto"><ion-skeleton-text animated></ion-skeleton-text></div>
+  }
+  }
+  @case ('error') {
+  <div class="equipos-error">
+    <span>No se han podido cargar los equipos.</span>
+    <button type="button" class="btn-texto" (click)="cargarEquipos()">Reintentar</button>
+  </div>
+  }
+  @default {
+  @for (e of equipos(); track e.id) {
+  <button
+    type="button"
+    class="equipo"
+    [class.activo]="e.id === equipoId()"
+    [attr.aria-pressed]="e.id === equipoId()"
+    [title]="e.nombre"
+    [attr.aria-label]="e.nombre"
+    (click)="seleccionarEquipo(e.id)"
+  >
+    <span class="escudo">
+      @if (e.escudo) {
+      <img [src]="e.escudo" alt="" width="52" height="52" loading="lazy" />
+      } @else {
+      <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+      }
+    </span>
+  </button>
+  }
+  }
+  }
+</nav>
+
+<section class="seccion">
+  @if (equipo(); as e) {
+  <header class="seccion-cabecera">
+    <div class="titulo">
+      @if (e.escudo) {
+      <img [src]="e.escudo" alt="" width="44" height="44" />
+      }
+      <div>
+        <h2>{{ e.nombre }}</h2>
+        @if (estadoJugadores() === 'listo') {
+        <p>
+          {{ resumen().total }} jugadores
+          @if (resumen().lesionados) { · {{ resumen().lesionados }} lesionados }
+          @if (resumen().inactivos) { · {{ resumen().inactivos }} inactivos }
+        </p>
+        }
+      </div>
+    </div>
+    <ion-button mode="md" class="btn-principal" (click)="nuevoJugador()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Nuevo jugador
+    </ion-button>
+  </header>
+
+  @if (estadoJugadores() === 'listo' && resumen().total > 8) {
+  <label class="buscador">
+    <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+    <input
+      type="search"
+      placeholder="Buscar en {{ e.nombre }}"
+      aria-label="Buscar jugador"
+      autocomplete="off"
+      [value]="busqueda()"
+      (input)="busqueda.set($any($event.target).value)"
+    />
+  </label>
+  }
+
+  @switch (estadoJugadores()) {
+  @case ('cargando') {
+  <div class="lista" aria-busy="true">
+    @for (i of [1, 2, 3, 4]; track i) {
+    <div class="jugador esqueleto">
+      <ion-skeleton-text animated class="sk-foto"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 50%; height: 14px"></ion-skeleton-text>
+    </div>
+    }
+  </div>
+  }
+
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se han podido cargar los jugadores.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargarJugadores()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+
+  @default {
+  @for (g of grupos(); track g.posicion) {
+  <h3 [class]="'grupo-titulo ' + g.posicion.toLowerCase()">
+    {{ g.titulo }}
+    <span class="contador">{{ g.jugadores.length }}</span>
+  </h3>
+  <ul class="lista">
+    @for (j of g.jugadores; track j.id) {
+    <li [class]="'jugador ' + j.posicion.toLowerCase()" [class.inactivo]="j.activo === false">
+      <img
+        class="foto"
+        [src]="j.foto || 'assets/images/default-player.png'"
+        alt=""
+        width="44"
+        height="44"
+        loading="lazy"
+      />
+      <div class="info">
+        <span class="nombre">{{ nombre(j) }}</span>
+        <span class="detalle">
+          <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()">{{ j.posicion }}</span>
+          @if (nombreCompleto(j); as completo) {
+          <span class="completo">{{ completo }}</span>
+          }
+          @if (j.lesionado) {
+          <span class="etiqueta lesion"><ion-icon name="medkit-outline" aria-hidden="true"></ion-icon>Lesionado</span>
+          }
+          @if (j.activo === false) {
+          <span class="etiqueta">Inactivo</span>
+          }
+        </span>
+      </div>
+      <button
+        type="button"
+        class="btn-icono"
+        (click)="editarJugador(j)"
+        [attr.aria-label]="'Editar ' + nombre(j)"
+        title="Editar"
+      >
+        <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+      </button>
+      <button
+        type="button"
+        class="btn-icono peligro"
+        [class.bloqueado]="j.tiene_historial"
+        (click)="eliminarJugador(j)"
+        [attr.aria-label]="'Eliminar ' + nombre(j)"
+        [title]="j.tiene_historial ? 'Tiene historial: desactívalo en lugar de borrarlo' : 'Eliminar'"
+      >
+        <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+      </button>
+    </li>
+    }
+  </ul>
+  } @empty {
+  <div class="estado-vacio">
+    @if (busqueda()) {
+    <p>Ningún jugador coincide con «{{ busqueda() }}».</p>
+    } @else {
+    <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+    <p>Este equipo aún no tiene jugadores.</p>
+    }
+  </div>
+  }
+  }
+  }
+  }
+</section>

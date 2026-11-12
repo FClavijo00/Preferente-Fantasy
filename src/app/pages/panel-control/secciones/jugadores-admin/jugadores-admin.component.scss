@@ -1,0 +1,422 @@
+:host {
+  display: block;
+  color: #ffffff;
+}
+
+/* ---------- Barra de equipos ---------- */
+.equipos {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  scroll-snap-type: x proximity;
+  /* Sin esto, el ajuste del scroll pega el primer/último botón al borde ignorando el padding */
+  scroll-padding-inline: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+
+  /* En un contenedor con scroll, el padding derecho se pierde: este hueco lo sustituye */
+  &::after {
+    content: '';
+    flex: 0 0 8px;
+  }
+}
+
+.equipo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ion-color-slate-muted);
+  font: inherit;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+
+  &.activo {
+    border-color: var(--ion-color-pitch);
+    background: rgba(0, 230, 118, 0.1);
+    color: #ffffff;
+  }
+
+  &.esqueleto ion-skeleton-text {
+    --background: rgba(255, 255, 255, 0.08);
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    border-radius: 50%;
+  }
+}
+
+.escudo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+
+  img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+  }
+
+  ion-icon {
+    font-size: 1.6rem;
+  }
+}
+
+.equipos-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--ion-color-slate-muted);
+}
+
+/* ---------- Cabecera del equipo ---------- */
+.seccion {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 18px 16px 32px;
+}
+
+.seccion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  .titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+
+    img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  p {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+ion-button {
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.btn-principal {
+  --background: var(--ion-color-pitch);
+  --background-activated: var(--ion-color-pitch-shade);
+  --background-hover: var(--ion-color-pitch-tint);
+  --color: var(--ion-color-pitch-contrast);
+  --border-radius: 12px;
+  font-weight: 800;
+  min-height: 40px;
+  flex-shrink: 0;
+}
+
+.btn-secundario {
+  --color: var(--ion-color-pitch);
+  --border-color: rgba(0, 230, 118, 0.55);
+  --border-radius: 12px;
+  font-weight: 700;
+}
+
+.btn-texto {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
+
+  &:focus-within {
+    border-color: var(--ion-color-pitch);
+  }
+
+  ion-icon {
+    color: var(--ion-color-slate-muted);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+/* ---------- Grupos por posición ---------- */
+.grupo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 8px;
+  padding-left: 10px;
+  border-left: 3px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  &.por {
+    color: var(--pf-pos-por);
+  }
+
+  &.def {
+    color: var(--pf-pos-def);
+  }
+
+  &.med {
+    color: var(--pf-pos-med);
+  }
+
+  &.del {
+    color: var(--pf-pos-del);
+  }
+
+  .contador {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ion-color-slate-muted);
+    letter-spacing: 0;
+  }
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.jugador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  /* Foto con el aro del color de su posición (como en la app de los usuarios) */
+  .foto {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &.por .foto {
+    border-color: var(--pf-pos-por);
+  }
+
+  &.def .foto {
+    border-color: var(--pf-pos-def);
+  }
+
+  &.med .foto {
+    border-color: var(--pf-pos-med);
+  }
+
+  &.del .foto {
+    border-color: var(--pf-pos-del);
+  }
+
+  &.inactivo {
+    .foto,
+    .info {
+      opacity: 0.5;
+    }
+  }
+
+  &.esqueleto {
+    ion-skeleton-text {
+      --background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+    }
+
+    .sk-foto {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      margin: 0;
+    }
+  }
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detalle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 0.75rem;
+  color: var(--ion-color-slate-muted);
+
+  .pf-chip-pos {
+    width: 34px;
+    height: 20px;
+    font-size: 0.6rem;
+  }
+
+  .completo {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 700;
+
+  &.lesion {
+    color: #ff8a80;
+    background: rgba(255, 82, 82, 0.14);
+  }
+}
+
+.btn-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1.05rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+
+  &.peligro {
+    color: var(--ion-color-red-card);
+
+    &:hover {
+      background: rgba(255, 82, 82, 0.12);
+      border-color: rgba(255, 82, 82, 0.4);
+    }
+  }
+
+  /* Se puede pulsar (explica por qué no se borra), pero se ve apagado */
+  &.bloqueado {
+    opacity: 0.35;
+  }
+}
+
+.estado-vacio {
+  text-align: center;
+  padding: 32px 20px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+
+  ion-icon {
+    font-size: 2rem;
+    color: var(--ion-color-pitch);
+  }
+
+  p {
+    margin: 8px 0 14px;
+    color: var(--ion-color-slate-muted);
+    font-size: 0.9rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
