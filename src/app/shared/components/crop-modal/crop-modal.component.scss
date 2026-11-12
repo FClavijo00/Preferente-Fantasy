@@ -1,17 +1,115 @@
+/* Recorte de foto: pantalla completa (recortar necesita espacio en el móvil),
+   con el mismo lenguaje visual que el resto de modales. */
+
 ion-header {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
-  
-  ion-toolbar {
-    --background: var(--ion-color-stadium);
+  background: var(--ion-color-stadium);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: calc(16px + env(safe-area-inset-top)) 20px 14px;
+  color: #ffffff;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--ion-color-slate-muted);
   }
 }
 
-.content-cropper {
-  --background: var(--ion-color-stadium);
+.btn-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ion-color-slate-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+ion-content.recorte {
+  --background: #050a07;
+}
+
+.lienzo {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+
+  ion-spinner {
+    color: var(--ion-color-pitch);
+  }
 }
+
 image-cropper {
-  max-height: 70vh;
+  max-width: 640px;
+  max-height: calc(100vh - 220px);
+  /* Colores de la herramienta de recorte (ngx-image-cropper) */
+  --cropper-outline-color: rgba(5, 10, 7, 0.75);
+  --cropper-overlay-color: #050a07;
+  color: var(--ion-color-pitch); /* asas y borde del recorte */
+
+  &.oculto {
+    visibility: hidden;
+    position: absolute;
+  }
+}
+
+ion-footer {
+  background: var(--ion-color-stadium);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pie {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+}
+
+ion-button {
+  margin: 0;
+  min-height: 48px;
+  text-transform: none;
+  letter-spacing: 0;
+  --border-radius: 12px;
+}
+
+.btn-tonal {
+  --background: rgba(255, 255, 255, 0.08);
+  --background-hover: rgba(255, 255, 255, 0.12);
+  --background-activated: rgba(255, 255, 255, 0.16);
+  --color: #ffffff;
+  --box-shadow: none;
+  font-weight: 700;
+}
+
+.btn-principal {
+  --background: var(--ion-color-pitch);
+  --background-activated: var(--ion-color-pitch-shade);
+  --background-hover: var(--ion-color-pitch-tint);
+  --color: var(--ion-color-pitch-contrast);
+  font-weight: 800;
 }

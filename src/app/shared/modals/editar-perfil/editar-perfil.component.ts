@@ -72,7 +72,6 @@ export class EditarPerfilComponent implements OnInit {
         ],
       ],
       foto: [null],
-      foto_url: [null],
     });
   }
 
@@ -96,7 +95,6 @@ export class EditarPerfilComponent implements OnInit {
       this.imagenPreview.set(data.croppedImageBase64);
 
       this.perfilForm.patchValue({ foto: data.croppedImageFile });
-      this.perfilForm.patchValue({ foto_url: data.croppedImageFile.name });
     }
 
     input.value = '';
@@ -115,14 +113,9 @@ export class EditarPerfilComponent implements OnInit {
 
     formData.append('nombre_club', this.perfilForm.value.nombre_club);
     formData.append('nombre_usuario', this.perfilForm.value.nombre_usuario);
-    formData.append('id', this.userData.id);
-
-    if (formValues.foto_url !== null && formValues.foto_url !== '') {
-      formData.append('foto_url', formValues.foto_url);
-    }
-
+    // El nombre del fichero lo pone el servidor (y el usuario sale del token, no del id)
     if (formValues.foto !== null) {
-      formData.append('foto', formValues.foto, formValues.foto_url);
+      formData.append('foto', formValues.foto, 'foto.webp');
     }
 
     this._authService

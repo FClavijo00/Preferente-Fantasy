@@ -47,7 +47,6 @@ export class RegisterPage {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     foto: this._fb.control<File | null>(null),
-    foto_url: this._fb.control<string | null>(null),
   });
 
   constructor() {
@@ -76,7 +75,6 @@ export class RegisterPage {
       this.avatarPreview.set(data.croppedImageBase64);
       this.registerForm.patchValue({
         foto: data.croppedImageFile,
-        foto_url: data.croppedImageFile.name,
       });
     }
 
@@ -92,7 +90,7 @@ export class RegisterPage {
     }
     if (this.enviando()) return;
 
-    const { username, club, email, password, foto, foto_url } = this.registerForm.getRawValue();
+    const { username, club, email, password, foto } = this.registerForm.getRawValue();
     const emailLimpio = email.trim();
 
     const formData = new FormData();
@@ -100,10 +98,8 @@ export class RegisterPage {
     formData.append('club', club.trim());
     formData.append('email', emailLimpio);
     formData.append('password', password);
-    if (foto && foto_url) {
-      formData.append('foto_url', foto_url);
-      formData.append('foto', foto, foto_url);
-    }
+    // El nombre del fichero lo pone el servidor
+    if (foto) formData.append('foto', foto, 'foto.webp');
 
     this.enviando.set(true);
     this._loadingService.show('Creando tu cuenta...');
