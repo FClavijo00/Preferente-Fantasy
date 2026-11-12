@@ -1,227 +1,335 @@
-<ion-header>
-  <ion-toolbar mode="md">
-    <ion-title>{{ partido.tiene_acta ? "Editar Acta" : "Crear Acta" }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button mode="ios" (click)="cerrarModal()">
-        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <div class="cabecera">
+    <div class="cabecera-fila">
+      <h2>{{ partido.tiene_acta ? 'Editar Acta' : 'Realizar Acta' }}</h2>
+      <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar">
+        <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Marcador del partido -->
+    <div class="marcador">
+      <div class="equipo local">
+        <span class="equipo-nombre">{{ partido.local_nombre }}</span>
+        @if (partido.local_escudo) {
+        <img [src]="partido.local_escudo" alt="" width="30" height="30" />
+        }
+      </div>
+      <div class="resultado">{{ partido.goles_local ?? 0 }} - {{ partido.goles_visitante ?? 0 }}</div>
+      <div class="equipo visitante">
+        @if (partido.visitante_escudo) {
+        <img [src]="partido.visitante_escudo" alt="" width="30" height="30" />
+        }
+        <span class="equipo-nombre">{{ partido.visitante_nombre }}</span>
+      </div>
+    </div>
+
+    <ion-segment
+      mode="md"
+      [scrollable]="true"
+      class="pestanas"
+      [value]="pestana()"
+      (ionChange)="pestana.set($any($event.detail.value))"
+    >
+      <ion-segment-button value="alineaciones">
+        <ion-label>Alineaciones</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="goles">
+        <ion-label>Goles · {{ totalGoles() }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="tarjetas">
+        <ion-label>Tarjetas · {{ tarjetas().length }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="destacado">
+        <ion-label>Destacado</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <form [formGroup]="actaForm" class="acta-container">
-    <div class="acta-grid">
-      <div class="team-col">
-        <h3 class="col-title local">
-          Equipo Local : {{ partido.local_nombre }}
-        </h3>
+<ion-content class="acta">
+  <div class="cuerpo">
+    @switch (estado()) {
+    @case ('cargando') {
+    <div class="centrado"><ion-spinner name="crescent"></ion-spinner></div>
+    }
 
-        <span class="sub-title">Titulares (11)</span>
-        <div formArrayName="titulares_local" class="players-list">
-          @for (
-          control of getFormArray("titulares_local").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaLocal; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
+    @case ('error') {
+    <div class="estado-vacio">
+      <p>No se ha podido cargar el acta.</p>
+      <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargar()">Reintentar</ion-button>
+    </div>
+    }
 
-        <span class="sub-title">Suplentes (7)</span>
-        <div formArrayName="suplentes_local" class="players-list">
-          @for (
-          control of getFormArray("suplentes_local").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaLocal; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-
-      <div class="team-col">
-        <h3 class="col-title visitante">
-          Equipo Visitante : {{ partido.visitante_nombre }}
-        </h3>
-
-        <span class="sub-title">Titulares (11)</span>
-        <div formArrayName="titulares_visitante" class="players-list">
-          @for (
-          control of getFormArray("titulares_visitante").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar jugador">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaVisitante; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
-
-        <span class="sub-title">Suplentes (7)</span>
-        <div formArrayName="suplentes_visitante" class="players-list">
-          @for (
-          control of getFormArray("suplentes_visitante").controls;
-          track $index
-          ) {
-          <div [formGroupName]="$index" class="player-row">
-            <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Seleccionar suplente">
-              <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-              @for (j of plantillaVisitante; track j.id) {
-              <ion-select-option [value]="j.id">{{
-                obtenerNombreFormateado(j)
-                }}</ion-select-option>
-              }
-            </ion-select>
-            <div class="cards-checks">
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla1" />
-                TA</label>
-              <label class="card-check yellow"><input type="checkbox" formControlName="amarilla2" />
-                TA</label>
-              <label class="card-check red"><input type="checkbox" formControlName="roja" /> TR</label>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
+    @default {
+    @switch (pestana()) {
+    <!-- ===================== ALINEACIONES ===================== -->
+    @case ('alineaciones') {
+    <div class="segmentado" role="tablist">
+      @for (lado of lados; track lado) {
+      <button
+        type="button"
+        role="tab"
+        class="segmento"
+        [class.activo]="ladoAlineacion() === lado"
+        [attr.aria-selected]="ladoAlineacion() === lado"
+        (click)="ladoAlineacion.set(lado)"
+      >
+        <span class="segmento-titulo">{{ nombreEquipo(lado) }}</span>
+        <span class="segmento-ayuda">{{ numConvocados()[lado] }} convocados</span>
+      </button>
+      }
     </div>
 
-    <div class="goles-section">
-      <h3 class="section-title">Anotadores del Partido</h3>
+    @for (grupo of grupos; track grupo) {
+    @let lado = ladoAlineacion();
+    @let lista = convocatoria()[lado][grupo];
+    <h3 class="titulo-bloque">
+      {{ grupo === 'titulares' ? 'Titulares' : 'Suplentes' }}
+      <span class="contador">{{ lista.length }}</span>
+    </h3>
+    <ol class="huecos">
+      @for (id of lista; track $index) {
+      <li class="hueco">
+        <span class="hueco-num">{{ $index + 1 }}</span>
+        <button
+          type="button"
+          class="selector-jugador"
+          [class.vacio]="id === null"
+          [attr.aria-label]="(grupo === 'titulares' ? 'Titular ' : 'Suplente ') + ($index + 1)"
+          (click)="abrirSelectorConvocado(lado, grupo, $index)"
+        >
+          @if (jugador(id); as j) {
+          <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()" aria-hidden="true">{{ j.posicion }}</span>
+          <span class="selector-nombre">{{ nombre(j) }}</span>
+          } @else {
+          <span class="selector-nombre">Vacío</span>
+          }
+          <ion-icon class="selector-flecha" name="chevron-down" aria-hidden="true"></ion-icon>
+        </button>
+      </li>
+      }
+    </ol>
+    @if (grupo === 'suplentes') {
+    <button type="button" class="btn-anadir" (click)="anadirSuplente(lado)">
+      <ion-icon name="add" aria-hidden="true"></ion-icon>
+      Añadir suplente
+    </button>
+    }
+    }
+    }
 
-      <div class="acta-grid">
-        <div class="team-col">
-          <span class="sub-title">Goles Locales ({{ getFormArray("goles_local_list").length }})</span>
-          <div formArrayName="goles_local_list" class="goals-list">
-            @for (
-            control of getFormArray("goles_local_list").controls;
-            track $index
-            ) {
-            <div [formGroupName]="$index" class="goal-row">
-              <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
-                <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-                @for (
-                j of control.get("tipo")?.value === "PROPIA"
-                ? plantillaVisitante
-                : plantillaLocal;
-                track j.id
-                ) {
-                <ion-select-option [value]="j.id">{{
-                  obtenerNombreFormateado(j)
-                  }}</ion-select-option>
-                }
-              </ion-select>
+    <!-- ===================== GOLES ===================== -->
+    @case ('goles') {
+    @if (totalGoles() === 0) {
+    <div class="estado-vacio">
+      <ion-icon name="football-outline" aria-hidden="true"></ion-icon>
+      <p>El partido acabó sin goles. Si no es así, corrige el resultado en «Editar partido».</p>
+    </div>
+    }
 
-              <ion-select mode="ios" formControlName="tipo" interface="popover" class="tipo-gol-select">
-                <ion-select-option value="NORMAL">Normal</ion-select-option>
-                <ion-select-option value="PENALTI">Penalti</ion-select-option>
-                <ion-select-option value="PROPIA">En propia</ion-select-option>
-              </ion-select>
-            </div>
+    @for (lado of lados; track lado) {
+    @if (goles()[lado].length > 0) {
+    <h3 class="titulo-bloque">
+      Goles del {{ nombreEquipo(lado) }}
+      <span class="contador">{{ goles()[lado].length }}</span>
+    </h3>
+    <ul class="eventos">
+      @for (gol of goles()[lado]; track $index) {
+      @let autorLado = ladoAutor(lado, gol.tipo);
+      <li class="evento">
+        <input
+          class="input-minuto"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          max="130"
+          placeholder="min"
+          aria-label="Minuto"
+          [value]="gol.minuto ?? ''"
+          (change)="elegirMinutoGol(lado, $index, $any($event.target).value)"
+        />
+        <button
+          type="button"
+          class="selector-jugador"
+          [class.vacio]="gol.jugador_id === null"
+          [attr.aria-label]="'Autor del gol'"
+          (click)="abrirSelectorGol(lado, $index)"
+        >
+          @if (jugador(gol.jugador_id); as j) {
+          <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()" aria-hidden="true">{{ j.posicion }}</span>
+          <span class="selector-nombre">{{ nombre(j) }}</span>
+          } @else {
+          <span class="selector-nombre">{{ gol.tipo === 'PROPIA' ? 'Jugador del ' + nombreEquipo(autorLado) : 'Autor del gol' }}</span>
+          }
+          <ion-icon class="selector-flecha" name="chevron-down" aria-hidden="true"></ion-icon>
+        </button>
+        <select
+          class="select-relleno select-tipo"
+          aria-label="Tipo de gol"
+          (change)="elegirTipoGol(lado, $index, $any($event.target).value)"
+        >
+          @for (t of tiposGol; track t.id) {
+          <option [value]="t.id" [selected]="t.id === gol.tipo">{{ t.texto }}</option>
+          }
+        </select>
+      </li>
+      }
+    </ul>
+    @if (numConvocados()[lado] === 0) {
+    <p class="aviso">Elige primero la convocatoria del {{ nombreEquipo(lado) }} en «Alineaciones».</p>
+    }
+    }
+    }
+    }
+
+    <!-- ===================== TARJETAS ===================== -->
+    @case ('tarjetas') {
+    <ul class="eventos">
+      @for (t of tarjetas(); track t.uid) {
+      <li class="evento tarjeta" [attr.data-tipo]="t.tipo">
+        <div class="tarjeta-fila">
+          <div class="mini-segmentado" role="group" aria-label="Equipo">
+            @for (lado of lados; track lado) {
+            <button
+              type="button"
+              [class.activo]="t.lado === lado"
+              [attr.aria-pressed]="t.lado === lado"
+              (click)="cambiarTarjeta(t.uid, { lado })"
+            >
+              {{ nombreEquipo(lado) }}
+            </button>
             }
           </div>
+          <button type="button" class="btn-quitar" (click)="quitarTarjeta(t.uid)" aria-label="Quitar tarjeta">
+            <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+          </button>
         </div>
 
-        <div class="team-col">
-          <span class="sub-title">Goles Visitantes ({{
-            getFormArray("goles_visitante_list").length
-            }})</span>
-          <div formArrayName="goles_visitante_list" class="goals-list">
-            @for (
-            control of getFormArray("goles_visitante_list").controls;
-            track $index
-            ) {
-            <div [formGroupName]="$index" class="goal-row">
-              <ion-select mode="ios" formControlName="jugador_id" interface="popover" placeholder="Autor del gol">
-                <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-                @for (
-                j of control.get("tipo")?.value === "PROPIA"
-                ? plantillaLocal
-                : plantillaVisitante;
-                track j.id
-                ) {
-                <ion-select-option [value]="j.id">{{
-                  obtenerNombreFormateado(j)
-                  }}</ion-select-option>
-                }
-              </ion-select>
-
-              <ion-select mode="ios" formControlName="tipo" interface="popover" class="tipo-gol-select">
-                <ion-select-option value="NORMAL">Normal</ion-select-option>
-                <ion-select-option value="PENALTI">Penalti</ion-select-option>
-                <ion-select-option value="PROPIA">En propia</ion-select-option>
-              </ion-select>
-            </div>
-            }
-          </div>
+        <div class="tarjeta-fila">
+          <input
+            class="input-minuto"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            max="130"
+            placeholder="min"
+            aria-label="Minuto"
+            [value]="t.minuto ?? ''"
+            (change)="elegirMinutoTarjeta(t.uid, $any($event.target).value)"
+          />
+          <button
+          type="button"
+          class="selector-jugador"
+          [class.vacio]="t.jugador_id === null"
+          [attr.aria-label]="'Jugador de la tarjeta'"
+          (click)="abrirSelectorTarjeta(t.uid)"
+        >
+          @if (jugador(t.jugador_id); as j) {
+          <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()" aria-hidden="true">{{ j.posicion }}</span>
+          <span class="selector-nombre">{{ nombre(j) }}</span>
+          } @else {
+          <span class="selector-nombre">Jugador</span>
+          }
+          <ion-icon class="selector-flecha" name="chevron-down" aria-hidden="true"></ion-icon>
+        </button>
         </div>
-      </div>
+
+        <div class="tipos-tarjeta" role="radiogroup" aria-label="Tipo de tarjeta">
+          @for (tipo of tiposTarjeta; track tipo.id) {
+          <button
+            type="button"
+            role="radio"
+            class="tipo-tarjeta"
+            [attr.data-tipo]="tipo.id"
+            [class.activo]="t.tipo === tipo.id"
+            [attr.aria-checked]="t.tipo === tipo.id"
+            (click)="elegirTipoTarjeta(t.uid, tipo.id)"
+          >
+            <span class="cartulina" aria-hidden="true"></span>
+            {{ tipo.texto }}
+          </button>
+          }
+        </div>
+      </li>
+      } @empty {
+      <li class="estado-vacio">
+        <p>Sin tarjetas en este partido.</p>
+      </li>
+      }
+    </ul>
+
+    <button type="button" class="btn-anadir" (click)="anadirTarjeta()">
+      <ion-icon name="add" aria-hidden="true"></ion-icon>
+      Añadir tarjeta
+    </button>
+    <p class="nota">
+      Una doble amarilla son dos tarjetas: la primera «Amarilla» y la segunda «2ª amarilla», cada una con su minuto.
+    </p>
+    }
+
+    <!-- ===================== DESTACADO ===================== -->
+    @case ('destacado') {
+    <h3 class="titulo-bloque">1. Equipo del jugador</h3>
+    <div class="segmentado">
+      @for (lado of lados; track lado) {
+      <button
+        type="button"
+        class="segmento"
+        [class.activo]="destacadoLado() === lado"
+        [attr.aria-pressed]="destacadoLado() === lado"
+        (click)="elegirLadoDestacado(lado)"
+      >
+        <span class="segmento-titulo">{{ nombreEquipo(lado) }}</span>
+      </button>
+      }
     </div>
 
-    <div class="goles-section">
-      <h3 class="section-title">⭐ JUGADOR DESTACADO</h3>
-      <div class="player-list">
-        <div class="player-row">
-          <ion-select mode="ios" formControlName="jugador_destacado_id" interface="popover">
-            <ion-select-option [value]="null">-- Ninguno / Vacío --</ion-select-option>
-            @for (jugador of plantillasJuntas; track jugador.id) {
-            <ion-select-option [value]="jugador.id">{{
-              obtenerNombreFormateado(jugador)
-              }}</ion-select-option>
-            }
-          </ion-select>
-        </div>
-      </div>
-    </div>
-  </form>
-
-  <div class="add-jornada-div ion-margin-vertical">
-    <ion-button mode="md" fill="clear" shape="round" (click)="cerrarActa()">
-      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-      Cerrar Acta
-    </ion-button>
+    @if (destacadoLado(); as lado) {
+    <h3 class="titulo-bloque">2. Jugador</h3>
+    <button
+          type="button"
+          class="selector-jugador"
+          [class.vacio]="destacadoId() === null"
+          [attr.aria-label]="'Jugador destacado'"
+          (click)="abrirSelectorDestacado(lado)"
+        >
+          @if (jugador(destacadoId()); as j) {
+          <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()" aria-hidden="true">{{ j.posicion }}</span>
+          <span class="selector-nombre">{{ nombre(j) }}</span>
+          } @else {
+          <span class="selector-nombre">Elegir jugador</span>
+          }
+          <ion-icon class="selector-flecha" name="chevron-down" aria-hidden="true"></ion-icon>
+        </button>
+    @if (numConvocados()[lado] === 0) {
+    <p class="aviso">Elige primero la convocatoria del {{ nombreEquipo(lado) }} en «Alineaciones».</p>
+    }
+    <button type="button" class="btn-texto" (click)="quitarDestacado()">Sin jugador destacado</button>
+    } @else {
+    <p class="nota">Opcional. Elige primero el equipo y después el jugador.</p>
+    }
+    }
+    }
+    }
+    }
   </div>
 </ion-content>
+
+<ion-footer class="ion-no-border">
+  <div class="pie">
+    <ion-button
+      mode="md"
+      expand="block"
+      class="btn-principal"
+      [disabled]="estado() !== 'listo' || enviando()"
+      (click)="guardar()"
+    >
+      @if (enviando()) {
+      <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+      Guardar acta
+      }
+    </ion-button>
+  </div>
+</ion-footer>

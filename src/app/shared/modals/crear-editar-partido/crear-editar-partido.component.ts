@@ -1,234 +1,275 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
-import {
-  IonHeader,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  ModalController,
-  IonToolbar,
-  IonContent,
-  IonLabel,
-  IonItem,
-  IonDatetime,
-  IonModal,
-  IonDatetimeButton,
-  IonSelect,
-  IonSelectOption,
-  IonInput,
-  IonCheckbox,
-  IonGrid, IonRow, IonCol
-} from '@ionic/angular';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonSpinner } from '@ionic/angular/ion-spinner';
+import { IonSelect } from '@ionic/angular/ion-select';
+import { IonSelectOption } from '@ionic/angular/ion-select-option';
+import { IonModal } from '@ionic/angular/ion-modal';
+import { IonDatetime } from '@ionic/angular/ion-datetime';
+import { AlertController } from '@ionic/angular/alert-controller';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { closeCircleOutline } from 'ionicons/icons';
-import { EquiposService } from '../../../core/services/equipos-service';
 import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  add,
+  calendarOutline,
+  chevronForward,
+  closeOutline,
+  remove,
+  shieldOutline,
+  warningOutline,
+} from 'ionicons/icons';
+import { Equipo, EquiposService } from '../../../core/services/equipos-service';
 import { PartidosService } from '../../../core/services/partidos.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { format } from 'date-fns';
+import { LoadingService } from '../../../core/services/loading.service';
+import { partesFechaJornada } from '../../../core/utils/fechas-jornada';
 
-interface Equipo {
-  id: number;
-  nombre: string;
-  competicion_id: number;
-  color_primario: string;
-  color_secundario: string;
-  estadio: string;
-  jugadores: any[];
+/** Lo mínimo que necesita el modal del partido (viene de la sección Calendario). */
+export interface PartidoFormulario {
+  partido_id?: number;
+  equipo_local_id?: number;
+  equipo_visitante_id?: number;
+  /** "YYYY-MM-DDTHH:mm" en hora de España */
+  fecha_partido_local?: string | null;
+  goles_local?: number | null;
+  goles_visitante?: number | null;
+  jugado?: boolean;
+  tiene_acta?: boolean;
 }
+
+/**
+ * En qué punto está el partido:
+ * - sin_programar: aún no se sabe cuándo se juega (sin fecha)
+ * - programado: tiene fecha, sin resultado
+ * - jugado: tiene fecha y resultado
+ */
+export type EstadoPartido = 'sin_programar' | 'programado' | 'jugado';
+
+type Lado = 'local' | 'visitante';
+
+const ESTADOS: { id: EstadoPartido; titulo: string; ayuda: string }[] = [
+  { id: 'sin_programar', titulo: 'Sin programar', ayuda: 'Sin fecha' },
+  { id: 'programado', titulo: 'Programado', ayuda: 'Con fecha' },
+  { id: 'jugado', titulo: 'Jugado', ayuda: 'Con resultado' },
+];
+
+const equiposDistintos = (grupo: AbstractControl): ValidationErrors | null => {
+  const { equipo_local_id, equipo_visitante_id } = grupo.value;
+  return equipo_local_id && equipo_local_id === equipo_visitante_id ? { mismoEquipo: true } : null;
+};
+
+/** Programado y jugado necesitan fecha. */
+const fechaSiProgramado = (grupo: AbstractControl): ValidationErrors | null => {
+  const { estado, fecha_partido } = grupo.value;
+  return estado !== 'sin_programar' && !fecha_partido ? { faltaFecha: true } : null;
+};
 
 @Component({
   selector: 'app-crear-editar-partido',
   templateUrl: './crear-editar-partido.component.html',
   styleUrls: ['./crear-editar-partido.component.scss'],
-  imports: [
-    IonCheckbox,
-    IonInput,
-    IonDatetimeButton,
-    IonModal,
-    IonDatetime,
-    IonItem,
-    IonLabel,
-    IonContent,
-    IonToolbar,
-    IonIcon,
-    IonButton,
-    IonButtons,
-    IonTitle,
-    IonHeader,
-    IonSelect,
-    IonSelectOption,
-    ReactiveFormsModule],
+  imports: [ReactiveFormsModule, IonButton, IonIcon, IonSpinner, IonSelect, IonSelectOption, IonModal, IonDatetime],
 })
 export class CrearEditarPartidoComponent implements OnInit {
-  @Input() jornada: any;
-  @Input() modo: any;
-  @Input() partido: any;
+  // Los pasa Calendario con componentProps (Ionic los asigna como propiedades)
+  @Input() modo: 'crear' | 'editar' = 'crear';
+  @Input() jornada: { id: number; numero_jornada: number } | null = null;
+  @Input() partido: PartidoFormulario = {};
 
   private _modalCtrl = inject(ModalController);
+  private _alertCtrl = inject(AlertController);
+  private _fb = inject(FormBuilder);
   private _equiposService = inject(EquiposService);
   private _partidosService = inject(PartidosService);
-  private _fb = inject(FormBuilder);
   private _toastService = inject(ToastService);
+  private _loadingService = inject(LoadingService);
 
-  public equipos = signal<Equipo[]>([]);
-  public partidoForm: FormGroup = new FormGroup({});
-  public hayFecha = signal<boolean>(false);
+  readonly estados = ESTADOS;
+  readonly equipos = signal<Equipo[]>([]);
+  readonly enviando = signal(false);
+  readonly selectorFecha = signal(false);
 
-  /**
-   * ACTA PARTIDO
-   */
-  public plantillaLocal = signal<any>([]);
-  public plantillaVisitante = signal<any>([]);
-  public golesLocal = signal<number>(0);
-  public golesVisitante = signal<number>(0);
+  readonly form = this._fb.group(
+    {
+      equipo_local_id: this._fb.control<number | null>(null, Validators.required),
+      equipo_visitante_id: this._fb.control<number | null>(null, Validators.required),
+      estado: this._fb.nonNullable.control<EstadoPartido>('sin_programar'),
+      fecha_partido: this._fb.nonNullable.control(''),
+      goles_local: this._fb.nonNullable.control(0),
+      goles_visitante: this._fb.nonNullable.control(0),
+    },
+    { validators: [equiposDistintos, fechaSiProgramado] },
+  );
+
+  /** Valores del formulario como signal, para que la vista reaccione. */
+  private readonly valores = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+
+  readonly estado = computed(() => this.valores().estado ?? 'sin_programar');
+  readonly escudoLocal = computed(() => this.escudoDe(this.valores().equipo_local_id));
+  readonly escudoVisitante = computed(() => this.escudoDe(this.valores().equipo_visitante_id));
+  readonly partesFecha = computed(() => partesFechaJornada(this.valores().fecha_partido ?? ''));
+
+  /** Lo que se enviaría ahora mismo, y lo que había al abrir (para saber si hay cambios). */
+  private readonly datosActuales = computed(() => {
+    this.valores();
+    return this.datosParaEnviar();
+  });
+  private datosIniciales = '';
+  readonly hayCambios = computed(() => JSON.stringify(this.datosActuales()) !== this.datosIniciales);
+
+  /** Si el partido tiene acta y se cambia algo, al guardar se borrará el acta. */
+  readonly tieneActa = computed(() => this.modo === 'editar' && !!this.partido?.tiene_acta);
+
+  /** Mismo estilo de alert que el resto del panel (cssClass como texto: ver calendario-admin). */
+  readonly opcionesSelectEquipo = { mode: 'ios', cssClass: 'pf-alert', header: 'Elegir equipo' };
+
+  get esEdicion(): boolean {
+    return this.modo === 'editar';
+  }
 
   constructor() {
-    addIcons({
-      closeCircleOutline,
-    });
-  }
-
-  async getEquipos() {
-    this._equiposService.getEquipos().subscribe({
-      next: (resp: any) => {
-        this.equipos.set(resp);
-        if (this.modo === 'editar' && this.partido) {
-          this.equipos().forEach((equipo) => {
-            if (equipo.id === this.partido.equipo_local_id) {
-              this.plantillaLocal.set(equipo.jugadores);
-            }
-            if (equipo.id === this.partido.equipo_visitante_id) {
-              this.plantillaVisitante.set(equipo.jugadores);
-            }
-          });
-        }
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  cambiarEquipoLocal(event: any) {
-    this.equipos().forEach((equipo) => {
-      if (equipo.id === event.detail.value) {
-        this.plantillaLocal.set(equipo.jugadores);
-      }
-    });
-  }
-
-  cambiarEquipoVisitante(event: any) {
-    this.equipos().forEach((equipo) => {
-      if (equipo.id === event.detail.value) {
-        this.plantillaVisitante.set(equipo.jugadores);
-      }
-    });
-  }
-
-  crearEditarPartido() {
-    if (this.partidoForm.invalid) {
-      return;
-    }
-
-    let data = {
-      partido_id: this.partido.partido_id || null,
-      equipo_local_id: this.partidoForm.value.equipo_local_id,
-      equipo_visitante_id: this.partidoForm.value.equipo_visitante_id,
-      fecha_partido: this.partidoForm.value.fecha_partido || null,
-      goles_local: this.partidoForm.value.goles_local || 0,
-      goles_visitante: this.partidoForm.value.goles_visitante || 0,
-      jugado: this.partidoForm.value.jugado,
-      jornada_id: this.jornada.id,
-    };
-
-    if (this.modo === 'crear') {
-      this._partidosService.crearPartido(data).subscribe({
-        next: (resp: any) => {
-          this._toastService.showSuccessToast('Partido creado con exito');
-          this._modalCtrl.dismiss(resp, 'confirm');
-        },
-        error: (error) => {
-          console.log(error);
-        },
-      });
-    } else if (this.modo === 'editar') {
-      this._partidosService.editarPartido(data).subscribe({
-        next: (resp: any) => {
-          this._toastService.showSuccessToast('Partido editado con exito');
-          this._modalCtrl.dismiss(resp, 'confirm');
-        },
-        error: (error: any) => {
-          console.log(error);
-        },
-      });
-    }
-  }
-
-  ionChangeCheckboxJugado(event: any) {
-    if (event.detail.checked) {
-      this.partidoForm.get('goles_local')?.enable();
-      this.partidoForm.get('goles_visitante')?.enable();
-    } else {
-      this.partidoForm.get('goles_local')?.disable();
-      this.partidoForm.get('goles_visitante')?.disable();
-    }
-  }
-
-  ionChangeCheckboxFecha(event: any) {
-    if (event.detail.checked) {
-      this.partidoForm.get('fecha_partido')?.enable();
-    } else {
-      this.partidoForm.get('fecha_partido')?.disable();
-    }
-  }
-
-  cerrarModal() {
-    this._modalCtrl.dismiss();
+    addIcons({ add, calendarOutline, chevronForward, closeOutline, remove, shieldOutline, warningOutline });
   }
 
   ngOnInit() {
-    if (this.modo === 'crear') {
-      this.partidoForm = this._fb.group({
-        equipo_local_id: [null, [Validators.required]],
-        equipo_visitante_id: [null, [Validators.required]],
-        fecha_partido: [null],
-        goles_local: [null],
-        goles_visitante: [null],
-        jugado: [false, [Validators.required]],
-      });
-      this.partidoForm.get('goles_local')?.disable();
-      this.partidoForm.get('goles_visitante')?.disable();
-      this.partidoForm.get('fecha_partido')?.disable();
-    } else if (this.modo === 'editar' && this.partido) {
-      this.partidoForm = this._fb.group({
-        equipo_local_id: [this.partido.equipo_local_id, [Validators.required]],
-        equipo_visitante_id: [this.partido.equipo_visitante_id, [Validators.required]],
-        fecha_partido: [this.partido.fecha_partido != null ? format(new Date(this.partido.fecha_partido), "yyyy-MM-dd'T'HH:mm") : null],
-        goles_local: [this.partido.goles_local || null],
-        goles_visitante: [this.partido.goles_visitante || null],
-        jugado: [this.partido.jugado, [Validators.required]],
-      });
-      if (this.partido.jugado) {
-        this.partidoForm.get('goles_local')?.enable();
-        this.partidoForm.get('goles_visitante')?.enable();
-        this.partidoForm.get('fecha_partido')?.enable();
-      } else {
-        this.partidoForm.get('goles_local')?.disable();
-        this.partidoForm.get('goles_visitante')?.disable();
-        this.partidoForm.get('fecha_partido')?.disable();
-      }
-      if (this.partido.fecha_partido != null) {
-        this.partidoForm.get('fecha_partido')?.enable();
-        this.hayFecha.set(true);
-      }
+    const p = this.partido ?? {};
+    const estado: EstadoPartido = p.jugado ? 'jugado' : p.fecha_partido_local ? 'programado' : 'sin_programar';
+    this.form.patchValue({
+      equipo_local_id: p.equipo_local_id ?? null,
+      equipo_visitante_id: p.equipo_visitante_id ?? null,
+      estado,
+      fecha_partido: p.fecha_partido_local ?? '',
+      goles_local: p.goles_local ?? 0,
+      goles_visitante: p.goles_visitante ?? 0,
+    });
+    this.datosIniciales = JSON.stringify(this.datosParaEnviar());
+    this.cargarEquipos();
+  }
+
+  private async cargarEquipos() {
+    try {
+      const res = (await firstValueFrom(this._equiposService.getEquiposLimpios())) as { data: Equipo[] };
+      this.equipos.set(res.data ?? []);
+    } catch {
+      this._toastService.showErrorToast('No se han podido cargar los equipos');
+    }
+  }
+
+  private escudoDe(id: number | null | undefined): string | null {
+    return this.equipos().find((e) => e.id === id)?.escudo ?? null;
+  }
+
+  // ---------- Estado ----------
+
+  /** Al pasar a programado/jugado sin fecha, se abre directamente el calendario. */
+  alCambiarEstado() {
+    if (this.form.controls.estado.value !== 'sin_programar' && !this.form.controls.fecha_partido.value) {
+      this.selectorFecha.set(true);
+    }
+  }
+
+  // ---------- Goles ----------
+
+  cambiarGoles(lado: Lado, delta: number) {
+    const control = lado === 'local' ? this.form.controls.goles_local : this.form.controls.goles_visitante;
+    control.setValue(Math.max(0, Math.min(99, (control.value || 0) + delta)));
+  }
+
+  // ---------- Fecha ----------
+
+  elegirFecha(valor: string | string[] | null | undefined) {
+    if (typeof valor === 'string') {
+      // ion-datetime devuelve "YYYY-MM-DDTHH:mm:ss": nos quedamos con "YYYY-MM-DDTHH:mm"
+      this.form.controls.fecha_partido.setValue(valor.slice(0, 16));
+    }
+    this.selectorFecha.set(false);
+  }
+
+  // ---------- Guardar ----------
+
+  private datosParaEnviar() {
+    const v = this.form.getRawValue();
+    const jugado = v.estado === 'jugado';
+    return {
+      equipo_local_id: v.equipo_local_id,
+      equipo_visitante_id: v.equipo_visitante_id,
+      fecha_partido: v.estado !== 'sin_programar' && v.fecha_partido ? v.fecha_partido : null,
+      jugado,
+      // Sin jugar, el marcador se guarda a 0 (como hasta ahora)
+      goles_local: jugado ? v.goles_local : 0,
+      goles_visitante: jugado ? v.goles_visitante : 0,
+    };
+  }
+
+  async guardar() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      if (this.form.hasError('mismoEquipo')) this._toastService.showErrorToast('Elige dos equipos distintos');
+      else if (this.form.hasError('faltaFecha')) this._toastService.showErrorToast('Indica la fecha del partido');
+      return;
+    }
+    if (!this.jornada || this.enviando()) return;
+
+    // Editar sin tocar nada: no hay nada que guardar
+    if (this.esEdicion && !this.hayCambios()) {
+      this._modalCtrl.dismiss(null, 'cancel');
+      return;
     }
 
-    this.getEquipos();
+    const borrarActa = this.tieneActa();
+    if (borrarActa && !(await this.confirmarBorrarActa())) return;
+
+    const datos = {
+      ...this.datosParaEnviar(),
+      partido_id: this.partido?.partido_id ?? null,
+      jornada_id: this.jornada.id,
+      borrar_acta: borrarActa,
+    };
+
+    this.enviando.set(true);
+    this._loadingService.show(
+      borrarActa ? 'Guardando partido y borrando su acta...' : this.esEdicion ? 'Guardando partido...' : 'Creando partido...',
+    );
+    try {
+      const peticion = this.esEdicion
+        ? this._partidosService.editarPartido(datos)
+        : this._partidosService.crearPartido(datos);
+      const resp = (await firstValueFrom(peticion)) as { message?: string };
+      this._toastService.showSuccessToast(
+        resp.message && borrarActa ? resp.message : this.esEdicion ? 'Partido actualizado' : 'Partido creado',
+      );
+      this._modalCtrl.dismiss(resp, 'confirm');
+    } catch (error) {
+      const err = error as HttpErrorResponse;
+      this._toastService.showErrorToast(err.error?.message || 'No se ha podido guardar el partido');
+    } finally {
+      this._loadingService.hide();
+      this.enviando.set(false);
+    }
+  }
+
+  private async confirmarBorrarActa(): Promise<boolean> {
+    const alert = await this._alertCtrl.create({
+      mode: 'ios',
+      cssClass: ['pf-alert', 'pf-alert-peligro'],
+      header: '¿Borrar el acta?',
+      message:
+        'Este partido tiene acta. Al guardar los cambios se borrarán el acta y los puntos que dio a los jugadores. Tendrás que volver a hacerla.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Guardar y borrar', role: 'destructive' },
+      ],
+    });
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+    return role === 'destructive';
+  }
+
+  cerrarModal() {
+    this._modalCtrl.dismiss(null, 'cancel');
   }
 }

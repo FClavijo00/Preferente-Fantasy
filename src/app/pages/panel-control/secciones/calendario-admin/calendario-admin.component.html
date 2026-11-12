@@ -1,0 +1,182 @@
+<section class="seccion">
+  @switch (estadoJornadas()) {
+  @case ('cargando') {
+  <div class="selector-tarjeta esqueleto" aria-busy="true">
+    <ion-skeleton-text animated style="width: 40%; height: 18px"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+  </div>
+  }
+
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se han podido cargar las jornadas.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargarJornadas()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+
+  @default {
+  @if (jornadas().length === 0) {
+  <div class="estado-vacio">
+    <p>Todavía no hay jornadas. Créalas desde la sección Jornadas.</p>
+  </div>
+  } @else {
+  <!-- ===== Selector de jornada + resumen ===== -->
+  <div class="selector-tarjeta">
+    <div class="selector-fila">
+      <ion-select
+        class="selector"
+        mode="ios"
+        aria-label="Jornada"
+        interface="alert"
+        [interfaceOptions]="opcionesSelector"
+        cancelText="Cancelar"
+        okText="Ver"
+        [value]="jornadaId()"
+        [selectedText]="jornada() ? 'Jornada ' + jornada()!.numero_jornada : ''"
+        (ionChange)="seleccionarJornada($event.detail.value)"
+      >
+        @for (j of jornadas(); track j.id) {
+        <ion-select-option [value]="j.id">{{ etiquetaJornada(j) }}</ion-select-option>
+        }
+      </ion-select>
+
+      @if (jornada(); as j) {
+      <span [class]="'chip ' + j.estado.toLowerCase()">{{ textoEstado[j.estado] }}</span>
+      }
+    </div>
+
+    @if (jornada(); as j) {
+    <div class="resumen">
+      <span title="Inicio (fecha límite para alinear)">
+        <ion-icon name="flag-outline" aria-hidden="true"></ion-icon>
+        {{ formatearFecha(j.fecha_inicio) }}
+      </span>
+      <span>
+        <ion-icon name="football-outline" aria-hidden="true"></ion-icon>
+        {{ j.num_partidos }} {{ j.num_partidos === 1 ? 'partido' : 'partidos' }}
+      </span>
+      @if (estadoPartidos() === 'listo' && partidos().length > 0) {
+      <span [class.completo]="actasHechas() === partidos().length">
+        <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+        {{ actasHechas() }}/{{ partidos().length }} actas
+      </span>
+      }
+    </div>
+    }
+  </div>
+
+  <div class="cabecera-partidos">
+    <h2>Partidos</h2>
+    <ion-button mode="md" class="btn-principal" (click)="nuevoPartido()" [disabled]="!jornada()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Añadir partido
+    </ion-button>
+  </div>
+
+  <!-- ===== Partidos de la jornada ===== -->
+  @switch (estadoPartidos()) {
+  @case ('cargando') {
+  <div class="lista" aria-busy="true">
+    @for (i of [1, 2, 3]; track i) {
+    <div class="partido esqueleto">
+      <ion-skeleton-text animated style="width: 80%; height: 16px; margin: 0 auto"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 45%; margin: 10px auto 0"></ion-skeleton-text>
+    </div>
+    }
+  </div>
+  }
+
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se han podido cargar los partidos.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargarPartidos()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+
+  @default {
+  <ul class="lista">
+    @for (p of partidos(); track p.partido_id) {
+    <li class="partido" [class.con-acta]="p.tiene_acta">
+      <!-- Marcador -->
+      <div class="marcador">
+        <div class="equipo local">
+          <span class="equipo-nombre">{{ p.local_nombre }}</span>
+          <img class="escudo" [src]="p.local_escudo || 'assets/images/default-player.png'" alt="" width="36" height="36" />
+        </div>
+
+        <div class="resultado" [class.pendiente]="!tieneResultado(p)">
+          @if (tieneResultado(p)) {
+          <span>{{ p.goles_local }}</span>
+          <span class="guion">-</span>
+          <span>{{ p.goles_visitante }}</span>
+          } @else {
+          <span class="vs">VS</span>
+          }
+        </div>
+
+        <div class="equipo visitante">
+          <img class="escudo" [src]="p.visitante_escudo || 'assets/images/default-player.png'" alt="" width="36" height="36" />
+          <span class="equipo-nombre">{{ p.visitante_nombre }}</span>
+        </div>
+      </div>
+
+      <!-- Fecha y estado -->
+      <div class="meta">
+        <span class="meta-fecha">
+          <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+          {{ fechaPartido(p) ?? 'Sin fecha' }}
+        </span>
+        @if (p.tiene_acta) {
+        <span class="etiqueta ok"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>Acta hecha</span>
+        } @else if (p.jugado) {
+        <span class="etiqueta aviso">Jugado · falta acta</span>
+        } @else {
+        <span class="etiqueta">Sin jugar</span>
+        }
+      </div>
+
+      <!-- Acciones -->
+      <div class="acciones">
+        <button type="button" class="btn-accion" (click)="editarPartido(p)">
+          <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+          Editar partido
+        </button>
+        <button
+          type="button"
+          class="btn-accion"
+          [class.destacado]="!p.tiene_acta"
+          (click)="abrirActa(p)"
+        >
+          <ion-icon name="document-text-outline" aria-hidden="true"></ion-icon>
+          {{ p.tiene_acta ? 'Editar acta' : 'Hacer acta' }}
+        </button>
+        <button
+          type="button"
+          class="btn-accion peligro"
+          (click)="eliminarPartido(p)"
+          [attr.aria-label]="'Eliminar ' + p.local_nombre + ' - ' + p.visitante_nombre"
+          title="Eliminar partido"
+        >
+          <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </li>
+    } @empty {
+    <li class="estado-vacio">
+      <ion-icon name="football-outline" aria-hidden="true"></ion-icon>
+      <p>Esta jornada aún no tiene partidos.</p>
+    </li>
+    }
+  </ul>
+  }
+  }
+  }
+  }
+  }
+</section>

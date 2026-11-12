@@ -1,151 +1,149 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ modo === "crear" ? "Crear" : "Editar" }} Partido</ion-title>
-    <ion-buttons slot="end">
-      <ion-button mode="ios" (click)="cerrarModal()">
-        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding">
-  <ion-item
-    class="item-estado-selector ion-margin-bottom"
-    mode="ios"
-    lines="none"
-  >
-    <ion-label
-      >Partido perteneciente a : Jornada {{ jornada.numero_jornada }}</ion-label
-    >
-  </ion-item>
-
-  <form [formGroup]="partidoForm">
-    <div class="div-equipos">
-      <ion-item
-        mode="ios"
-        lines="none"
-        class="item-estado-selector ion-margin-bottom"
-      >
-        <ion-select
-          label="Equipo Local :"
-          mode="ios"
-          cancelText="Cancelar"
-          okText="Aceptar"
-          formControlName="equipo_local_id"
-          (ionChange)="cambiarEquipoLocal($event)"
-        >
-          @for (equipo of equipos(); track equipo) {
-            <ion-select-option [value]="equipo.id">{{
-              equipo.nombre
-            }}</ion-select-option>
-          }
-        </ion-select>
-      </ion-item>
-      <ion-input
-        class="outline-input ion-margin-bottom"
-        mode="md"
-        label="Goles"
-        label-placement="stacked"
-        fill="outline"
-        type="number"
-        formControlName="goles_local"
-      >
-      </ion-input>
+<div class="pf-modal">
+  <header class="cabecera">
+    <div>
+      <h2>{{ esEdicion ? 'Editar partido' : 'Nuevo partido' }}</h2>
+      @if (jornada) {
+      <p class="subtitulo">Jornada {{ jornada.numero_jornada }}</p>
+      }
     </div>
+    <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
 
-    <div class="div-equipos">
-      <ion-item
-        mode="ios"
-        lines="none"
-        class="item-estado-selector ion-margin-bottom"
-      >
-        <ion-select
-          label="Equipo Visitante :"
-          mode="ios"
-          cancelText="Cancelar"
-          okText="Aceptar"
-          formControlName="equipo_visitante_id"
-          (ionChange)="cambiarEquipoVisitante($event)"
-        >
-          @for (equipo of equipos(); track equipo) {
-            <ion-select-option [value]="equipo.id">{{
-              equipo.nombre
-            }}</ion-select-option>
-          }
-        </ion-select>
-      </ion-item>
-
-      <ion-input
-        class="outline-input ion-margin-bottom"
-        mode="md"
-        label="Goles"
-        label-placement="stacked"
-        fill="outline"
-        type="number"
-        formControlName="goles_visitante"
-      >
-      </ion-input>
+  <form class="pf-modal-cuerpo" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <!-- Aviso: editar un partido con acta la borra -->
+    @if (tieneActa()) {
+    <div class="aviso-acta" [class.activo]="hayCambios()" role="status">
+      <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+      <p>
+        @if (hayCambios()) {
+        <strong>Al guardar se borrará el acta</strong> y los puntos que dio a los jugadores.
+        } @else {
+        Este partido <strong>tiene acta</strong>. Si cambias algo, se borrará junto a sus puntos.
+        }
+      </p>
     </div>
+    }
 
-    <ion-item
-      mode="ios"
-      lines="none"
-      class="item-estado-selector ion-margin-bottom"
-    >
-      <ion-label>Fecha Partido :</ion-label>
-      <ion-datetime-button
-        class="date-picker-button"
-        datetime="id-datepicker"
-        slot="end"
-        mode="ios"
-      ></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true" class="date-picker-modal">
-        <ng-template>
-          <ion-datetime
-            id="id-datepicker"
+    <!-- ===== Estado del partido ===== -->
+    <fieldset class="campo">
+      <legend>Estado</legend>
+      <div class="segmentado">
+        @for (e of estados; track e.id) {
+        <label class="segmento" [class.activo]="estado() === e.id">
+          <input type="radio" formControlName="estado" [value]="e.id" (change)="alCambiarEstado()" />
+          <span class="segmento-titulo">{{ e.titulo }}</span>
+          <span class="segmento-ayuda">{{ e.ayuda }}</span>
+        </label>
+        }
+      </div>
+    </fieldset>
+
+    <!-- ===== Equipos (y goles si se ha jugado) ===== -->
+    <div class="bloque" [class.invalido]="form.hasError('mismoEquipo')">
+      @for (lado of ['local', 'visitante']; track lado) {
+      <div class="fila-equipo">
+        <span class="lado">{{ lado === 'local' ? 'Local' : 'Visitante' }}</span>
+
+        <div class="equipo">
+          <span class="escudo" aria-hidden="true">
+            @if (lado === 'local' ? escudoLocal() : escudoVisitante(); as escudo) {
+            <img [src]="escudo" alt="" width="32" height="32" />
+            } @else {
+            <ion-icon name="shield-outline"></ion-icon>
+            }
+          </span>
+
+          <ion-select
+            class="select-equipo"
             mode="ios"
-            formControlName="fecha_partido"
-            showDefaultButtons="true"
-            doneText="Confirmar"
+            interface="alert"
+            [interfaceOptions]="opcionesSelectEquipo"
+            [attr.aria-label]="lado === 'local' ? 'Equipo local' : 'Equipo visitante'"
+            placeholder="Elegir equipo"
             cancelText="Cancelar"
-            firstDayOfWeek="1"
+            okText="Aceptar"
+            [formControlName]="lado === 'local' ? 'equipo_local_id' : 'equipo_visitante_id'"
           >
-          </ion-datetime>
-        </ng-template>
-      </ion-modal>
-    </ion-item>
+            @for (equipo of equipos(); track equipo.id) {
+            <ion-select-option [value]="equipo.id">{{ equipo.nombre }}</ion-select-option>
+            }
+          </ion-select>
+        </div>
 
-    <div class="div-checkboxs">
-      <ion-checkbox
-        class="input-checkbox ion-margin-right"
-        labelPlacement="start"
-        mode="ios"
-        formControlName="jugado"
-        (ionChange)="ionChangeCheckboxJugado($event)"
-        >¿Partido Jugado?</ion-checkbox
-      >
-
-      <ion-checkbox
-        class="input-checkbox"
-        labelPlacement="start"
-        mode="ios"
-        [checked]="hayFecha()"
-        (ionChange)="ionChangeCheckboxFecha($event)"
-        >¿Hay fecha?</ion-checkbox
-      >
+        @if (estado() === 'jugado') {
+        <div class="goles" role="group" [attr.aria-label]="'Goles ' + lado">
+          <button type="button" class="btn-gol" (click)="cambiarGoles($any(lado), -1)" aria-label="Quitar gol">
+            <ion-icon name="remove" aria-hidden="true"></ion-icon>
+          </button>
+          <span class="goles-valor">
+            {{ lado === 'local' ? form.controls.goles_local.value : form.controls.goles_visitante.value }}
+          </span>
+          <button type="button" class="btn-gol" (click)="cambiarGoles($any(lado), 1)" aria-label="Añadir gol">
+            <ion-icon name="add" aria-hidden="true"></ion-icon>
+          </button>
+        </div>
+        }
+      </div>
+      }
+      @if (form.hasError('mismoEquipo')) {
+      <span class="campo-error">Elige dos equipos distintos</span>
+      }
     </div>
 
-    <div class="div-buttons">
-      <ion-button
-        class="btn-cancelar-guardar ion-margin-top"
-        mode="md"
-        color="success"
-        (click)="crearEditarPartido()"
+    <!-- ===== Fecha (programado y jugado) ===== -->
+    @if (estado() !== 'sin_programar') {
+    <div class="campo">
+      <span class="etiqueta">Fecha y hora</span>
+      <button
+        type="button"
+        class="fecha-boton"
+        [class.invalido]="form.touched && form.hasError('faltaFecha')"
+        (click)="selectorFecha.set(true)"
       >
-        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-        {{ modo === "crear" ? "Crear" : "Editar" }} Partido
-      </ion-button>
+        <span class="fecha-icono" aria-hidden="true"><ion-icon name="calendar-outline"></ion-icon></span>
+        @if (partesFecha(); as f) {
+        <span class="fecha-texto">
+          <span class="fecha-dia">{{ f.dia }}</span>
+          <span class="fecha-hora">{{ f.hora }} h</span>
+        </span>
+        } @else {
+        <span class="fecha-texto vacia">Elegir fecha y hora</span>
+        }
+        <ion-icon class="fecha-flecha" name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
     </div>
+    }
+
+    <ion-button type="submit" mode="md" expand="block" class="btn-principal" [disabled]="enviando()">
+      @if (enviando()) {
+      <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+      {{ esEdicion ? 'Guardar cambios' : 'Crear partido' }}
+      }
+    </ion-button>
   </form>
-</ion-content>
+
+  <!-- Calendario del partido (mismo estilo que el de jornadas: .pf-datetime-modal) -->
+  <ion-modal class="pf-datetime-modal" [isOpen]="selectorFecha()" (didDismiss)="selectorFecha.set(false)">
+    <ng-template>
+      <ion-datetime
+        mode="ios"
+        presentation="date-time"
+        locale="es-ES"
+        hourCycle="h23"
+        [firstDayOfWeek]="1"
+        [showDefaultButtons]="true"
+        doneText="Aceptar"
+        cancelText="Cancelar"
+        [value]="form.controls.fecha_partido.value || undefined"
+        (ionChange)="elegirFecha($event.detail.value)"
+        (ionCancel)="selectorFecha.set(false)"
+      >
+        <span slot="title">Fecha del partido</span>
+        <span slot="time-label">Hora</span>
+      </ion-datetime>
+    </ng-template>
+  </ion-modal>
+</div>

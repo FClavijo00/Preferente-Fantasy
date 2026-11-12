@@ -1,0 +1,72 @@
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="cabecera-fila">
+      <div>
+        <h2>{{ titulo }}</h2>
+        @if (subtitulo) {
+        <p class="subtitulo">{{ subtitulo }}</p>
+        }
+      </div>
+      <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+        <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+      </button>
+    </div>
+
+    @if (total() > 8) {
+    <label class="buscador">
+      <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+      <input
+        type="search"
+        placeholder="Buscar jugador"
+        aria-label="Buscar jugador"
+        autocomplete="off"
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      />
+    </label>
+    }
+  </header>
+
+  <div class="pf-modal-cuerpo">
+    @if (permitirVacio && !busqueda()) {
+    <button type="button" class="opcion vaciar" [class.activa]="seleccionado === null" (click)="elegir(null)">
+      <span class="chip-vacio" aria-hidden="true"><ion-icon name="remove-circle-outline"></ion-icon></span>
+      <span class="opcion-texto">{{ textoVacio }}</span>
+    </button>
+    }
+
+    @for (g of gruposFiltrados(); track g.posicion) {
+    <section class="grupo">
+      <h3>{{ g.titulo }}</h3>
+      @for (j of g.jugadores; track j.id) {
+      @let ocupado = estaOcupado(j.id);
+      <button
+        type="button"
+        class="opcion"
+        [class.activa]="j.id === seleccionado"
+        [class.ocupada]="ocupado"
+        [disabled]="ocupado"
+        (click)="elegir(j.id)"
+      >
+        <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()" aria-hidden="true">{{ j.posicion }}</span>
+        <span class="opcion-texto">
+          <span class="opcion-nombre">{{ nombre(j) }}</span>
+          @if (ocupado) {
+          <span class="opcion-detalle">{{ textoOcupado }}</span>
+          } @else if (nombreCompleto(j); as completo) {
+          <span class="opcion-detalle">{{ completo }}</span>
+          }
+        </span>
+        @if (j.id === seleccionado) {
+        <ion-icon class="check" name="checkmark-circle" aria-label="Elegido"></ion-icon>
+        }
+      </button>
+      }
+    </section>
+    } @empty {
+    <p class="vacio-lista">
+      {{ busqueda() ? 'Ningún jugador coincide con «' + busqueda() + '».' : mensajeSinJugadores }}
+    </p>
+    }
+  </div>
+</div>

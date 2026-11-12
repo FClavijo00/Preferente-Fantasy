@@ -1,596 +1,532 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  inject,
-  signal,
-  effect,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  FormArray,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import {
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
-  IonCheckbox,
-  IonButton,
-  IonIcon,
-  IonBadge,
-  IonContent,
-  IonTitle,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  ModalController,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonListHeader,
-  IonCardTitle,
-} from '@ionic/angular';
-import { PartidosService } from '../../../core/services/partidos.service';
-import { EquiposService } from '../../../core/services/equipos-service';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonFooter } from '@ionic/angular/ion-footer';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonSpinner } from '@ionic/angular/ion-spinner';
+import { IonSegment } from '@ionic/angular/ion-segment';
+import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
+import { add, chevronDown, closeOutline, footballOutline, peopleOutline, starOutline, trashOutline } from 'ionicons/icons';
 import {
-  checkmarkCircleOutline,
-  closeCircleOutline,
-  add,
-  trash,
-  saveOutline,
-} from 'ionicons/icons';
+  ActaPartido,
+  EventoActa,
+  JugadorActa,
+  PartidosService,
+  PayloadActa,
+  Posicion,
+  TipoGol,
+  TipoTarjeta,
+} from '../../../core/services/partidos.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { LoadingService } from '../../../core/services/loading.service';
-export interface JugadorSimple {
-  id: number;
-  nombre: string;
-  apellidos: string;
-  apodo?: string;
-  posicion: string;
+import { opcionesModalAuto } from '../../../core/utils/modal-auto';
+import { SelectorJugadorActasComponent } from '../selector-jugador-actas/selector-jugador-actas.component';
+
+/** Lo que llega desde Calendario. */
+export interface PartidoActa {
+  partido_id: number;
+  equipo_local_id: number;
+  equipo_visitante_id: number;
+  local_nombre: string;
+  visitante_nombre: string;
+  local_escudo?: string;
+  visitante_escudo?: string;
+  goles_local: number | null;
+  goles_visitante: number | null;
+  tiene_acta: boolean;
 }
+
+type Lado = 'local' | 'visitante';
+type Pestana = 'alineaciones' | 'goles' | 'tarjetas' | 'destacado';
+type Grupo = 'titulares' | 'suplentes';
+
+interface Convocatoria {
+  titulares: (number | null)[];
+  suplentes: (number | null)[];
+}
+
+interface GolForm {
+  jugador_id: number | null;
+  tipo: TipoGol;
+  minuto: number | null;
+}
+
+interface TarjetaForm {
+  uid: number;
+  lado: Lado;
+  jugador_id: number | null;
+  tipo: TipoTarjeta;
+  minuto: number | null;
+}
+
+interface GrupoPosicion {
+  posicion: Posicion;
+  titulo: string;
+  jugadores: JugadorActa[];
+}
+
+const TITULARES = 11;
+const SUPLENTES = 7;
+
+const TITULO_POSICION: Record<Posicion, string> = {
+  POR: 'Porteros',
+  DEF: 'Defensas',
+  MED: 'Centrocampistas',
+  DEL: 'Delanteros',
+};
+
+const rellenar = (ids: number[] | undefined, minimo: number): (number | null)[] => {
+  const lista: (number | null)[] = [...(ids ?? [])];
+  while (lista.length < minimo) lista.push(null);
+  return lista;
+};
+
+/** Agrupa una lista (ya ordenada por posición y nombre) en grupos para los <optgroup>. */
+const agrupar = (jugadores: JugadorActa[]): GrupoPosicion[] =>
+  (Object.keys(TITULO_POSICION) as Posicion[])
+    .map((posicion) => ({
+      posicion,
+      titulo: TITULO_POSICION[posicion],
+      jugadores: jugadores.filter((j) => j.posicion === posicion),
+    }))
+    .filter((g) => g.jugadores.length > 0);
 
 @Component({
   selector: 'app-crear-editar-acta-partido',
-  standalone: true,
-  imports: [
-    IonButtons,
-    IonToolbar,
-    IonHeader,
-    IonTitle,
-    IonContent,
-    CommonModule,
-    ReactiveFormsModule,
-    IonSelect,
-    IonSelectOption,
-    IonButton,
-    IonIcon
-],
   templateUrl: './crear-editar-acta-partido.component.html',
   styleUrls: ['./crear-editar-acta-partido.component.scss'],
+  imports: [
+    IonHeader,
+    IonContent,
+    IonFooter,
+    IonButton,
+    IonIcon,
+    IonSpinner,
+    IonSegment,
+    IonSegmentButton,
+    IonLabel,
+  ],
 })
 export class CrearEditarActaPartidoComponent implements OnInit {
-  private _fb = inject(FormBuilder);
-
-  @Input() partido: any;
-  @Input() actaExistente?: any;
+  /** Lo pasa Calendario con componentProps (Ionic lo asigna como propiedad). */
+  @Input() partido!: PartidoActa;
 
   private _partidosService = inject(PartidosService);
-  private _equiposService = inject(EquiposService);
   private _modalCtrl = inject(ModalController);
+  private _toastService = inject(ToastService);
   private _loadingService = inject(LoadingService);
 
-  equipos = signal<any>([]);
-  plantillaLocal: JugadorSimple[] = [];
-  plantillaVisitante: JugadorSimple[] = [];
-  plantillasJuntas: JugadorSimple[] = [];
+  readonly estado = signal<'cargando' | 'listo' | 'error'>('cargando');
+  readonly enviando = signal(false);
+  readonly pestana = signal<Pestana>('alineaciones');
+  readonly ladoAlineacion = signal<Lado>('local');
 
-  actaForm!: FormGroup;
+  readonly jugadores = signal<Record<Lado, JugadorActa[]>>({ local: [], visitante: [] });
+  readonly convocatoria = signal<Record<Lado, Convocatoria>>({
+    local: { titulares: rellenar([], TITULARES), suplentes: rellenar([], SUPLENTES) },
+    visitante: { titulares: rellenar([], TITULARES), suplentes: rellenar([], SUPLENTES) },
+  });
+  readonly goles = signal<Record<Lado, GolForm[]>>({ local: [], visitante: [] });
+  readonly tarjetas = signal<TarjetaForm[]>([]);
+  readonly destacadoLado = signal<Lado | null>(null);
+  readonly destacadoId = signal<number | null>(null);
 
-  // Configuración de slots por defecto
-  private readonly SLOTS_TITULARES_DEFAULT = 11;
-  private readonly SLOTS_SUPLENTES_DEFAULT = 7;
+  private siguienteUid = 1;
+
+  readonly lados: Lado[] = ['local', 'visitante'];
+  readonly grupos: Grupo[] = ['titulares', 'suplentes'];
+  readonly tiposGol: { id: TipoGol; texto: string }[] = [
+    { id: 'NORMAL', texto: 'Normal' },
+    { id: 'PENALTI', texto: 'Penalti' },
+    { id: 'PROPIA', texto: 'En propia' },
+  ];
+  readonly tiposTarjeta: { id: TipoTarjeta; texto: string }[] = [
+    { id: 'AMARILLA', texto: 'Amarilla' },
+    { id: 'DOBLE AMARILLA', texto: '2ª amarilla (expulsión)' },
+    { id: 'ROJA', texto: 'Roja directa' },
+  ];
+
+  // ---------- Derivados ----------
+
+  /** Plantilla completa de cada equipo agrupada por posición (para la convocatoria). */
+  readonly plantillaAgrupada = computed(() => ({
+    local: agrupar(this.jugadores().local),
+    visitante: agrupar(this.jugadores().visitante),
+  }));
+
+  /** Ids convocados (titulares + suplentes) por equipo. */
+  readonly idsConvocados = computed(() => {
+    const c = this.convocatoria();
+    const ids = (l: Lado) => new Set([...c[l].titulares, ...c[l].suplentes].filter((id): id is number => id !== null));
+    return { local: ids('local'), visitante: ids('visitante') };
+  });
+
+  /** Convocados de cada equipo, en el orden de la plantilla, agrupados por posición. */
+  readonly convocadosAgrupados = computed(() => {
+    const ids = this.idsConvocados();
+    const j = this.jugadores();
+    return {
+      local: agrupar(j.local.filter((x) => ids.local.has(x.id))),
+      visitante: agrupar(j.visitante.filter((x) => ids.visitante.has(x.id))),
+    };
+  });
+
+  readonly numConvocados = computed(() => ({
+    local: this.idsConvocados().local.size,
+    visitante: this.idsConvocados().visitante.size,
+  }));
+
+  readonly totalGoles = computed(() => this.goles().local.length + this.goles().visitante.length);
+
+  /** Todos los jugadores del partido por id (para pintar el elegido en cada botón). */
+  private readonly jugadoresPorId = computed(
+    () => new Map([...this.jugadores().local, ...this.jugadores().visitante].map((j) => [j.id, j])),
+  );
 
   constructor() {
-    addIcons({
-      add,
-      trash,
-      saveOutline,
-      closeCircleOutline,
-      checkmarkCircleOutline,
-    });
-  }
-
-  private crearEstructuraBaseFormulario() {
-    this.actaForm = this._fb.group({
-      partido_id: [this.partido.id || null, Validators.required],
-      titulares_local: this._fb.array<FormGroup>([]),
-      suplentes_local: this._fb.array<FormGroup>([]),
-      titulares_visitante: this._fb.array<FormGroup>([]),
-      suplentes_visitante: this._fb.array<FormGroup>([]),
-      goles_local_list: this._fb.array([]),
-      goles_visitante_list: this._fb.array([]),
-      jugador_destacado_id: [null],
-    });
-  }
-
-  private async initForm() {
-    this.actaForm = this._fb.group({
-      // 11 Titulares por equipo
-      titulares_local: this.crearSlotsJugadores(11),
-      titulares_visitante: this.crearSlotsJugadores(11),
-      // 7 Suplentes por equipo
-      suplentes_local: this.crearSlotsJugadores(7),
-      suplentes_visitante: this.crearSlotsJugadores(7),
-      // Listas dinámicas para goleadores
-      goles_local_list: this._fb.array([]),
-      goles_visitante_list: this._fb.array([]),
-    });
-  }
-
-  private obtenerActa() {
-    this._loadingService.show();
-    this._partidosService.obtenerActa(this.partido.partido_id).subscribe({
-      next: (acta: any) => {
-        this.actaExistente = acta;
-        this.cargarDatosEnFormulario(acta);
-        this._loadingService.hide();
-      },
-      error: (error) => {
-        this.generarSlotsVacios();
-        this._loadingService.hide();
-      },
-    });
-  }
-
-  private generarSlotsVacios() {
-    this.poblarSlots('titulares_local', [], this.SLOTS_TITULARES_DEFAULT);
-    this.poblarSlots('suplentes_local', [], this.SLOTS_SUPLENTES_DEFAULT);
-    this.poblarSlots('titulares_visitante', [], this.SLOTS_TITULARES_DEFAULT);
-    this.poblarSlots('suplentes_visitante', [], this.SLOTS_SUPLENTES_DEFAULT);
-
-    this.sincronizarGoles('goles_local_list', this.partido.goles_local || 0);
-    this.sincronizarGoles(
-      'goles_visitante_list',
-      this.partido.goles_visitante || 0,
-    );
-  }
-
-  private cargarDatosEnFormulario(acta: any) {
-    this.actaForm.patchValue({
-      partido_id: acta.partido_id || this.partido.partido_id,
-      jugador_destacado_id: acta.jugador_destacado_id || null,
-    });
-
-    // Cargar alineaciones (asegurando el mínimo de slots visibles)
-    this.poblarSlots(
-      'titulares_local',
-      acta.titulares_local || [],
-      this.SLOTS_TITULARES_DEFAULT,
-    );
-    this.poblarSlots(
-      'suplentes_local',
-      acta.suplentes_local || [],
-      this.SLOTS_SUPLENTES_DEFAULT,
-    );
-    this.poblarSlots(
-      'titulares_visitante',
-      acta.titulares_visitante || [],
-      this.SLOTS_TITULARES_DEFAULT,
-    );
-    this.poblarSlots(
-      'suplentes_visitante',
-      acta.suplentes_visitante || [],
-      this.SLOTS_SUPLENTES_DEFAULT,
-    );
-
-    this.sincronizarGoles('goles_local_list', this.partido.goles_local || 0);
-    this.sincronizarGoles(
-      'goles_visitante_list',
-      this.partido.goles_visitante || 0,
-    );
-
-    // Cargar eventos dinámicos (goles y tarjetas)
-    this.poblarGoles('goles_local_list', acta.goles_local || []);
-    this.poblarGoles('goles_visitante_list', acta.goles_visitante || []);
-
-    this.poblarTarjetas('local', acta.tarjetas_local || []);
-    this.poblarTarjetas('visitante', acta.tarjetas_visitante || []);
-  }
-
-  private poblarSlots(
-    controlName: string,
-    idsGuardados: number[],
-    minSlots: number,
-  ) {
-    const array = this.getFormArray(controlName);
-    array.clear();
-
-    const totalSlots = Math.max(idsGuardados.length, minSlots);
-
-    for (let i = 0; i < totalSlots; i++) {
-      const jugadorId = idsGuardados[i] !== undefined ? idsGuardados[i] : null;
-      array.push(
-        this._fb.group({
-          jugador_id: [jugadorId],
-          amarilla1: [false],
-          amarilla2: [false],
-          roja: [false],
-        }),
-      );
-    }
-  }
-
-  private poblarGoles(controlName: string, goles: any) {
-    const array = this.getFormArray(controlName);
-    array.clear();
-
-    for (const gol of goles) {
-      array.push(
-        this._fb.group({
-          jugador_id: [gol.jugador_id, Validators.required],
-          equipo_id: [gol.equipo_id, Validators.required],
-          tipo: [gol.tipo || 'NORMAL', Validators.required],
-        }),
-      );
-    }
-  }
-
-  private poblarTarjetas(equipo: 'local' | 'visitante', tarjetas: any[]) {
-    // 1. Seleccionamos los FormArray según el equipo que estemos procesando
-    const titulares =
-      equipo === 'local'
-        ? this.getFormArray('titulares_local')
-        : this.getFormArray('titulares_visitante');
-
-    const suplentes =
-      equipo === 'local'
-        ? this.getFormArray('suplentes_local')
-        : this.getFormArray('suplentes_visitante');
-
-    // 2. Recorremos cada tarjeta que viene de la API para ese equipo
-    for (const tarjeta of tarjetas) {
-      const jugadorId = tarjeta.jugador_id;
-
-      // Buscamos al jugador primero en titulares y, si no está, en suplentes
-      let controlJugador = titulares.controls.find(
-        (control) => control.get('jugador_id')?.value === jugadorId,
-      );
-
-      if (!controlJugador) {
-        controlJugador = suplentes.controls.find(
-          (control) => control.get('jugador_id')?.value === jugadorId,
-        );
-      }
-
-      // 3. Si encontramos al jugador en la convocatoria, le aplicamos la sanción
-      if (controlJugador) {
-        const tipo = tarjeta.tipo; // Ej: 'AMARILLA', 'DOBLE_AMARILLA', 'ROJA'
-
-        if (tipo === 'AMARILLA') {
-          // Si ya tiene la primera amarilla marcada, marcamos la segunda
-          if (controlJugador.get('amarilla1')?.value) {
-            controlJugador.patchValue({ amarilla2: true });
-          } else {
-            controlJugador.patchValue({ amarilla1: true });
-          }
-        } else if (tipo === 'DOBLE AMARILLA') {
-          controlJugador.patchValue({
-            amarilla1: true,
-            amarilla2: true,
-          });
-        } else if (tipo === 'ROJA') {
-          controlJugador.patchValue({ roja: true });
-        }
-      }
-    }
-  }
-
-  // --- Métodos de apoyo para el HTML / FormArray ---
-
-  getFormArray(nombre: string): FormArray {
-    return this.actaForm.get(nombre) as FormArray;
-  }
-
-  agregarGol() {
-    this.getFormArray('goles').push(
-      this._fb.group({
-        jugador_id: [null, Validators.required],
-        equipo_id: [null, Validators.required],
-        tipo: ['NORMAL', Validators.required],
-      }),
-    );
-  }
-
-  eliminarGol(index: number) {
-    this.getFormArray('goles').removeAt(index);
-  }
-
-  agregarTarjeta() {
-    this.getFormArray('tarjetas').push(
-      this._fb.group({
-        jugador_id: [null, Validators.required],
-        equipo_id: [null, Validators.required],
-        tipo: ['AMARILLA', Validators.required],
-      }),
-    );
-  }
-
-  eliminarTarjeta(index: number) {
-    this.getFormArray('tarjetas').removeAt(index);
-  }
-
-  private crearSlotsJugadores(cantidad: number): FormArray {
-    const array = this._fb.array<FormGroup>([]);
-    for (let i = 0; i < cantidad; i++) {
-      array.push(
-        this._fb.group({
-          jugador_id: [null],
-          amarilla1: [false],
-          amarilla2: [false],
-          roja: [false],
-        }),
-      );
-    }
-    return array as FormArray;
-  }
-
-  // Genera o ajusta dinámicamente los campos según los goles del marcador
-  sincronizarGoles(
-    campo: 'goles_local_list' | 'goles_visitante_list',
-    cantidad: number,
-  ) {
-    const array = this.actaForm.get(campo) as FormArray;
-    while (array.length !== cantidad) {
-      if (array.length < cantidad) {
-        array.push(
-          this._fb.group({
-            jugador_id: [null, Validators.required],
-            tipo: ['NORMAL'], // 'NORMAL', 'PENALTI', 'PROPIA'
-          }),
-        );
-      } else {
-        array.removeAt(array.length - 1);
-      }
-    }
-  }
-
-  async getEquipos() {
-    this._equiposService.getEquipos().subscribe({
-      next: (data: any) => {
-        this.equipos.set(data);
-
-        this.cargarPlantillas();
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  async cargarPlantillas() {
-    this.equipos().map((equipo: any) => {
-      if (equipo.id === this.partido.equipo_local_id) {
-        this.plantillaLocal = equipo.jugadores;
-      }
-      if (equipo.id === this.partido.equipo_visitante_id) {
-        this.plantillaVisitante = equipo.jugadores;
-      }
-    });
-    this.plantillasJuntas = [
-      ...this.plantillaLocal,
-      ...this.plantillaVisitante,
-    ];
-  }
-
-  async cargarActa() {
-    this._partidosService.obtenerActa(this.partido.partido_id).subscribe({
-      next: (acta: any) => {
-        // 1. Cargar Titulares y Suplentes Local
-        this.rellenarSlots('titulares_local', acta.titulares_local);
-        this.rellenarSlots('suplentes_local', acta.suplentes_local);
-
-        // 2. Cargar Titulares y Suplentes Visitante
-        this.rellenarSlots('titulares_visitante', acta.titulares_visitante);
-        this.rellenarSlots('suplentes_visitante', acta.suplentes_visitante);
-
-        // 3. Cargar Goles
-        this.rellenarGoles('goles_local_list', acta.goles);
-        this.rellenarGoles('goles_visitante_list', acta.goles);
-
-        // 4. Cargar Tarjetas
-        //this.rellenarTarjetas(acta.tarjetas);
-
-        // 5. Cargar Destacado
-        if (acta.jugador_destacado_id) {
-          this.actaForm.patchValue({
-            jugador_destacado_id: acta.jugador_destacado_id,
-          });
-        }
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  private rellenarSlots(controlName: string, idsGuardados: number[]) {
-    const array = this.actaForm.get(controlName) as FormArray;
-    array.clear(); // Limpia los slots por defecto
-    // Asegura que siempre haya un número mínimo de slots cargando los elegidos primero
-    const totalSlots = Math.max(idsGuardados.length, 7); // Mínimo 7 slots, o los que hayan guardados
-
-    for (let i = 0; i < totalSlots; i++) {
-      const jugadorId = idsGuardados[i] !== undefined ? idsGuardados[i] : null;
-      array.push(
-        this._fb.group({
-          jugador_id: [jugadorId],
-          amarilla1: [false],
-          amarilla2: [false],
-          roja: [false],
-        }),
-      );
-    }
-  }
-
-  private rellenarGoles(campo: string, goles: any[]) {
-    const golesArray = this.actaForm.get(campo) as FormArray;
-    golesArray.clear();
-
-    for (const gol of goles) {
-      golesArray.push(
-        this._fb.group({
-          jugador_id: [gol.jugador_id],
-          equipo_id: [gol.equipo_id],
-          tipo: [gol.tipo],
-        }),
-      );
-    }
-  }
-
-  private rellenarTarjetas(tarjetas: any[]) {
-    const tarjetasArray = this.actaForm.get('tarjetas') as FormArray;
-    //tarjetasArray.clear();
-
-    for (const tarjeta of tarjetas) {
-      tarjetasArray.push(
-        this._fb.group({
-          jugador_id: [tarjeta.jugador_id],
-          equipo_id: [tarjeta.equipo_id],
-          tipo: [tarjeta.tipo],
-        }),
-      );
-    }
-  }
-
-  obtenerNombreFormateado(j: JugadorSimple): string {
-    if (j.apodo) return `${j.apodo} (${j.posicion})`;
-    return `${j.nombre} ${j.apellidos} (${j.posicion})`;
-  }
-
-  // ==================== MÉTODOS PARA EXTRAER Y LIMPIAR LOS DATOS ====================
-
-  getArray(nombre: string): FormArray {
-    return this.actaForm.get(nombre) as FormArray;
-  }
-
-  private extraerIdsSeleccionados(formArrayName: string): number[] {
-    const controles = this.getArray(formArrayName).value;
-    return controles
-      .map((c: any) => c.jugador_id)
-      .filter((id: any) => id !== null && id !== undefined);
-  }
-
-  private extraerTarjetas(formArrayName: string, equipoId: number) {
-    const controles = this.getArray(formArrayName).value;
-    const tarjetas: any[] = [];
-
-    controles.forEach((c: any) => {
-      if (c.jugador_id) {
-        if (c.amarilla1)
-          tarjetas.push({
-            jugador_id: c.jugador_id,
-            equipo_id: equipoId,
-            tipo: 'AMARILLA',
-          });
-        if (c.amarilla2)
-          tarjetas.push({
-            jugador_id: c.jugador_id,
-            equipo_id: equipoId,
-            tipo: 'DOBLE AMARILLA',
-          });
-        if (c.roja)
-          tarjetas.push({
-            jugador_id: c.jugador_id,
-            equipo_id: equipoId,
-            tipo: 'ROJA',
-          });
-      }
-    });
-
-    return tarjetas;
-  }
-
-  async cerrarActa() {
-    this._loadingService.show();
-
-    const titularesLocal = this.extraerIdsSeleccionados('titulares_local');
-    const suplentesLocal = this.extraerIdsSeleccionados('suplentes_local');
-    const titularesVisitante = this.extraerIdsSeleccionados(
-      'titulares_visitante',
-    );
-    const suplentesVisitante = this.extraerIdsSeleccionados(
-      'suplentes_visitante',
-    );
-    const tarjetas = [
-      ...this.extraerTarjetas('titulares_local', this.partido.equipo_local_id),
-      ...this.extraerTarjetas('suplentes_local', this.partido.equipo_local_id),
-      ...this.extraerTarjetas(
-        'titulares_visitante',
-        this.partido.equipo_visitante_id,
-      ),
-      ...this.extraerTarjetas(
-        'suplentes_visitante',
-        this.partido.equipo_visitante_id,
-      ),
-    ];
-    const golesLocal = this.getArray('goles_local_list').value.map(
-      (g: any) => ({
-        jugador_id: g.jugador_id,
-        equipo_id: this.partido.equipo_local_id,
-        tipo: g.tipo,
-      }),
-    );
-
-    const golesVisitante = this.getArray('goles_visitante_list').value.map(
-      (g: any) => ({
-        jugador_id: g.jugador_id,
-        equipo_id: this.partido.equipo_visitante_id,
-        tipo: g.tipo,
-      }),
-    );
-
-    const jugadorDestacado = this.actaForm.value.jugador_destacado_id || null;
-
-    // 4. Mapeamos la carga útil (Payload) final que enviaremos al Backend
-    const payloadActa = {
-      partido_id: this.partido.partido_id,
-      titulares_local: titularesLocal,
-      suplentes_local: suplentesLocal,
-      titulares_visitante: titularesVisitante,
-      suplentes_visitante: suplentesVisitante,
-      tarjetas: tarjetas,
-      goles: [...golesLocal, ...golesVisitante],
-      jugador_destacado_id: jugadorDestacado,
-    };
-
-    this._partidosService.cerrarActa(payloadActa).subscribe({
-      next: (data: any) => {
-        this._modalCtrl.dismiss(data, 'confirm');
-        this._loadingService.hide();
-      },
-      error: (error: any) => {
-        console.log(error);
-      },
-    });
-  }
-
-  cerrarModal() {
-    this._modalCtrl.dismiss();
+    addIcons({ add, chevronDown, closeOutline, footballOutline, peopleOutline, starOutline, trashOutline });
   }
 
   async ngOnInit() {
-    this.getEquipos();
-    this.crearEstructuraBaseFormulario();
+    await this.cargar();
+  }
 
-    if (this.partido.tiene_acta === true) {
-      this.obtenerActa();
-    } else {
-      this.generarSlotsVacios();
+  // ===================== Carga =====================
+
+  async cargar() {
+    this.estado.set('cargando');
+    try {
+      const [jugadores, acta] = await Promise.all([
+        firstValueFrom(this._partidosService.getJugadoresActa(this.partido.partido_id)),
+        this.partido.tiene_acta
+          ? firstValueFrom(this._partidosService.obtenerActa(this.partido.partido_id))
+          : Promise.resolve(null),
+      ]);
+      this.jugadores.set(jugadores.data);
+      this.aplicarActa(acta);
+      this.estado.set('listo');
+    } catch {
+      this.estado.set('error');
     }
+  }
+
+  /** Vuelca un acta guardada (o ninguna) en el formulario. Los goles cuadran con el resultado. */
+  private aplicarActa(acta: ActaPartido | null) {
+    this.convocatoria.set({
+      local: { titulares: rellenar(acta?.titulares_local, TITULARES), suplentes: rellenar(acta?.suplentes_local, SUPLENTES) },
+      visitante: {
+        titulares: rellenar(acta?.titulares_visitante, TITULARES),
+        suplentes: rellenar(acta?.suplentes_visitante, SUPLENTES),
+      },
+    });
+
+    const aGoles = (eventos: EventoActa[] | undefined, cantidad: number): GolForm[] => {
+      const lista: GolForm[] = (eventos ?? []).slice(0, cantidad).map((e) => ({
+        jugador_id: e.jugador_id,
+        tipo: (e.tipo as TipoGol) || 'NORMAL',
+        minuto: e.minuto ?? null,
+      }));
+      while (lista.length < cantidad) lista.push({ jugador_id: null, tipo: 'NORMAL', minuto: null });
+      return lista;
+    };
+    this.goles.set({
+      local: aGoles(acta?.goles_local, this.partido.goles_local ?? 0),
+      visitante: aGoles(acta?.goles_visitante, this.partido.goles_visitante ?? 0),
+    });
+
+    const aTarjetas = (eventos: EventoActa[] | undefined, lado: Lado): TarjetaForm[] =>
+      (eventos ?? []).map((e) => ({
+        uid: this.siguienteUid++,
+        lado,
+        jugador_id: e.jugador_id,
+        tipo: e.tipo as TipoTarjeta,
+        minuto: e.minuto ?? null,
+      }));
+    this.tarjetas.set([...aTarjetas(acta?.tarjetas_local, 'local'), ...aTarjetas(acta?.tarjetas_visitante, 'visitante')]);
+
+    const destacado = acta?.jugador_destacado_id ?? null;
+    this.destacadoId.set(destacado);
+    this.destacadoLado.set(
+      destacado === null ? null : this.jugadores().visitante.some((j) => j.id === destacado) ? 'visitante' : 'local',
+    );
+  }
+
+  // ===================== Ayudas de vista =====================
+
+  nombre(j: JugadorActa): string {
+    return j.apodo?.trim() || `${j.nombre} ${j.apellidos ?? ''}`.trim();
+  }
+
+  jugador(id: number | null): JugadorActa | null {
+    return id === null ? null : (this.jugadoresPorId().get(id) ?? null);
+  }
+
+  nombreEquipo(lado: Lado): string {
+    return lado === 'local' ? this.partido.local_nombre : this.partido.visitante_nombre;
+  }
+
+  /** Lado del que salen los autores de un gol: en propia, del rival. */
+  ladoAutor(lado: Lado, tipo: TipoGol): Lado {
+    return tipo === 'PROPIA' ? (lado === 'local' ? 'visitante' : 'local') : lado;
+  }
+
+  private aId(valor: string): number | null {
+    return valor ? Number(valor) : null;
+  }
+
+  private aMinuto(valor: string): number | null {
+    if (valor === '') return null;
+    const n = Math.round(Number(valor));
+    return Number.isFinite(n) ? Math.max(0, Math.min(130, n)) : null;
+  }
+
+  // ===================== Selector de jugador =====================
+
+  /**
+   * Abre el selector propio de jugador. Devuelve el id elegido, null si se vacía,
+   * o undefined si se cierra sin elegir.
+   */
+  private async elegirJugador(opciones: {
+    titulo: string;
+    subtitulo: string;
+    grupos: { posicion: Posicion; titulo: string; jugadores: JugadorActa[] }[];
+    seleccionado: number | null;
+    ocupados?: number[];
+    permitirVacio?: boolean;
+    textoVacio?: string;
+    mensajeSinJugadores?: string;
+  }): Promise<number | null | undefined> {
+    const modal = await this._modalCtrl.create({
+      component: SelectorJugadorActasComponent,
+      componentProps: opciones,
+      ...opcionesModalAuto(),
+    });
+    await modal.present();
+    const { data, role } = await modal.onWillDismiss<number | null>();
+    return role === 'confirm' ? (data ?? null) : undefined;
+  }
+
+  private readonly sinConvocados = 'Primero elige la convocatoria en «Alineaciones».';
+
+  async abrirSelectorConvocado(lado: Lado, grupo: Grupo, indice: number) {
+    const actual = this.convocatoria()[lado][grupo][indice];
+    const id = await this.elegirJugador({
+      titulo: `${grupo === 'titulares' ? 'Titular' : 'Suplente'} ${indice + 1}`,
+      subtitulo: this.nombreEquipo(lado),
+      grupos: this.plantillaAgrupada()[lado],
+      seleccionado: actual,
+      ocupados: [...this.idsConvocados()[lado]],
+      textoVacio: 'Dejar hueco vacío',
+    });
+    if (id !== undefined) this.elegirConvocado(lado, grupo, indice, id === null ? '' : String(id));
+  }
+
+  async abrirSelectorGol(lado: Lado, indice: number) {
+    const gol = this.goles()[lado][indice];
+    const autor = this.ladoAutor(lado, gol.tipo);
+    const id = await this.elegirJugador({
+      titulo: gol.tipo === 'PROPIA' ? 'Gol en propia' : 'Autor del gol',
+      subtitulo: gol.tipo === 'PROPIA' ? `Jugador del ${this.nombreEquipo(autor)}` : this.nombreEquipo(lado),
+      grupos: this.convocadosAgrupados()[autor],
+      seleccionado: gol.jugador_id,
+      permitirVacio: false,
+      mensajeSinJugadores: this.sinConvocados,
+    });
+    if (id !== undefined) this.cambiarGol(lado, indice, { jugador_id: id });
+  }
+
+  async abrirSelectorTarjeta(uid: number) {
+    const tarjeta = this.tarjetas().find((t) => t.uid === uid);
+    if (!tarjeta) return;
+    const id = await this.elegirJugador({
+      titulo: 'Jugador de la tarjeta',
+      subtitulo: this.nombreEquipo(tarjeta.lado),
+      grupos: this.convocadosAgrupados()[tarjeta.lado],
+      seleccionado: tarjeta.jugador_id,
+      permitirVacio: false,
+      mensajeSinJugadores: this.sinConvocados,
+    });
+    if (id !== undefined) this.cambiarTarjeta(uid, { jugador_id: id });
+  }
+
+  async abrirSelectorDestacado(lado: Lado) {
+    const id = await this.elegirJugador({
+      titulo: 'Jugador destacado',
+      subtitulo: this.nombreEquipo(lado),
+      grupos: this.convocadosAgrupados()[lado],
+      seleccionado: this.destacadoId(),
+      permitirVacio: false,
+      mensajeSinJugadores: this.sinConvocados,
+    });
+    if (id !== undefined) this.destacadoId.set(id);
+  }
+
+  // ===================== Convocatoria =====================
+
+  elegirConvocado(lado: Lado, grupo: Grupo, indice: number, valor: string) {
+    this.convocatoria.update((c) => {
+      const lista = [...c[lado][grupo]];
+      lista[indice] = this.aId(valor);
+      return { ...c, [lado]: { ...c[lado], [grupo]: lista } };
+    });
+  }
+
+  anadirSuplente(lado: Lado) {
+    this.convocatoria.update((c) => ({ ...c, [lado]: { ...c[lado], suplentes: [...c[lado].suplentes, null] } }));
+  }
+
+  // ===================== Goles =====================
+
+  cambiarGol(lado: Lado, indice: number, cambios: Partial<GolForm>) {
+    this.goles.update((g) => {
+      const lista = [...g[lado]];
+      const anterior = lista[indice];
+      const nuevo = { ...anterior, ...cambios };
+      // Si cambia a/desde "en propia", el autor deja de valer (es del otro equipo)
+      if (cambios.tipo && (cambios.tipo === 'PROPIA') !== (anterior.tipo === 'PROPIA')) nuevo.jugador_id = null;
+      lista[indice] = nuevo;
+      return { ...g, [lado]: lista };
+    });
+  }
+
+  elegirTipoGol(lado: Lado, indice: number, valor: string) {
+    this.cambiarGol(lado, indice, { tipo: valor as TipoGol });
+  }
+
+  elegirMinutoGol(lado: Lado, indice: number, valor: string) {
+    this.cambiarGol(lado, indice, { minuto: this.aMinuto(valor) });
+  }
+
+  // ===================== Tarjetas =====================
+
+  anadirTarjeta() {
+    this.tarjetas.update((t) => [
+      ...t,
+      { uid: this.siguienteUid++, lado: 'local', jugador_id: null, tipo: 'AMARILLA', minuto: null },
+    ]);
+  }
+
+  quitarTarjeta(uid: number) {
+    this.tarjetas.update((t) => t.filter((x) => x.uid !== uid));
+  }
+
+  cambiarTarjeta(uid: number, cambios: Partial<TarjetaForm>) {
+    this.tarjetas.update((t) =>
+      t.map((x) => {
+        if (x.uid !== uid) return x;
+        const nueva = { ...x, ...cambios };
+        if (cambios.lado && cambios.lado !== x.lado) nueva.jugador_id = null;
+        return nueva;
+      }),
+    );
+  }
+
+  elegirTipoTarjeta(uid: number, valor: string) {
+    this.cambiarTarjeta(uid, { tipo: valor as TipoTarjeta });
+  }
+
+  elegirMinutoTarjeta(uid: number, valor: string) {
+    this.cambiarTarjeta(uid, { minuto: this.aMinuto(valor) });
+  }
+
+  // ===================== Destacado =====================
+
+  elegirLadoDestacado(lado: Lado) {
+    if (this.destacadoLado() === lado) return;
+    this.destacadoLado.set(lado);
+    this.destacadoId.set(null);
+  }
+
+  quitarDestacado() {
+    this.destacadoLado.set(null);
+    this.destacadoId.set(null);
+  }
+
+  // ===================== Guardar =====================
+
+  /** Devuelve el primer problema encontrado (y la pestaña donde está) o null. */
+  private validar(): { mensaje: string; pestana: Pestana } | null {
+    const ids = this.idsConvocados();
+
+    for (const lado of this.lados) {
+      for (const gol of this.goles()[lado]) {
+        if (gol.jugador_id === null) {
+          return { mensaje: `Falta el autor de algún gol del ${this.nombreEquipo(lado)}`, pestana: 'goles' };
+        }
+        if (!ids[this.ladoAutor(lado, gol.tipo)].has(gol.jugador_id)) {
+          return { mensaje: 'Algún goleador no está convocado', pestana: 'goles' };
+        }
+      }
+    }
+
+    for (const t of this.tarjetas()) {
+      if (t.jugador_id === null) return { mensaje: 'Falta el jugador de alguna tarjeta', pestana: 'tarjetas' };
+      if (!ids[t.lado].has(t.jugador_id)) return { mensaje: 'Alguna tarjeta es de un jugador no convocado', pestana: 'tarjetas' };
+    }
+
+    const destacado = this.destacadoId();
+    const lado = this.destacadoLado();
+    if (destacado !== null && lado && !ids[lado].has(destacado)) {
+      return { mensaje: 'El jugador destacado no está convocado', pestana: 'destacado' };
+    }
+    return null;
+  }
+
+  async guardar() {
+    if (this.enviando()) return;
+
+    const problema = this.validar();
+    if (problema) {
+      this.pestana.set(problema.pestana);
+      this._toastService.showErrorToast(problema.mensaje);
+      return;
+    }
+
+    const equipo = (lado: Lado) => (lado === 'local' ? this.partido.equipo_local_id : this.partido.equipo_visitante_id);
+    const limpiar = (lista: (number | null)[]) => lista.filter((id): id is number => id !== null);
+    const c = this.convocatoria();
+
+    const payload: PayloadActa = {
+      partido_id: this.partido.partido_id,
+      titulares_local: limpiar(c.local.titulares),
+      suplentes_local: limpiar(c.local.suplentes),
+      titulares_visitante: limpiar(c.visitante.titulares),
+      suplentes_visitante: limpiar(c.visitante.suplentes),
+      // En los goles en propia, equipo_id es el equipo que suma el gol (como hasta ahora)
+      goles: this.lados.flatMap((lado) =>
+        this.goles()[lado].map((g) => ({ jugador_id: g.jugador_id!, equipo_id: equipo(lado), tipo: g.tipo, minuto: g.minuto })),
+      ),
+      tarjetas: this.tarjetas().map((t) => ({
+        jugador_id: t.jugador_id!,
+        equipo_id: equipo(t.lado),
+        tipo: t.tipo,
+        minuto: t.minuto,
+      })),
+      jugador_destacado_id: this.destacadoId(),
+    };
+
+    this.enviando.set(true);
+    this._loadingService.show('Guardando acta y calculando puntos...');
+    try {
+      const resp = await firstValueFrom(this._partidosService.cerrarActa(payload));
+      this._toastService.showSuccessToast(resp?.message || 'Acta guardada');
+      this._modalCtrl.dismiss(resp, 'confirm');
+    } catch (error) {
+      const err = error as HttpErrorResponse;
+      this._toastService.showErrorToast(err.error?.message || 'No se ha podido guardar el acta');
+    } finally {
+      this._loadingService.hide();
+      this.enviando.set(false);
+    }
+  }
+
+  cerrarModal() {
+    this._modalCtrl.dismiss(null, 'cancel');
   }
 }
