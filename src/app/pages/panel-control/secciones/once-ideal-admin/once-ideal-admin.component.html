@@ -1,0 +1,88 @@
+<section class="seccion">
+  <header class="seccion-cabecera">
+    <h2>11 Ideal</h2>
+    @if (estado() === 'listo' && resumen().total > 0) {
+    <p>
+      {{ resumen().publicados }} de {{ resumen().total }} jornadas cerradas con 11 ideal
+      @if (resumen().pendientes > 0) {
+      · <span class="pendientes">{{ resumen().pendientes }} pendientes</span>
+      }
+    </p>
+    }
+  </header>
+
+  @switch (estado()) {
+  @case ('cargando') {
+  <div class="lista" aria-busy="true">
+    @for (i of [1, 2, 3]; track i) {
+    <div class="jornada esqueleto">
+      <ion-skeleton-text animated class="sk-numero"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 45%; height: 14px"></ion-skeleton-text>
+    </div>
+    }
+  </div>
+  }
+
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se han podido cargar las jornadas.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargar()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+
+  @default {
+  <ul class="lista">
+    @for (j of jornadas(); track j.id) {
+    @let publicado = j.once_ideal_id !== null;
+    <li class="jornada" [class.publicado]="publicado">
+      <div class="numero" aria-hidden="true">J{{ j.numero_jornada }}</div>
+
+      <div class="info">
+        <h3>Jornada {{ j.numero_jornada }}</h3>
+        @if (publicado) {
+        <p class="estado ok">
+          <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
+          Publicado · {{ j.formacion }}
+        </p>
+        } @else if (sinPuntos(j)) {
+        <p class="estado aviso">
+          <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+          Sin puntos: faltan las actas
+        </p>
+        } @else {
+        <p class="estado pendiente">Pendiente de publicar</p>
+        }
+      </div>
+
+      <div class="acciones">
+        @if (publicado) {
+        <button type="button" class="btn-icono" (click)="ver(j)" [attr.aria-label]="'Ver 11 ideal de la jornada ' + j.numero_jornada" title="Ver como los usuarios">
+          <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="btn-icono" (click)="editar(j)" [attr.aria-label]="'Editar 11 ideal de la jornada ' + j.numero_jornada" title="Editar">
+          <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="btn-icono peligro" (click)="eliminar(j)" [attr.aria-label]="'Eliminar 11 ideal de la jornada ' + j.numero_jornada" title="Eliminar">
+          <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        </button>
+        } @else {
+        <button type="button" class="btn-crear" [class.bloqueado]="sinPuntos(j)" (click)="crear(j)">
+          <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
+          Crear
+        </button>
+        }
+      </div>
+    </li>
+    } @empty {
+    <li class="estado-vacio">
+      <ion-icon name="star-outline" aria-hidden="true"></ion-icon>
+      <p>Aún no hay jornadas cerradas. El 11 ideal se crea cuando una jornada termina.</p>
+    </li>
+    }
+  </ul>
+  }
+  }
+</section>

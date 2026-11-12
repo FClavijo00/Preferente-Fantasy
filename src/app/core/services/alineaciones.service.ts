@@ -23,7 +23,13 @@ export class AlineacionesService {
         return this.http.post(`${this.apiUrl}/cargarOnceIdeal`, { jornada_id: jornadaID });
     }
 
-    guardarOnceIdeal(payload: any) {
-        return this.http.post(`${this.apiUrl}/guardarOnceIdeal`, payload);
+    /** Crea o actualiza el 11 ideal de una jornada (solo admin). */
+    guardarOnceIdeal(payload: { jornada_id: number; formacion_id: number; jugadores: { jugador_id: number; hueco_index: number }[] }) {
+        return this.http.post<{ ok: boolean; message?: string }>(`${this.apiUrl}/guardarOnceIdeal`, payload);
+    }
+
+    /** Elimina el 11 ideal de una jornada (solo admin). */
+    eliminarOnceIdeal(jornadaId: number) {
+        return this.http.post<{ ok: boolean; message?: string }>(`${this.apiUrl}/eliminarOnceIdeal`, { jornada_id: jornadaId });
     }
 }

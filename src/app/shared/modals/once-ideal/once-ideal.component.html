@@ -1,4 +1,4 @@
-@if (jornada) {
+@if (esVista) {
 <ion-header class="ion-no-border once-ideal-header">
   <div class="header-banner">
     <!-- Botón de cerrar modal flotante -->
@@ -135,20 +135,25 @@
         <span class="txt-brand">PREFERENTE <span class="highlight">FANTASY</span></span>
       </div>
       <div class="bottom-row">
+        @if (jornadaFija) {
+        <span class="txt-jornada">JORNADA {{ jornadaFija.numero_jornada }}</span>
+        } @else {
         <ion-item>
           <ion-label>Jornada:</ion-label>
-          <ion-select mode="ios" interface="popover" [value]="jornadasDisponibles()"
+          <ion-select mode="ios" interface="popover" placeholder="Elegir" [value]="jornadaSeleccionada()?.id"
             (ionChange)="cambiarJornada($event)">
             @for (j of jornadasDisponibles(); track j.id) {
             <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
             }
           </ion-select>
         </ion-item>
+        }
       </div>
       <div class="bottom-row">
         <ion-item>
           <ion-label>Formación:</ion-label>
-          <ion-select mode="ios" interface="popover" [value]="formaciones()" (ionChange)="cambiarFormacion($event)">
+          <ion-select mode="ios" interface="popover" placeholder="Elegir" [value]="formacionSeleccionada()?.id"
+            (ionChange)="cambiarFormacion($event)">
             @for (f of formaciones(); track f.id) {
             <ion-select-option [value]="f.id">{{ f.formacion }}</ion-select-option>
             }
@@ -161,9 +166,11 @@
 
 <ion-content fullscreen="true" class="once-ideal-content">
   <div class="btn-div-guardar">
-    <ion-button class="btn-guardar" fill="clear" shape="round" (click)="guardarOnceIdeal()">
+    <ion-button class="btn-guardar" fill="clear" shape="round" (click)="guardarOnceIdeal()"
+      [disabled]="!jornadaSeleccionada() || !formacionSeleccionada() || colocados() !== 11">
       <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-      Guardar 11 Ideal
+      {{ modoEfectivo === 'editar' ? 'Guardar cambios' : 'Publicar 11 Ideal' }}
+      @if (formacionSeleccionada()) { · {{ colocados() }}/11 }
     </ion-button>
   </div>
   <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
