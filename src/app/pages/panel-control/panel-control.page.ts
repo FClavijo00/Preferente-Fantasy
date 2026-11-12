@@ -1,467 +1,75 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonMenu,
-  IonButtons,
-  IonMenuButton,
-  IonLabel,
-  IonList,
-  IonItem,
-  IonIcon,
-  MenuController,
-  IonSelect,
-  IonSelectOption,
-  IonButton,
-  IonListHeader,
-  ModalController,
-  NavController,
-  IonBadge,
-  IonAvatar,
-} from '@ionic/angular';
-import { HeaderComponent } from '../../shared/components/header/header.component';
+import { Component, inject, signal } from '@angular/core';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonButtons } from '@ionic/angular/ion-buttons';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonSegment } from '@ionic/angular/ion-segment';
+import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
+import { NavController } from '@ionic/angular/nav-controller';
 import { addIcons } from 'ionicons';
 import {
-  addOutline,
   arrowBackOutline,
+  calendarNumberOutline,
   calendarOutline,
-  checkmarkCircleOutline,
-  chevronBackCircleOutline,
-  chevronBackOutline,
-  closeCircleOutline,
-  documentTextOutline,
-  pencilOutline,
   personCircleOutline,
   starOutline,
 } from 'ionicons/icons';
-import { JornadasService } from '../../core/services/jornadas-service';
-import { CrearJornadaComponent } from '../../shared/modals/crear-jornada/crear-jornada.component';
-import { CrearEditarPartidoComponent } from '../../shared/modals/crear-editar-partido/crear-editar-partido.component';
-import { EquiposService } from '../../core/services/equipos-service';
-import { CrearEditarJugadorComponent } from '../../shared/modals/crear-editar-jugador/crear-editar-jugador.component';
-import { CrearEditarActaPartidoComponent } from '../../shared/modals/crear-editar-acta-partido/crear-editar-acta-partido.component';
-import { LoadingService } from '../../core/services/loading.service';
-import { OnceIdealComponent } from '../../shared/modals/once-ideal/once-ideal.component';
+import { JornadasAdminComponent } from './secciones/jornadas-admin/jornadas-admin.component';
+import { CalendarioAdminComponent } from './secciones/calendario-admin/calendario-admin.component';
+import { JugadoresAdminComponent } from './secciones/jugadores-admin/jugadores-admin.component';
+import { OnceIdealAdminComponent } from './secciones/once-ideal-admin/once-ideal-admin.component';
 
-interface Jornada {
-  id: number;
-  estado: string;
-  fecha_inicio: string;
-  fecha_fin: string;
-  numero_jornada: number;
-  competicion_id: number;
-}
+type Seccion = 'jornadas' | 'calendario' | 'jugadores' | 'onceideal';
 
-interface Partido {
-  partido_id: number;
-  fecha_partido: string | null;
-  goles_local: number | null;
-  equipo_local_id: number;
-  goles_visitante: number | null;
-  equipo_visitante_id: number;
-  local_nombre: string;
-  visitante_nombre: string;
-  jugado: boolean;
-  tiene_acta: boolean;
-  fecha: string;
-  hora: string;
-}
+const SECCIONES: { id: Seccion; titulo: string; icono: string }[] = [
+  { id: 'jornadas', titulo: 'Jornadas', icono: 'calendar-number-outline' },
+  { id: 'calendario', titulo: 'Calendario', icono: 'calendar-outline' },
+  { id: 'jugadores', titulo: 'Jugadores', icono: 'person-circle-outline' },
+  { id: 'onceideal', titulo: '11 Ideal', icono: 'star-outline' },
+];
 
-export interface Equipo {
-  id: number;
-  nombre: string;
-  escudo: string;
-  escudo_url: string;
-  color_primario: string;
-  color_secundario: string;
-  competicion_id: number;
-  jugadores: Jugador[];
-}
-
-export interface Jugador {
-  id: number;
-  nombre: string;
-  apellidos: string;
-  apodo: string;
-  posicion: 'POR' | 'DEF' | 'MED' | 'DEL';
-  precio: number;
-  puntosTotales: number;
-  fotoUrl?: string;
-  foto?: string;
-}
+/**
+ * Panel de control (solo admin). Cada sección es un componente que carga sus propios datos:
+ * aquí solo se elige cuál se muestra.
+ */
 @Component({
   selector: 'app-panel-control',
   templateUrl: './panel-control.page.html',
   styleUrls: ['./panel-control.page.scss'],
   imports: [
-    IonAvatar,
-    IonListHeader,
-    IonButton,
-    IonSelect,
-    IonSelectOption,
-    IonIcon,
-    IonItem,
-    IonList,
-    IonLabel,
-    IonMenuButton,
-    IonButtons,
-    IonButtons,
-    IonMenu,
     IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
-    CommonModule,
-    FormsModule,
-    HeaderComponent,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonLabel,
+    IonSegment,
+    IonSegmentButton,
+    JornadasAdminComponent,
+    CalendarioAdminComponent,
+    JugadoresAdminComponent,
+    OnceIdealAdminComponent,
   ],
 })
 export class PanelControlPage {
-  private _menuCtrl = inject(MenuController);
-  private _jornadasService = inject(JornadasService);
-  private _modalCtrl = inject(ModalController);
   private _navCtrl = inject(NavController);
-  private _equiposService = inject(EquiposService);
-  private _loadingService = inject(LoadingService);
 
-  public content = signal<string>('');
-  public jornadas = signal<Jornada[]>([]);
-  public jornadaSeleccionada = signal<Jornada>({
-    id: 0,
-    estado: '',
-    fecha_inicio: '',
-    fecha_fin: '',
-    numero_jornada: 0,
-    competicion_id: 0,
-  });
-  public partidosJornada = signal<Partido[]>([]);
-
-  /* EDITANDO MODES */
-  public editandoEstado = signal<boolean>(false);
-  public estadoEditadoChange = signal<string>('');
-  public editandoPartido = signal<boolean>(false);
-  public partidoSeleccionado = signal<Partido>({
-    partido_id: 0,
-    fecha_partido: '',
-    goles_local: 0,
-    equipo_local_id: 0,
-    goles_visitante: 0,
-    equipo_visitante_id: 0,
-    local_nombre: '',
-    visitante_nombre: '',
-    jugado: false,
-    tiene_acta: false,
-    fecha: '',
-    hora: '',
-  });
-
-  equipos = signal<Equipo[]>([]);
-  equipoSeleccionado = signal<Equipo | null>(null);
-  jugadores = signal<Jugador[]>([]);
-
-  /**
-   * ONCE IDEAL
-   */
-  public jornadasOnceIdeal = signal<Jornada[]>([]);
+  readonly secciones = SECCIONES;
+  readonly content = signal<Seccion>('jornadas');
 
   constructor() {
-    addIcons({
-      calendarOutline,
-      personCircleOutline,
-      pencilOutline,
-      closeCircleOutline,
-      checkmarkCircleOutline,
-      addOutline,
-      arrowBackOutline,
-      documentTextOutline,
-      starOutline
-    });
+    addIcons({ arrowBackOutline, calendarNumberOutline, calendarOutline, personCircleOutline, starOutline });
   }
 
-  async abrirMainContent(content: string) {
-    this.content.set(content);
-    if (content === 'calendario') {
-      await this.getJornadas();
-    } else if (content === 'jugadores') {
-      await this.cargarEquipos();
-    } else if (content === 'onceideal') {
-      await this.cargarJornadasOnceIdeal();
-    }
-    await this._menuCtrl.close();
-  }
-
-  async crearNuevaJornada() {
-    const modal = await this._modalCtrl.create({
-      component: CrearJornadaComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'crear',
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.getJornadas();
-    }
-  }
-
-  async crearNuevoPartido() {
-    const modal = await this._modalCtrl.create({
-      component: CrearEditarPartidoComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'crear',
-        jornada: this.jornadaSeleccionada(),
-        partido: this.partidoSeleccionado(),
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.getJornadas();
-      this.jornadaSeleccionada.set(this.jornadaSeleccionada());
-      this.cargarPartidosJornada(this.jornadaSeleccionada().id);
-    }
-  }
-
-  async abrirEditarPartido() {
-    const modal = await this._modalCtrl.create({
-      component: CrearEditarPartidoComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'editar',
-        jornada: this.jornadaSeleccionada(),
-        partido: this.partidoSeleccionado(),
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.getJornadas();
-      this.jornadaSeleccionada.set(this.jornadaSeleccionada());
-      this.cargarPartidosJornada(this.jornadaSeleccionada().id);
-    }
-  }
-
-  async abrirCrearJugador() {
-    const modal = await this._modalCtrl.create({
-      component: CrearEditarJugadorComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'crear',
-        equipos: this.equipos(),
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.cargarEquipos(data.equipo_id);
-    }
-  }
-
-  async editarJugador(jugador: Jugador) {
-    const modal = await this._modalCtrl.create({
-      component: CrearEditarJugadorComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'editar',
-        jugador: jugador,
-        equipo: this.equipoSeleccionado(),
-        equipos: this.equipos(),
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.cargarEquipos(data.equipo_id);
-    }
-  }
-
-  async abrirEditarActaPartido(partido: Partido) {
-    const modal = await this._modalCtrl.create({
-      component: CrearEditarActaPartidoComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        partido: partido
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.getJornadas();
-      this.jornadaSeleccionada.set(this.jornadaSeleccionada());
-      this.cargarPartidosJornada(this.jornadaSeleccionada().id);
-    }
-  }
-
-  async getJornadas() {
-    this._jornadasService.getJornadas().subscribe({
-      next: (data: any) => {
-        this.jornadas.set(data);
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  async cargarEquipos(idEquipo?: number) {
-    this._equiposService.getEquipos().subscribe({
-      next: (data: any) => {
-        this.equipos.set(data);
-        if (idEquipo) {
-          this.seleccionarEquipo(data.find((equipo: Equipo) => equipo.id === idEquipo));
-        }
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  seleccionarEquipo(equipo: Equipo) {
-    this.equipoSeleccionado.set(equipo);
-
-    const listaCompleta = equipo.jugadores || [];
-
-    this.jugadores.set(listaCompleta);
-
-    /* if (this.posicionFiltro() === 'TODOS') {
-        this.jugadoresFiltrados.set(listaCompleta);
-      } else {
-        this.jugadoresFiltrados.set(
-          listaCompleta.filter((j: Jugador) => j.posicion === this.posicionFiltro())
-        );
-      } */
-  }
-
-  seleccionarJornada(event: any) {
-    const jornadaID = Number(event.detail.value);
-    this.jornadas().forEach((jornada) => {
-      if (jornada.id === jornadaID) {
-        this.jornadaSeleccionada.set(jornada);
-        this.cargarPartidosJornada(jornadaID);
-      }
-    });
-  }
-
-  async cargarPartidosJornada(numeroJornada: number) {
-    this._jornadasService.cargarPartidosJornada(numeroJornada).subscribe({
-      next: (resp: any) => {
-        this.partidosJornada.set(resp.data);
-      },
-      error: (error) => {
-        console.log(error);
-        this.partidosJornada.set([]);
-      },
-    });
-  }
-
-  editarEstadoJornada(jornada: Jornada) {
-    this.editandoEstado.set(true);
-  }
-
-  editarPartido(partido: Partido) {
-    this.editandoPartido.set(true);
-    this.partidoSeleccionado.set(partido);
-
-    this.abrirEditarPartido();
-  }
-
-  async guardarEstadoJornada() {
-    let data = {
-      jornadaId: this.jornadaSeleccionada().id,
-      estado: this.estadoEditadoChange(),
-    };
-    this._jornadasService.cambiarEstadoJornada(data).subscribe({
-      next: (resp: any) => {
-        this.editandoEstado.set(false);
-        this.estadoEditadoChange.set('');
-        this.jornadaSeleccionada.set({
-          id: 0,
-          estado: '',
-          fecha_inicio: '',
-          fecha_fin: '',
-          numero_jornada: 0,
-          competicion_id: 0,
-        });
-        this.getJornadas();
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  async cargarJornadasOnceIdeal() {
-    this._loadingService.show();
-    this._jornadasService.getJornadasOnceIdeal().subscribe({
-      next: async (resp: any) => {
-        if (resp.ok) {
-          this.jornadasOnceIdeal.set(resp.data || []);
-          this._loadingService.hide();
-        }
-      },
-      error: (err: any) => {
-        console.error('Error al cargar jornadas:', err);
-        this._loadingService.hide();
-      },
-    })
-  }
-
-  async addOnceIdeal() {
-    const modal = await this._modalCtrl.create({
-      component: OnceIdealComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        jornadasConOnceIdeal: this.jornadasOnceIdeal(),
-      }
-    });
-
-    await modal.present();
+  abrirSeccion(valor: unknown) {
+    const seccion = SECCIONES.find((s) => s.id === valor)?.id;
+    if (seccion) this.content.set(seccion);
   }
 
   volverRecepcion() {
