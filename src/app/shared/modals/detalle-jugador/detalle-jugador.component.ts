@@ -1,12 +1,10 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
-import {
-  IonContent,
-  IonAvatar,
-  IonCardContent,
-  IonCard,
-  IonBadge,
-  IonIcon,
-} from '@ionic/angular';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonAvatar } from '@ionic/angular/ion-avatar';
+import { IonCardContent } from '@ionic/angular/ion-card-content';
+import { IonCard } from '@ionic/angular/ion-card';
+import { IonBadge } from '@ionic/angular/ion-badge';
+import { IonIcon } from '@ionic/angular/ion-icon';
 import { DecimalPipe } from '@angular/common';
 import { checkmarkCircle, medkit } from 'ionicons/icons';
 import { addIcons } from 'ionicons';

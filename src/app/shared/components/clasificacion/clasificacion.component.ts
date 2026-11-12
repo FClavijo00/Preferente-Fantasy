@@ -1,21 +1,20 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import {
-  IonBadge,
-  IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCardContent,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel,
-  IonSegmentView,
-  IonSegmentContent,
-  IonItem,
-  IonList,
-  IonAvatar,
-  IonButton, IonIcon
-} from '@ionic/angular';
+import { IonBadge } from '@ionic/angular/ion-badge';
+import { IonCard } from '@ionic/angular/ion-card';
+import { IonCardHeader } from '@ionic/angular/ion-card-header';
+import { IonCardSubtitle } from '@ionic/angular/ion-card-subtitle';
+import { IonCardTitle } from '@ionic/angular/ion-card-title';
+import { IonCardContent } from '@ionic/angular/ion-card-content';
+import { IonSegment } from '@ionic/angular/ion-segment';
+import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonSegmentView } from '@ionic/angular/ion-segment-view';
+import { IonSegmentContent } from '@ionic/angular/ion-segment-content';
+import { IonItem } from '@ionic/angular/ion-item';
+import { IonList } from '@ionic/angular/ion-list';
+import { IonAvatar } from '@ionic/angular/ion-avatar';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
 import { EquiposService } from '../../../core/services/equipos-service';
 import { JugadoresService } from '../../../core/services/jugadores-service';
 import { addIcons } from 'ionicons';

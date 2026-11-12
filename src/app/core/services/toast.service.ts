@@ -1,5 +1,5 @@
 import { inject, Service } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/toast-controller';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 

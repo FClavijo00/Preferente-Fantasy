@@ -1,21 +1,19 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonSpinner,
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonLabel,
-  IonBadge,
-  IonSegment,
-  IonSegmentButton,
-  ModalController,
-} from '@ionic/angular';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonSpinner } from '@ionic/angular/ion-spinner';
+import { IonList } from '@ionic/angular/ion-list';
+import { IonItem } from '@ionic/angular/ion-item';
+import { IonAvatar } from '@ionic/angular/ion-avatar';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonBadge } from '@ionic/angular/ion-badge';
+import { IonSegment } from '@ionic/angular/ion-segment';
+import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { EquiposService } from '../../core/services/equipos-service';
 import { DetalleJugadorComponent } from '../../shared/modals/detalle-jugador/detalle-jugador.component';

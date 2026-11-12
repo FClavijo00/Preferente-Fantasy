@@ -1,17 +1,15 @@
 import { afterNextRender, Component, computed, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { JornadasService } from '../../../core/services/jornadas-service';
-import {
-  IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCardContent,
-  IonSegment,
-  IonSegmentButton,
-  IonBadge,
-  IonLabel,
-  ModalController,
-} from '@ionic/angular';
+import { IonCard } from '@ionic/angular/ion-card';
+import { IonCardHeader } from '@ionic/angular/ion-card-header';
+import { IonCardSubtitle } from '@ionic/angular/ion-card-subtitle';
+import { IonCardTitle } from '@ionic/angular/ion-card-title';
+import { IonCardContent } from '@ionic/angular/ion-card-content';
+import { IonSegment } from '@ionic/angular/ion-segment';
+import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
+import { IonBadge } from '@ionic/angular/ion-badge';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { DatePipe } from '@angular/common';
 import { ToastService } from '../../../core/services/toast.service';
 import { ActaPartidoComponent } from '../acta-partido/acta-partido.component';

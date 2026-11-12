@@ -1,22 +1,22 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonSelect,
-  IonSelectOption,
-  IonTitle,
-  IonToolbar,
-  ModalController,
-  IonIcon,
-  IonAvatar,
-  IonItem,
-  IonList,
-} from '@ionic/angular';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonSelect } from '@ionic/angular/ion-select';
+import { IonSelectOption } from '@ionic/angular/ion-select-option';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { ModalController } from '@ionic/angular/modal-controller';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonAvatar } from '@ionic/angular/ion-avatar';
+import { IonItem } from '@ionic/angular/ion-item';
+import { IonList } from '@ionic/angular/ion-list';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { LoadingService } from '../../core/services/loading.service';
-import { IonSegment, IonLabel, IonSegmentButton } from '@ionic/angular';
+import { IonSegment } from '@ionic/angular/ion-segment';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
 import { LigasService } from '../../core/services/ligas.service';
 import { AuthService } from '../../core/services/auth-service.service';
 import { AlineacionesService } from '../../core/services/alineaciones.service';

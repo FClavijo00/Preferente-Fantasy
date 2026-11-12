@@ -1,15 +1,13 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import {
-  IonTitle,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonBackButton,
-  IonButton,
-  IonIcon,
-  NavController,
-  ModalController
-} from '@ionic/angular';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonButtons } from '@ionic/angular/ion-buttons';
+import { IonBackButton } from '@ionic/angular/ion-back-button';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { NavController } from '@ionic/angular/nav-controller';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronBackOutline, informationCircleOutline, trophyOutline } from 'ionicons/icons';
 import { Ligas, LigasService } from '../../../core/services/ligas.service';

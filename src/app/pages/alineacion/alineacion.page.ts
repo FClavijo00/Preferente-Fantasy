@@ -1,14 +1,12 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonIcon,
-  IonSelect,
-  IonSelectOption,
-  ModalController,
-  IonButton,
-} from '@ionic/angular';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonSelect } from '@ionic/angular/ion-select';
+import { IonSelectOption } from '@ionic/angular/ion-select-option';
+import { ModalController } from '@ionic/angular/modal-controller';
+import { IonButton } from '@ionic/angular/ion-button';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { LoadingService } from '../../core/services/loading.service';
 import { JornadasService } from '../../core/services/jornadas-service';

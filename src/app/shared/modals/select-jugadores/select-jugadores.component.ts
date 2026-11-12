@@ -1,15 +1,13 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
-import {
-  IonHeader,
-  IonAvatar,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  IonContent,
-  IonTitle,
-  ModalController,
-} from '@ionic/angular';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonAvatar } from '@ionic/angular/ion-avatar';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonButtons } from '@ionic/angular/ion-buttons';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
 import { add, close, trash } from 'ionicons/icons';
 

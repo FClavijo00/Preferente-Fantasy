@@ -7,21 +7,19 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { AlineacionesService } from '../../../core/services/alineaciones.service';
 import { AuthService } from '../../../core/services/auth-service.service';
 import { ClasificacionesService } from '../../../core/services/clasificaciones.service';
 import { LigasService } from '../../../core/services/ligas.service';
 import { LoadingService } from '../../../core/services/loading.service';
-import {
-  IonIcon,
-  IonPopover,
-  IonButton,
-  IonContent,
-  IonList,
-  IonLabel,
-  IonItem,
-} from '@ionic/angular';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonPopover } from '@ionic/angular/ion-popover';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonList } from '@ionic/angular/ion-list';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonItem } from '@ionic/angular/ion-item';
 import { DetalleJugadorJornadaComponent } from '../../modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
 import { JornadasService } from '../../../core/services/jornadas-service';
 import { NgTemplateOutlet } from '@angular/common';
