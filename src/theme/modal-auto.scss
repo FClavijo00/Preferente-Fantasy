@@ -1,0 +1,58 @@
+/* ==========================================================================
+   Modales que se ajustan a su contenido
+   - .pf-sheet:   móvil. Sheet desde abajo con tirador (initialBreakpoint 1, breakpoints [0, 1]).
+   - .pf-dialogo: escritorio. Tarjeta centrada.
+   El componente de dentro NO debe usar ion-content (Ionic no calcula la altura automática con él):
+   usa .pf-modal-cuerpo, que hace scroll si el contenido no cabe.
+   ========================================================================== */
+
+ion-modal.pf-sheet,
+ion-modal.pf-dialogo {
+  --height: auto;
+  --background: var(--ion-color-stadium);
+  --backdrop-opacity: 0.6;
+
+  .ion-page {
+    position: relative;
+    display: block;
+    contain: content;
+  }
+
+  &::part(backdrop) {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+ion-modal.pf-sheet {
+  --border-radius: 22px;
+
+  &::part(content) {
+    border-top: 1px solid rgba(0, 230, 118, 0.3);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  &::part(handle) {
+    background: rgba(255, 255, 255, 0.25);
+    width: 40px;
+    top: 8px;
+  }
+
+  .pf-modal-cuerpo {
+    max-height: calc(88vh - 70px);
+  }
+}
+
+ion-modal.pf-dialogo {
+  --width: min(440px, 92vw);
+  --border-radius: 20px;
+  --box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 230, 118, 0.12);
+
+  &::part(content) {
+    border: 1px solid rgba(0, 230, 118, 0.25);
+  }
+
+  .pf-modal-cuerpo {
+    max-height: calc(80vh - 70px);
+  }
+}

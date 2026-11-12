@@ -1,0 +1,52 @@
+/* ==========================================================================
+   Colores de posición: los mismos en toda la app
+   (son los que ya usan plantillas, el acta pública y la clasificación)
+   POR verde · DEF naranja · MED azul · DEL rojo
+   ========================================================================== */
+:root {
+  --pf-pos-por: #43a047;
+  --pf-pos-por-rgb: 67, 160, 71;
+  --pf-pos-def: #f18436;
+  --pf-pos-def-rgb: 241, 132, 54;
+  --pf-pos-med: #0288d1;
+  --pf-pos-med-rgb: 2, 136, 209;
+  --pf-pos-del: #ff5252; /* = --ion-color-red-card */
+  --pf-pos-del-rgb: 255, 82, 82;
+}
+
+/*
+ * Chip con la abreviatura de la posición: <span class="pf-chip-pos def">DEF</span>
+ * El texto se aclara un poco para que se lea bien sobre el fondo oscuro.
+ */
+.pf-chip-pos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+
+  &.por {
+    color: #81c784;
+    background: rgba(var(--pf-pos-por-rgb), 0.18);
+  }
+
+  &.def {
+    color: #ffb27a;
+    background: rgba(var(--pf-pos-def-rgb), 0.18);
+  }
+
+  &.med {
+    color: #4fc3f7;
+    background: rgba(var(--pf-pos-med-rgb), 0.2);
+  }
+
+  &.del {
+    color: #ff8a80;
+    background: rgba(var(--pf-pos-del-rgb), 0.18);
+  }
+}
