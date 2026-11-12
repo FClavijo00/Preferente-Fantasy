@@ -1,248 +1,476 @@
-ion-header {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+/* El tamaño y la forma del modal (sheet / diálogo) están en src/theme/modal-auto.scss */
 
-  ion-toolbar {
-    --background: var(--ion-color-stadium);
-    --border-color: var(--ion-color-pitch);
-    --border-width: 0 0 1px 0;
-    --color: var(--ion-color-pitch);
-  }
+.pf-modal {
+  color: #ffffff;
 }
 
-ion-content {
-  --background: var(--ion-color-stadium);
-
-  .div-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: space-between;
-  }
-
-  .btn-unir {
-    --background: var(--ion-color-pitch);
-    --color: var(--ion-color-pitch-contrast);
-  }
-
-  div-cod {
-    animation: fade-in 1s ease-in-out;
-  }
-}
-
-ion-input.outline-input {
-  --border-color: var(--ion-color-pitch);
-  --border-radius: 10px;
-  --highlight-color-focused: var(--ion-color-pitch);
-  --highlight-color-valid: var(--ion-color-pitch);
-  --highlight-color-invalid: var(--ion-color-red-card);
-
-  ion-icon.input-icon {
-    color: var(--ion-color-pitch);
-    font-size: 1.5rem;
-  }
-}
-
-.leagues-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 16px;
-}
-
-/* Base de Tarjeta con efecto cristal (Glassmorphism) */
-.league-card {
-  border-radius: 16px;
-  padding: 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform 0.2s ease, border-color 0.2s ease;
-  cursor: pointer;
-
-  &:active {
-    transform: scale(0.98);
-  }
-}
-
-/* =======================================================
-   1. ESTILO "MIS LIGAS" (Tarjetas donde ya estás dentro)
-   ======================================================= */
-.league-card.joined {
-  background: rgba(18, 29, 22, 0.85); // Tono verde muy oscuro con transparencia
-  border: 1px solid rgba(34, 197, 94, 0.25); // Borde verde fino
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-
-    .league-badge-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: rgba(34, 197, 94, 0.15);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      ion-icon {
-        font-size: 1.4rem;
-        color: #22c55e;
-      }
-    }
-
-    .league-title {
-      flex: 1;
-      h3 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #ffffff;
-      }
-
-      .code-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        margin-top: 2px;
-      }
-    }
-
-    .role-badge {
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.7);
-
-      &.admin {
-        background: rgba(34, 197, 94, 0.2);
-        color: #4ade80;
-        border: 1px solid rgba(34, 197, 94, 0.4);
-      }
-    }
-  }
-
-  .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      color: rgba(255, 255, 255, 0.6);
-
-      .dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background-color: #22c55e;
-        box-shadow: 0 0 8px #22c55e;
-      }
-    }
-
-    .btn-enter {
-      background: transparent;
-      border: none;
-      color: #22c55e;
-      font-weight: 700;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 0;
-    }
-  }
-}
-
-/* =======================================================
-   2. ESTILO "LIGAS PÚBLICAS" (Explorar / Unirme)
-   ======================================================= */
-.league-card.discover {
-  background: rgba(15, 20, 25, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* ---------- Cabecera ---------- */
+.cabecera {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 26px 20px 10px;
 
-  .card-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    .public-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      ion-icon {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.7);
-      }
-    }
-
-    .details {
-      h3 {
-        margin: 0;
-        font-size: 0.98rem;
-        font-weight: 600;
-        color: #ffffff;
-      }
-
-      span {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.5);
-      }
-
-      .stats {
-        display: flex;
-        gap: 10px;
-        margin-top: 4px;
-
-        span {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.5);
-        }
-      }
-    }
-  }
-
-  .btn-join {
-    --background: #22c55e;
-    --color: #080f0b;
-    border: none;
-    //padding: 8px 16px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    //cursor: pointer;
-    //transition: background 0.2s ease;
-
-    &:active {
-      background: #16a34a;
-    }
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
   }
 }
 
-.toggle-privado{
-  --handle-background-checked: var(--ion-color-pitch);
-  --track-background-checked: #686c6a;
+.btn-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ion-color-slate-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+
+  &:hover {
+    color: #ffffff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+.pf-modal-cuerpo {
+  overflow-y: auto;
+  padding: 10px 20px 24px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---------- Campos ---------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.campo-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.campo label,
+.campo legend {
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ion-color-slate-muted);
+}
+
+.campo legend {
+  margin-bottom: 8px;
+}
+
+.contador {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.campo-error {
+  font-size: 0.8rem;
+  color: var(--ion-color-red-card);
+}
+
+.input-relleno {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  &:focus {
+    border-color: var(--ion-color-pitch);
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  &.invalido {
+    border-color: var(--ion-color-red-card);
+  }
+}
+
+/* ---------- Privado / público ---------- */
+.opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Icono + título en la primera fila, descripción debajo a todo el ancho */
+.opcion {
+  padding: 5px 10px !important;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 6px;
+  padding: 16px 16px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  /* Anula el estilo de etiqueta de .campo label */
+  &.opcion {
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: 0;
+    text-transform: none;
+    color: inherit;
+  }
+
+  /* El radio real queda oculto pero accesible (teclado y lectores de pantalla) */
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  ion-icon {
+    font-size: 1.1rem;
+    color: var(--ion-color-slate-muted);
+  }
+
+  strong {
+    font-size: 0.88rem;
+    color: #ffffff;
+  }
+
+  span {
+    grid-column: 1 / -1;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: var(--ion-color-slate-muted);
+  }
+
+  &.seleccionada {
+    border-color: var(--ion-color-pitch);
+    background: rgba(0, 230, 118, 0.08);
+
+    ion-icon {
+      color: var(--ion-color-pitch);
+    }
+  }
+
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Código ---------- */
+.centrado-texto {
+  text-align: center;
+}
+
+.codigo-caja {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.07);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  transition: border-color 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--ion-color-pitch);
+  }
+
+  &.invalido {
+    border-color: var(--ion-color-red-card);
+  }
+}
+
+.codigo-prefijo {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.codigo-input {
+  width: 5.2ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.ayuda {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ion-color-slate-muted);
+}
+
+/* ---------- Botones ---------- */
+ion-button {
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.btn-principal {
+  --background: var(--ion-color-pitch);
+  --background-activated: var(--ion-color-pitch-shade);
+  --background-hover: var(--ion-color-pitch-tint);
+  --color: var(--ion-color-pitch-contrast);
+  --border-radius: 12px;
+  font-weight: 800;
+  min-height: 48px;
+
+  ion-spinner {
+    color: var(--ion-color-pitch-contrast);
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.btn-secundario {
+  --color: var(--ion-color-pitch);
+  --border-color: rgba(0, 230, 118, 0.55);
+  --border-radius: 12px;
+  font-weight: 700;
+  min-height: 46px;
+}
+
+/* "Hecho": botón tonal neutro (gris translúcido, texto blanco) para no competir
+   con Copiar/Invitar, pero con la misma forma y tamaño que el resto */
+.btn-hecho {
+  --background: rgba(255, 255, 255, 0.08);
+  --background-hover: rgba(255, 255, 255, 0.12);
+  --background-activated: rgba(255, 255, 255, 0.16);
+  --color: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: none;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 20px;
+  font-weight: 700;
+}
+
+/* ---------- Liga creada ---------- */
+.creada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .creada-icono {
+    font-size: 60px;
+    color: var(--ion-color-pitch);
+    margin-bottom: 6px;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0 0 8px;
+    word-break: break-word;
+  }
+
+  p {
+    color: var(--ion-color-slate-muted);
+    font-size: 0.9rem;
+    margin: 0 0 16px;
+  }
+
+  .nota {
+    font-size: 0.8rem;
+    margin: 12px 0 0;
+  }
+}
+
+.codigo-grande {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--ion-color-pitch);
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: 1px dashed rgba(0, 230, 118, 0.6);
+  background: rgba(0, 230, 118, 0.08);
+  margin-bottom: 16px;
+  user-select: all;
+}
+
+.botones-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ---------- Unirse ---------- */
+.segmento {
+  margin-bottom: 20px;
+  --background: rgba(255, 255, 255, 0.06);
+
+  ion-segment-button {
+    --color: var(--ion-color-slate-muted);
+    --color-checked: var(--ion-color-pitch-contrast);
+    --indicator-color: var(--ion-color-pitch);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+.buscador {
+  --background: rgba(255, 255, 255, 0.07);
+  --color: #ffffff;
+  --placeholder-color: var(--ion-color-slate-muted);
+  --icon-color: var(--ion-color-slate-muted);
+  --border-radius: 12px;
+  padding: 0 0 12px;
+}
+
+.cargando {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+
+  ion-spinner {
+    color: var(--ion-color-pitch);
+  }
+}
+
+.lista-abiertas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.liga-abierta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.liga-icono {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+.liga-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.liga-nombre {
+  font-weight: 700;
+  font-size: 0.98rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liga-meta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.btn-unirme {
+  flex-shrink: 0;
+  min-height: 36px;
+  min-width: 84px;
+  --border-radius: 10px;
+  font-size: 0.85rem;
+
+  ion-spinner {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.estado-vacio {
+  text-align: center;
+  padding: 24px 16px;
+  border-radius: 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+
+  p {
+    color: var(--ion-color-slate-muted);
+    font-size: 0.88rem;
+    margin: 0 0 12px;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
 }

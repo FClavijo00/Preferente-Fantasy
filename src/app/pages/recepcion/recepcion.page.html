@@ -1,110 +1,162 @@
-<ion-content class="ion-padding reception-background">
-  <!-- Botones de accion - PANEL ADMIN - LOGOUT -->
+<ion-content class="reception-background">
+  <ion-refresher slot="fixed" mode="md" class="refresher-pf" (ionRefresh)="recargar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <!-- El resto de tu interfaz de selección de ligas -->
-  <!-- <ion-fab class="ion-margin-bottom" vertical="top" horizontal="start" mode="ios">
-    <ion-fab-button class="plus-button">
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="bottom">
-      @if (user?.rol_id === 1) {
-      <ion-button (click)="abrirPanelDeControl()">
-        <ion-icon name="sparkles-outline"></ion-icon>
-        <ion-label>Panel de Control</ion-label>
+  <div class="recepcion">
+    <!-- Barra superior: quién eres + accesos -->
+    <header class="topbar">
+      <div class="usuario">
+        <img
+          class="avatar"
+          [src]="user()?.image_url || 'assets/images/default-player.png'"
+          alt=""
+          width="44"
+          height="44"
+        />
+        <div class="saludo">
+          <span class="hola">Bienvenido,</span>
+          <strong class="club">{{ user()?.nombre_usuario || 'Mi Usuario' }}</strong>
+        </div>
+      </div>
+
+      <div class="topbar-acciones">
+        @if (esAdmin()) {
+        <ion-button
+          mode="ios"
+          fill="clear"
+          class="icon-btn admin"
+          aria-label="Panel de control"
+          (click)="abrirPanelDeControl()"
+        >
+          <ion-icon slot="icon-only" name="sparkles-outline"></ion-icon>
+        </ion-button>
+        }
+        <ion-button
+          mode="ios"
+          fill="clear"
+          class="icon-btn logout"
+          aria-label="Cerrar sesión"
+          (click)="logout()"
+        >
+          <ion-icon slot="icon-only" name="power-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </header>
+
+    <!-- Marca -->
+    <section class="brand">
+      <img src="assets/images/pf-logo-v2.svg" alt="" class="brand-logo" width="96" height="96" />
+      <h1 class="brand-title">PREFERENTE <span class="highlight">FANTASY</span></h1>
+      <p>Elige un campeonato para empezar a jugar</p>
+    </section>
+
+    <!-- Acciones principales, siempre a la vista -->
+    <div class="acciones">
+      <ion-button mode="md" fill="outline" class="btn-secundario" (click)="abrirModal('crear')">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Crear campeonato
       </ion-button>
+      <ion-button mode="md" fill="outline" class="btn-secundario" (click)="abrirModal('unir')">
+        <ion-icon slot="start" name="enter-outline"></ion-icon>
+        Unirse
+      </ion-button>
+    </div>
+
+    <!-- Mis ligas -->
+    <section class="mis-ligas" aria-labelledby="titulo-mis-ligas">
+      <h2 id="titulo-mis-ligas" class="seccion-titulo">
+        Mis campeonatos
+        @if (estado() === 'listo' && misLigas().length > 0) {
+        <span class="contador">{{ misLigas().length }}</span>
+        }
+      </h2>
+
+      @switch (estado()) {
+      @case ('cargando') {
+      <div class="lista" aria-busy="true">
+        @for (i of [1, 2]; track i) {
+        <div class="liga-card esqueleto">
+          <ion-skeleton-text animated class="sk-icono"></ion-skeleton-text>
+          <div class="sk-textos">
+            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 35%"></ion-skeleton-text>
+          </div>
+        </div>
+        }
+      </div>
       }
-      <ion-button (click)="crearCampeonato()">
-        <ion-icon name="trophy-outline"></ion-icon>
-        <ion-label>Crear Campeonato</ion-label>
-      </ion-button>
-      <ion-button (click)="unirseCampeonato()">
-        <ion-icon name="trophy-outline"></ion-icon>
-        <ion-label>Unirse a Campeonato</ion-label>
-      </ion-button>
-    </ion-fab-list>
-  </ion-fab> -->
 
-  <ion-button
-    mode="ios"
-    class="btn-fab-neon"
-    (click)="simularTabButton()"
-  >
-    @if (tabButtonOpen() === true) {
-    <ion-icon name="close"></ion-icon>
-    } @else {
-    <ion-icon name="add"></ion-icon>
-    }
-  </ion-button>
-
-  @if (tabButtonOpen() === true) {
-  <div class="div-simulate-tab-buttons">
-    @if (user?.rol_id === 1) {
-    <ion-button (click)="abrirPanelDeControl()" mode="ios">
-      <ion-icon slot="start" name="sparkles-outline"></ion-icon>
-      Panel de Control
-    </ion-button>
-    }
-    <ion-button (click)="crearCampeonato()" mode="ios">
-      <ion-icon slot="start" name="trophy-outline"></ion-icon>
-      Crear Campeonato
-    </ion-button>
-    <ion-button (click)="unirseCampeonato()" mode="ios">
-      <ion-icon slot="start" name="trophy-outline"></ion-icon>
-      Unirse a Campeonato
-    </ion-button>
-  </div>
-
-  }
-
-  <ion-button mode="ios" (click)="logout()" class="btn-logout-neon">
-    <ion-icon name="power-outline"></ion-icon>
-  </ion-button>
-  <div class="brand-section ion-text-center">
-    <img
-      src="assets/images/pf-logo-v2.svg"
-      alt="Preferente Fantasy"
-      class="auth-logo"
-    />
-    <h1 class="fantasy-title">PREFERENTE FANTASY</h1>
-    <p class="auth-subtitle">Crea tu campeonato o únete a uno existente</p>
-  </div>
-
-  <div class="leagues-grid">
-    @for (liga of misLigas(); track liga.id) {
-    <div class="league-card joined" (click)="entrarEnLiga(liga)">
-      <!-- Cabecera de la tarjeta: Título y Rol -->
-      <div class="card-header">
-        <div class="league-badge-icon">
-          <ion-icon name="trophy"></ion-icon>
-        </div>
-        <div class="league-title">
-          <h3>{{ liga.nombre_liga }}</h3>
-          <span class="code-pill">{{ liga.nombre_competicion }}</span>
-          <!-- <span class="code-pill">
-              <ion-icon name="key-outline"></ion-icon> {{ liga.codigo_acceso }}
-            </span> -->
-        </div>
-        <span class="people-badge">
-          <ion-icon name="people-outline"></ion-icon>
-          {{ liga.total_participantes }}
-        </span>
+      @case ('error') {
+      <div class="estado-vacio">
+        <p>No se han podido cargar tus campeonatos.</p>
+        <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargarMisLigas()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Reintentar
+        </ion-button>
       </div>
+      }
 
-      <!-- Footer de la tarjeta: Acceso rápido -->
-      <div class="card-footer">
-        <span class="status-indicator">
-          <span class="dot"></span> Liga {{ liga.privada ? `Privada (Código:
-          ${liga.codigo_acceso})` : 'Publica' }}
-        </span>
-        <button class="btn-enter">
-          Entrar <ion-icon name="arrow-forward-outline"></ion-icon>
-        </button>
+      @default {
+      <div class="lista">
+        @for (liga of misLigas(); track liga.id) {
+        <article class="liga-card">
+          <button type="button" class="liga-entrar" (click)="entrarEnLiga(liga)">
+            <span class="liga-icono" aria-hidden="true">
+              <ion-icon name="trophy"></ion-icon>
+            </span>
+
+            <span class="liga-info">
+              <span class="liga-nombre">{{ liga.nombre_liga }}</span>
+              <span class="liga-meta">
+                <span>{{ liga.nombre_competicion }}</span>
+                <span class="sep" aria-hidden="true">·</span>
+                <span class="meta-item">
+                  <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+                  {{ liga.total_participantes }}
+                  {{ liga.total_participantes === 1 ? 'equipo' : 'equipos' }}
+                </span>
+                <span class="sep" aria-hidden="true">·</span>
+                <span class="meta-item">
+                  <ion-icon
+                    [name]="liga.privada ? 'lock-closed-outline' : 'globe-outline'"
+                    aria-hidden="true"
+                  ></ion-icon>
+                  {{ liga.privada ? 'Privada' : 'Pública' }}
+                </span>
+              </span>
+            </span>
+
+            <ion-icon class="liga-flecha" name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+          </button>
+
+          @if (liga.privada && liga.codigo_acceso) {
+          <div class="liga-codigo">
+            <span>Código: <strong>{{ liga.codigo_acceso }}</strong></span>
+            <button
+              type="button"
+              class="btn-compartir"
+              (click)="compartirCodigo($event, liga)"
+              [attr.aria-label]="'Invitar a ' + liga.nombre_liga"
+            >
+              <ion-icon name="share-social-outline" aria-hidden="true"></ion-icon>
+              Invitar
+            </button>
+          </div>
+          }
+        </article>
+        } @empty {
+        <div class="estado-vacio">
+          <span class="vacio-icono" aria-hidden="true"><ion-icon name="trophy"></ion-icon></span>
+          <h3>Aún no juegas ningún campeonato</h3>
+          <p>
+            Crea uno e invita a tus amigos con el código, o únete a una liga pública o privada.
+          </p>
+        </div>
+        }
       </div>
-    </div>
-    } @empty {
-    <div class="empty-state">
-      <p>Aún no perteneces a ninguna liga.</p>
-    </div>
-    }
+      }
+      }
+    </section>
   </div>
 </ion-content>

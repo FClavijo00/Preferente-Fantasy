@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service, signal } from '@angular/core';
-import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   ok: boolean;
   data: T;
+  message?: string;
 }
 
 export interface Ligas {
@@ -17,6 +17,12 @@ export interface Ligas {
   total_participantes: number;
   creado_por: number;
 }
+
+/** Liga pública en la que aún no estás (el backend no devuelve el creador). */
+export type LigaAbierta = Omit<Ligas, 'creado_por'>;
+
+/** Lo que devuelve crearLiga: lo justo para enseñar y compartir el código. */
+export type LigaCreada = Pick<Ligas, 'id' | 'nombre_liga' | 'privada' | 'codigo_acceso'>;
 
 
 @Service()
@@ -36,20 +42,21 @@ export class LigasService {
     return this.http.post(`${this.apiUrl}/eliminarLiga`, data);
   }
 
-  crearLiga(data: any) {
-    return this.http.post(`${this.apiUrl}/crearLiga`, data);
+  crearLiga(data: { nombre_campeonato: string; privado: boolean }) {
+    return this.http.post<ApiResponse<LigaCreada>>(`${this.apiUrl}/crearLiga`, data);
   }
 
   getLigasAbiertas() {
-    return this.http.get(`${this.apiUrl}/getLigasAbiertas`);
+    return this.http.get<ApiResponse<LigaAbierta[]>>(`${this.apiUrl}/getLigasAbiertas`);
   }
 
   getMisLigas() {
-    return this.http.get(`${this.apiUrl}/getMisLigas`);
+    return this.http.get<ApiResponse<Ligas[]>>(`${this.apiUrl}/getMisLigas`);
   }
 
-  unirseALiga(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/unirseALiga`, data);
+  /** Por código (ligas privadas o públicas) o por id (solo públicas). */
+  unirseALiga(data: { codigo: string } | { ligaId: number }) {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/unirseALiga`, data);
   }
 
   cargarUsuariosLiga(data: any) {

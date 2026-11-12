@@ -1,152 +1,115 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonFabList,
-  IonLabel,
-  IonButton,
-  ModalController,
-  NavController,
-} from '@ionic/angular';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonRefresher } from '@ionic/angular/ion-refresher';
+import { IonRefresherContent } from '@ionic/angular/ion-refresher-content';
+import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
+import { ModalController } from '@ionic/angular/modal-controller';
+import { NavController } from '@ionic/angular/nav-controller';
 import { addIcons } from 'ionicons';
 import {
-  add,
-  addOutline,
+  addCircleOutline,
   arrowForwardOutline,
-  close,
-  keyOutline,
+  copyOutline,
+  enterOutline,
+  globeOutline,
   lockClosedOutline,
   peopleOutline,
   powerOutline,
+  refreshOutline,
+  shareSocialOutline,
   sparklesOutline,
   trophy,
-  trophyOutline,
 } from 'ionicons/icons';
 import { CrearUnirCampeonatoComponent } from '../../shared/modals/crear-unir-campeonato/crear-unir-campeonato.component';
 import { AuthService } from '../../core/services/auth-service.service';
-import { LigasService } from '../../core/services/ligas.service';
+import { Ligas, LigasService } from '../../core/services/ligas.service';
+import { ToastService } from '../../core/services/toast.service';
+import { compartirLiga } from '../../core/utils/compartir-liga';
 
-interface Usuario {
-  id: number;
-  email: string;
-  nombre_usuario: string;
-  nombre_club: string;
-  image_url: string;
-  image: string;
-  rol_id: number;
-}
+const ROL_ADMIN = 1;
 
-export interface Ligas {
-  id: number;
-  nombre_liga: string;
-  privada: boolean;
-  codigo_acceso: string | null;
-  nombre_competicion: string;
-  total_participantes: number;
-  creado_por: number;
-}
+type EstadoCarga = 'cargando' | 'listo' | 'error';
 
 @Component({
   selector: 'app-recepcion',
   templateUrl: './recepcion.page.html',
   styleUrls: ['./recepcion.page.scss'],
-  imports: [
-    IonButton,
-    IonIcon,
-    IonContent,
-    CommonModule,
-    FormsModule
-],
+  imports: [IonContent, IonButton, IonIcon, IonRefresher, IonRefresherContent, IonSkeletonText],
 })
 export class RecepcionPage implements OnInit {
   private _modalCtrl = inject(ModalController);
   private _authService = inject(AuthService);
   private _navCtrl = inject(NavController);
   private _ligasService = inject(LigasService);
+  private _toastService = inject(ToastService);
 
-  public user: Usuario | null = this._authService.currentUser();
-  public misLigas = signal<Ligas[]>([]);
+  readonly user = this._authService.currentUser;
+  readonly esAdmin = computed(() => this.user()?.rol_id === ROL_ADMIN);
 
-  public tabButtonOpen = signal<boolean>(false);
+  readonly misLigas = signal<Ligas[]>([]);
+  readonly estado = signal<EstadoCarga>('cargando');
 
   constructor() {
     addIcons({
-      addOutline,
-      add,
-      trophyOutline,
-      trophy,
-      keyOutline,
+      addCircleOutline,
       arrowForwardOutline,
-      powerOutline,
-      peopleOutline,
-      sparklesOutline,
+      copyOutline,
+      enterOutline,
+      globeOutline,
       lockClosedOutline,
-      close
+      peopleOutline,
+      powerOutline,
+      refreshOutline,
+      shareSocialOutline,
+      sparklesOutline,
+      trophy,
     });
   }
 
-  async crearCampeonato() {
-    const modal = await this._modalCtrl.create({
-      component: CrearUnirCampeonatoComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'crear',
-      },
-    });
+  ngOnInit() {
+    this.cargarMisLigas();
+  }
 
-    await modal.present();
+  async cargarMisLigas() {
+    // En recargas no vaciamos la lista: el usuario sigue viendo sus ligas mientras tanto
+    if (this.misLigas().length === 0) this.estado.set('cargando');
 
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.cargasMisLigas();
+    try {
+      const res = await firstValueFrom(this._ligasService.getMisLigas());
+      this.misLigas.set(res.data);
+      this.estado.set('listo');
+    } catch {
+      // Si la sesión ha caducado ya se encarga el interceptor; aquí solo dejamos reintentar
+      this.estado.set('error');
     }
   }
 
-  async unirseCampeonato() {
-    const modal = await this._modalCtrl.create({
-      component: CrearUnirCampeonatoComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        modo: 'unir',
-      },
-    });
-
-    await modal.present();
-
-    const { data, role } = await modal.onWillDismiss();
-
-    if (role === 'confirm' && data) {
-      this.cargasMisLigas();
-    }
+  async recargar(event: CustomEvent) {
+    await this.cargarMisLigas();
+    (event.target as HTMLIonRefresherElement).complete();
   }
 
-  async cargasMisLigas() {
-    const userId = this.user?.id;
-    if (!userId) return;
+  async abrirModal(modo: 'crear' | 'unir') {
+    // Móvil: sheet desde abajo que se cierra deslizando. Escritorio: tarjeta centrada.
+    // Los dos se ajustan al contenido (estilos en src/theme/modal-auto.scss)
+    const esEscritorio = window.matchMedia('(min-width: 768px)').matches;
 
-    this._ligasService.getMisLigas().subscribe({
-      next: (res: any) => {
-        if (res.ok) {
-          this.misLigas.set(res.data);
-        }
-      }, error: (err: any) => {
-        this.logout();
-      }
+    const modal = await this._modalCtrl.create({
+      component: CrearUnirCampeonatoComponent,
+      componentProps: { modo },
+      mode: 'ios',
+      cssClass: esEscritorio ? 'pf-dialogo' : 'pf-sheet',
+      ...(esEscritorio ? {} : { initialBreakpoint: 1, breakpoints: [0, 1] }),
     });
+    await modal.present();
+
+    // Se recarga siempre: si se crea una liga y luego se cierra deslizando,
+    // el modal no puede devolver 'confirm' y la lista se quedaría sin actualizar
+    await modal.onWillDismiss();
+    this.cargarMisLigas();
   }
 
   entrarEnLiga(liga: Ligas) {
@@ -154,19 +117,24 @@ export class RecepcionPage implements OnInit {
     this._navCtrl.navigateRoot(['/tabs/home'], { replaceUrl: true });
   }
 
-  logout() {
-    this._authService.logout();
+  async compartirCodigo(event: Event, liga: Ligas) {
+    // Que el toque en el botón no abra también la liga
+    event.stopPropagation();
+    if (!liga.codigo_acceso) return;
+
+    const resultado = await compartirLiga(liga.nombre_liga, liga.codigo_acceso);
+    if (resultado === 'copiado') {
+      this._toastService.showSuccessToast(`Código ${liga.codigo_acceso} copiado`);
+    } else if (resultado === 'error') {
+      this._toastService.showErrorToast('No se ha podido copiar el código');
+    }
   }
 
   abrirPanelDeControl() {
     this._navCtrl.navigateRoot(['/panel-control'], { replaceUrl: true });
   }
 
-  simularTabButton() {
-    this.tabButtonOpen.set(!this.tabButtonOpen());
-  }
-
-  ngOnInit() {
-    this.cargasMisLigas();
+  logout() {
+    this._authService.logout();
   }
 }

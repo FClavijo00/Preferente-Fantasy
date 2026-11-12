@@ -1,143 +1,217 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title
-      >{{ modo === "crear" ? "Crear" : "Unirse a" }} Campeonato</ion-title
-    >
-    <ion-buttons slot="end">
-      <ion-button mode="ios" (click)="cerrarModal()">
-        <ion-icon class="only-icon" name="close-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="pf-modal">
+  <!-- Cabecera -->
+  <header class="cabecera">
+    <h2 id="titulo-modal">
+      @if (modo === 'crear') {
+      {{ ligaCreada() ? '¡Listo!' : 'Crear campeonato' }}
+      } @else {
+      Unirse a un campeonato
+      }
+    </h2>
+    <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
 
-<ion-content class="ion-padding campeonato-modal">
-  @if (modo === "crear") {
-    <form [formGroup]="campeonatoForm">
-      <ion-input
-        class="outline-input ion-margin-bottom"
-        mode="md"
-        label="Nombre del Campeonato"
-        label-placement="stacked"
-        fill="outline"
-        type="text"
-        formControlName="nombre_campeonato"
-      >
-        <ion-icon
-          name="trophy-outline"
-          slot="start"
-          class="input-icon"
-        ></ion-icon>
-      </ion-input>
+  <div class="pf-modal-cuerpo">
+    @if (modo === 'crear') {
+    <!-- ===================== CREAR ===================== -->
+    @if (ligaCreada(); as liga) {
+    <div class="creada">
+      <ion-icon class="creada-icono" name="checkmark-circle" aria-hidden="true"></ion-icon>
+      <h3>«{{ liga.nombre_liga }}» está listo</h3>
 
-      <ion-toggle class="toggle-privado" formControlName="privado"
-        >¿Campeonato Privado?</ion-toggle
-      >
+      @if (liga.privada && liga.codigo_acceso) {
+      <p>Es privado: pasa este código a tus amigos para que se unan.</p>
 
-      <ion-button
-        class="btn-unir ion-margin-top"
-        mode="md"
-        expand="block"
-        fill="clear"
-        shape="round"
-        (click)="crearCampeonato()"
-        [disabled]="!campeonatoForm.valid"
-      >
-        Crear Campeonato
-      </ion-button>
-    </form>
-  } @else if (modo === "unir") {
-    <div class="div-buttons ion-margin-bottom">
-      <ion-button
-        class="btn-unir"
-        mode="md"
-        expand="block"
-        fill="clear"
-        shape="round"
-        (click)="abrirFormularioCodigo()"
-        [disabled]="medianteCodigo()"
-      >
-        Mediante Código
-      </ion-button>
-      <ion-button
-        class="btn-unir"
-        mode="md"
-        expand="block"
-        fill="clear"
-        shape="round"
-        (click)="abrirLigasAbiertas()"
-        [disabled]="medianteLigasAbiertas()"
-      >
-        Ver Ligas Abiertas
-      </ion-button>
-    </div>
+      <div class="codigo-grande" aria-label="Código de acceso">{{ liga.codigo_acceso }}</div>
 
-    @if (medianteCodigo()) {
-      <div class="div-cod">
-        <ion-input
-          class="outline-input ion-margin-bottom"
-          mode="md"
-          label="Código Liga"
-          label-placement="stacked"
-          fill="outline"
-          type="text"
-          [value]="codigo()"
-          (ionInput)="codigo.set($event.detail.value ?? '')"
-        >
-          <ion-icon
-            name="document-text-outline"
-            slot="start"
-            class="input-icon"
-          ></ion-icon>
-        </ion-input>
-
-        <ion-button
-          class="btn-unir"
-          mode="md"
-          expand="block"
-          fill="clear"
-          shape="round"
-          (click)="unirseALigaXCodigo(codigo())"
-          [disabled]="!codigo()"
-        >
-          Unirse
+      <div class="botones-fila">
+        <ion-button mode="md" fill="outline" class="btn-secundario" (click)="copiarCodigo(liga.codigo_acceso)">
+          <ion-icon slot="start" name="copy-outline"></ion-icon>
+          Copiar
+        </ion-button>
+        <ion-button mode="md" class="btn-principal" (click)="compartir(liga)">
+          <ion-icon slot="start" name="share-social-outline"></ion-icon>
+          Invitar
         </ion-button>
       </div>
-    }
+      <p class="nota">Lo tendrás siempre a mano en la tarjeta del campeonato.</p>
+      } @else {
+      <p>Es público: cualquiera puede encontrarlo en «Unirse» → «Ligas abiertas».</p>
+      }
 
-    @if (medianteLigasAbiertas()) {
-      <div class="leagues-grid">
-        @for (liga of ligasAbiertas(); track liga.id) {
-          <div class="league-card discover">
-            <div class="card-info">
-              <div class="public-icon">
-                <ion-icon name="globe-outline"></ion-icon>
-              </div>
-              <div class="details">
-                <h3>{{ liga.nombre_liga }}</h3>
-                <span> {{ liga.nombre_competicion }}</span>
-                <div class="stats">
-                  <span
-                    ><ion-icon name="people-outline"></ion-icon>
-                    {{ liga.total_participantes }} equipos</span
-                  >
-                  <span
-                    ><ion-icon name="shield-checkmark-outline"></ion-icon>
-                    Pública</span
-                  >
-                </div>
-              </div>
-            </div>
-            <ion-button class="btn-join" (click)="unirseALiga(liga)"
-              >Unirme</ion-button
-            >
-          </div>
-        } @empty {
-          <div class="empty-state">
-            <p>No hay ligas públicas disponibles en este momento.</p>
-          </div>
+      <ion-button mode="md" expand="block" class="btn-hecho" (click)="cerrarModal()">
+        Hecho
+      </ion-button>
+    </div>
+    } @else {
+    <form [formGroup]="crearForm" (ngSubmit)="crearCampeonato()" novalidate>
+      <!-- Nombre -->
+      <div class="campo">
+        <div class="campo-cabecera">
+          <label for="nombre-campeonato">Nombre</label>
+          <span class="contador">{{ crearForm.controls.nombre.value.length }}/40</span>
+        </div>
+        <input
+          id="nombre-campeonato"
+          class="input-relleno"
+          type="text"
+          placeholder="Ej.: Liga de los martes"
+          autocomplete="off"
+          autocapitalize="sentences"
+          maxlength="40"
+          formControlName="nombre"
+          [class.invalido]="crearForm.controls.nombre.touched && crearForm.controls.nombre.invalid"
+        />
+        @if (crearForm.controls.nombre.touched && crearForm.controls.nombre.invalid) {
+        <span class="campo-error">Entre 3 y 40 caracteres</span>
         }
       </div>
+
+      <!-- Privado / público -->
+      <fieldset class="campo">
+        <legend>Tipo de campeonato</legend>
+        <div class="opciones">
+          <label class="opcion" [class.seleccionada]="!crearForm.controls.privada.value">
+            <input type="radio" formControlName="privada" [value]="false" />
+            <ion-icon name="globe-outline" aria-hidden="true"></ion-icon>
+            <strong>Público</strong>
+            <span>Cualquiera puede encontrarlo y unirse</span>
+          </label>
+          <label class="opcion" [class.seleccionada]="crearForm.controls.privada.value">
+            <input type="radio" formControlName="privada" [value]="true" />
+            <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
+            <strong>Privado</strong>
+            <span>Solo entra quien tenga el código</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <ion-button type="submit" mode="md" expand="block" class="btn-principal" [disabled]="enviando()">
+        @if (enviando()) {
+        <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+        Crear campeonato
+        }
+      </ion-button>
+    </form>
     }
-  }
-</ion-content>
+    } @else {
+    <!-- ===================== UNIRSE ===================== -->
+    <ion-segment
+      mode="ios"
+      class="segmento"
+      [value]="pestana()"
+      (ionChange)="cambiarPestana($event.detail.value)"
+    >
+      <ion-segment-button value="codigo">
+        <ion-label>Con código</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="abiertas">
+        <ion-label>Ligas abiertas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    @if (pestana() === 'codigo') {
+    <form (submit)="$event.preventDefault(); unirsePorCodigo()" novalidate>
+      <div class="campo">
+        <label for="codigo-liga" class="centrado-texto">Código de acceso</label>
+        <div class="codigo-caja" [class.invalido]="codigoControl.touched && codigoControl.invalid">
+          <span class="codigo-prefijo" aria-hidden="true">{{ prefijoCodigo }}</span>
+          <input
+            #inputCodigo
+            id="codigo-liga"
+            class="codigo-input"
+            type="text"
+            placeholder="XXXX"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            [attr.aria-describedby]="'ayuda-codigo'"
+            [formControl]="codigoControl"
+            (input)="normalizarCodigo(inputCodigo)"
+          />
+        </div>
+        <p id="ayuda-codigo" class="ayuda centrado-texto">
+          Pídeselo al creador del campeonato. Son 4 letras o números.
+        </p>
+      </div>
+
+      <ion-button
+        type="submit"
+        mode="md"
+        expand="block"
+        class="btn-principal"
+        [disabled]="enviando() || codigoControl.invalid"
+      >
+        @if (enviando()) {
+        <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+        Unirme
+        }
+      </ion-button>
+    </form>
+    } @else {
+    <div class="abiertas">
+      <ion-searchbar
+        mode="ios"
+        class="buscador"
+        placeholder="Buscar por nombre"
+        [debounce]="150"
+        (ionInput)="busqueda.set($event.detail.value ?? '')"
+      ></ion-searchbar>
+
+      @if (cargandoAbiertas()) {
+      <div class="cargando"><ion-spinner name="crescent"></ion-spinner></div>
+      } @else if (errorAbiertas()) {
+      <div class="estado-vacio">
+        <p>No se han podido cargar las ligas abiertas.</p>
+        <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargarLigasAbiertas()">
+          Reintentar
+        </ion-button>
+      </div>
+      } @else {
+      <ul class="lista-abiertas">
+        @for (liga of ligasFiltradas(); track liga.id) {
+        <li class="liga-abierta">
+          <span class="liga-icono" aria-hidden="true"><ion-icon name="globe-outline"></ion-icon></span>
+          <span class="liga-info">
+            <span class="liga-nombre">{{ liga.nombre_liga }}</span>
+            <span class="liga-meta">
+              {{ liga.nombre_competicion }} ·
+              <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+              {{ liga.total_participantes }} {{ liga.total_participantes === 1 ? 'equipo' : 'equipos' }}
+            </span>
+          </span>
+          <ion-button
+            mode="md"
+            size="small"
+            class="btn-principal btn-unirme"
+            [disabled]="enviando()"
+            (click)="unirseALigaAbierta(liga)"
+            [attr.aria-label]="'Unirme a ' + liga.nombre_liga"
+          >
+            @if (uniendoId() === liga.id) {
+            <ion-spinner name="crescent"></ion-spinner>
+            } @else {
+            Unirme
+            }
+          </ion-button>
+        </li>
+        } @empty {
+        <li class="estado-vacio">
+          @if (busqueda()) {
+          <p>Ninguna liga abierta coincide con «{{ busqueda() }}».</p>
+          } @else {
+          <p>Ahora mismo no hay ligas abiertas en las que no estés. ¡Crea la tuya!</p>
+          }
+        </li>
+        }
+      </ul>
+      }
+    </div>
+    }
+    }
+  </div>
+</div>
