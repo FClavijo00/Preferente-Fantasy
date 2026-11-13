@@ -1,0 +1,28 @@
+<div class="tarjeta">
+  <div class="pestanas" role="tablist" aria-label="Competición">
+    @for (p of pestanas; track p.id) {
+    <button
+      type="button"
+      role="tab"
+      class="pestana"
+      [id]="'pestana-' + p.id"
+      [class.activa]="activa() === p.id"
+      [attr.aria-selected]="activa() === p.id"
+      [attr.aria-controls]="'panel-' + p.id"
+      (click)="activa.set(p.id)"
+    >
+      {{ p.titulo }}
+    </button>
+    }
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-partidos" aria-labelledby="pestana-partidos" [hidden]="activa() !== 'partidos'">
+    <app-calendario></app-calendario>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-clasificacion" aria-labelledby="pestana-clasificacion" [hidden]="activa() !== 'clasificacion'">
+    <app-clasificacion></app-clasificacion>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-ranking" aria-labelledby="pestana-ranking" [hidden]="activa() !== 'ranking'">
+    <app-ranking-jugadores></app-ranking-jugadores>
+  </div>
+</div>

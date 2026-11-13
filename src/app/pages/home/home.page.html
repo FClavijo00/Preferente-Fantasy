@@ -1,9 +1,90 @@
-<app-header titulo="Home"></app-header>
+<app-header titulo="Inicio"></app-header>
 
+<ion-content [fullscreen]="true">
+  <div class="inicio">
+    <!-- ===================== LIGA DEL JUEGO (desactivado por ahora) =====================
+      Para recuperarlo: descomentar este bloque, poner BLOQUE_LIGA_ACTIVO = true en home.page.ts
+      y volver a añadir IonIcon e IonSkeletonText a los imports del componente.
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <app-calendario></app-calendario>
+    <section class="bloque-liga" aria-labelledby="titulo-bloque-liga">
+      <header class="bloque-cabecera">
+        <span class="etiqueta">Tu Liga</span>
+        <h2 id="titulo-bloque-liga">Última Jornada</h2>
+      </header>
 
-  <app-clasificacion></app-clasificacion>
-  
+      <div class="tarjeta">
+        @if (estado() === 'listo' && resumen()?.jornada; as j) {
+        <span class="jornada-chip">Jornada {{ j.numero_jornada }}</span>
+        }
+        @switch (estado()) {
+        @case ('cargando') {
+        <div class="metricas" aria-busy="true">
+          <ion-skeleton-text animated class="sk-metrica"></ion-skeleton-text>
+          <ion-skeleton-text animated class="sk-metrica"></ion-skeleton-text>
+        </div>
+        }
+
+        @case ('error') {
+        <div class="vacio">
+          <p>No se ha podido cargar tu última jornada.</p>
+          <button type="button" class="btn-secundario" (click)="reintentar()">
+            <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+            Reintentar
+          </button>
+        </div>
+        }
+
+        @default {
+        @if (resumen(); as r) {
+        @if (r.jornada; as j) {
+        @if (r.mis_puntos !== null && r.mis_puntos !== undefined) {
+        <div class="metricas">
+          <div class="metrica">
+            <span class="valor">{{ r.mis_puntos }}<small>pts</small></span>
+            <span class="descripcion">Tus puntos</span>
+          </div>
+          <div class="metrica" [class.lider]="r.mi_posicion === 1">
+            <span class="valor">
+              @if (r.mi_posicion === 1) {
+              <ion-icon name="trophy" aria-hidden="true"></ion-icon>
+              }
+              {{ r.mi_posicion }}º<small>de {{ r.participantes }}</small>
+            </span>
+            <span class="descripcion">En la jornada</span>
+          </div>
+        </div>
+
+        <button type="button" class="btn-principal" (click)="verMiEquipo(j.id)">
+          Ver mi equipo en la Jornada {{ j.numero_jornada }}
+          <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
+        </button>
+        } @else {
+        [La liga jugó esa jornada, pero el usuario no alineó]
+        <div class="vacio">
+          <p>No alineaste en la Jornada {{ j.numero_jornada }}, así que no sumaste puntos.</p>
+        </div>
+        }
+        } @else {
+        <div class="vacio">
+          <p>Tu liga aún no ha jugado ninguna jornada. ¡Prepara tu alineación para la próxima!</p>
+        </div>
+        }
+        }
+        }
+        }
+      </div>
+    </section>
+    ===================== FIN LIGA DEL JUEGO ===================== -->
+
+    <!-- ===================== COMPETICIÓN REAL ===================== -->
+    <section class="bloque-competicion" aria-labelledby="titulo-competicion">
+      <header class="bloque-cabecera">
+        <span class="etiqueta">Competición</span>
+        <h2 id="titulo-competicion">{{ liga()?.nombre_competicion || 'Competición' }}</h2>
+      </header>
+
+      <!-- Partidos · Clasificación · Ranking -->
+      <app-competicion></app-competicion>
+    </section>
+  </div>
 </ion-content>

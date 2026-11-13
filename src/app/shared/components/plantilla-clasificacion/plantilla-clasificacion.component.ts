@@ -73,6 +73,17 @@ export class PlantillaClasificacionComponent {
 
   @Input() miEquipo: boolean = false;
 
+  /**
+   * Jornada que se abre al cargar (si el usuario la tiene); si no, la más reciente.
+   * Si cambia con las jornadas ya cargadas, se salta a ella.
+   */
+  @Input() set jornadaInicialId(id: number | null | undefined) {
+    this._jornadaInicialId = id ?? null;
+    const jornada = this.jornadasDisponibles().find((j: any) => j.jornada_id === this._jornadaInicialId);
+    if (jornada && jornada.jornada_id !== this.jornadaSeleccionadaId()) this.seleccionarJornada(jornada);
+  }
+  private _jornadaInicialId: number | null = null;
+
   public _usuario: any;
   private _liga: any;
 
@@ -209,8 +220,10 @@ export class PlantillaClasificacionComponent {
         if (res.ok) {
           this.jornadasDisponibles.set(res.data || []);
           if (res.data.length > 0) {
-            this.jornadaSeleccionada.set(res.data[0]);
-            this.jornadaSeleccionadaId.set(res.data[0].jornada_id);
+            const inicial =
+              res.data.find((j: any) => j.jornada_id === this._jornadaInicialId) ?? res.data[0];
+            this.jornadaSeleccionada.set(inicial);
+            this.jornadaSeleccionadaId.set(inicial.jornada_id);
             this.cargarAlineacionJornada();
           }
           this._loadingService.hide();

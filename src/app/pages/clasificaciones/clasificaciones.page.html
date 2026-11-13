@@ -1,4 +1,9 @@
-<app-header titulo="Clasificaciones"></app-header>
+<app-header titulo="Clasificación">
+  <button acciones type="button" class="pf-header-accion" (click)="abrirInformacionPuntuacion()"
+    aria-label="Cómo se puntúa" title="Cómo se puntúa">
+    <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon>
+  </button>
+</app-header>
 
 <ion-content [fullscreen]="true">
   <ion-segment mode="ios" [value]="tabActivo()" (ionChange)="cambiarTab($event)" class="custom-segment">
@@ -15,7 +20,8 @@
 
   <!-- TAB 1: Mi Alineación en la Jornada + Puntos obtenidos -->
   @if (tabActivo() === 'jornada_mi_equipo') {
-  <app-plantilla-clasificacion [user]="user" [liga]="liga" [miEquipo]="true"></app-plantilla-clasificacion>
+  <app-plantilla-clasificacion [user]="user" [liga]="liga" [miEquipo]="true"
+    [jornadaInicialId]="jornadaInicialMiEquipo()"></app-plantilla-clasificacion>
   }
 
   @if (tabActivo() === 'clasificacion_jornadas') {

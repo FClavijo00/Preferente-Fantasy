@@ -1,4 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent } from '@ionic/angular/ion-content';
@@ -21,7 +23,8 @@ import { LigasService } from '../../core/services/ligas.service';
 import { AuthService } from '../../core/services/auth-service.service';
 import { AlineacionesService } from '../../core/services/alineaciones.service';
 import { addIcons } from 'ionicons';
-import { warning } from 'ionicons/icons';
+import { informationCircleOutline, warning } from 'ionicons/icons';
+import { InfoPuntuacionComponent } from '../../shared/modals/info-puntuacion/info-puntuacion.component';
 import { DetalleJugadorJornadaComponent } from '../../shared/modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
 import { ClasificacionesService } from '../../core/services/clasificaciones.service';
 import { PlantillaClasificacionComponent } from '../../shared/components/plantilla-clasificacion/plantilla-clasificacion.component';
@@ -53,6 +56,7 @@ export interface JugadorSlot {
     PlantillaClasificacionComponent,
     IonSelect,
     IonSelectOption,
+    IonIcon,
 ],
 })
 export class ClasificacionesPage {
@@ -70,6 +74,9 @@ export class ClasificacionesPage {
 
   // Tab activo: 'jornada_mi_equipo' | 'clasificacion_jornada' | 'clasificacion_general'
   tabActivo = signal<string>('jornada_mi_equipo');
+
+  /** Jornada con la que abrir "Mi equipo" (viene del Inicio: ?vista=mi-equipo&jornada=ID). */
+  jornadaInicialMiEquipo = signal<number | null>(null);
 
   // Datos globales
   jornadaSeleccionadaId = signal<number | null>(null);
@@ -109,8 +116,29 @@ export class ClasificacionesPage {
 
   constructor() {
     addIcons({
-      warning
+      warning,
+      informationCircleOutline,
     });
+
+    // Las pestañas no se destruyen al cambiar de una a otra: se escucha la URL en todo momento
+    inject(ActivatedRoute)
+      .queryParamMap.pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        if (params.get('vista') !== 'mi-equipo') return;
+        this.tabActivo.set('jornada_mi_equipo');
+        const jornada = Number(params.get('jornada'));
+        this.jornadaInicialMiEquipo.set(Number.isInteger(jornada) && jornada > 0 ? jornada : null);
+      });
+  }
+
+  /** Botón ⓘ de la cabecera: cómo se puntúa. */
+  async abrirInformacionPuntuacion() {
+    const modal = await this._modalCtrl.create({
+      component: InfoPuntuacionComponent,
+      cssClass: 'card-modal-center',
+      backdropDismiss: true,
+    });
+    await modal.present();
   }
 
   async abrirDetalleJugador(jugador: any) {

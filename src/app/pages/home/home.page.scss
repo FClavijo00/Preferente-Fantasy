@@ -1,3 +1,176 @@
 ion-content {
-    --background: var(--ion-color-stadium);
+  --background: var(--ion-color-stadium);
+}
+
+.inicio {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px 16px 0;
+  color: #ffffff;
+}
+
+/* ---------- Cabecera de cada bloque ---------- */
+.bloque-cabecera {
+  margin-bottom: 12px;
+
+  .etiqueta {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--ion-color-pitch);
+  }
+
+  h2 {
+    margin: 2px 0 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+}
+
+/* ---------- Bloque de la liga del juego ---------- */
+.bloque-liga {
+  margin-bottom: 28px;
+}
+
+/* Misma tarjeta que el bloque de competición */
+.tarjeta {
+  padding: 16px 14px;
+  border-radius: 20px;
+  background: rgba(18, 29, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Arriba y centrado dentro de la tarjeta */
+.jornada-chip {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 14px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.metricas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+
+  .sk-metrica {
+    height: 84px;
+    margin: 0;
+    border-radius: 14px;
+    --background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.metrica {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  .valor {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 2.1rem;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+
+    small {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ion-color-slate-muted);
+    }
+
+    ion-icon {
+      align-self: center;
+      font-size: 1.4rem;
+      color: #fbbf24;
+    }
+  }
+
+  .descripcion {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ion-color-slate-muted);
+  }
+
+  /* 1º de la jornada: acento dorado */
+  &.lider {
+    border-color: rgba(251, 191, 36, 0.45);
+    background: rgba(251, 191, 36, 0.08);
+
+    .valor {
+      color: #fde68a;
+    }
+  }
+}
+
+.vacio {
+  padding: 4px 0;
+
+  p {
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--ion-color-slate-muted);
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* ---------- Botones ---------- */
+.btn-principal,
+.btn-secundario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 46px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+  }
+}
+
+.btn-principal {
+  border: 0;
+  background: var(--ion-color-pitch);
+  color: var(--ion-color-pitch-contrast);
+
+  &:active {
+    background: var(--ion-color-pitch-shade);
+  }
+}
+
+.btn-secundario {
+  width: auto;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 230, 118, 0.55);
+  background: transparent;
+  color: var(--ion-color-pitch);
+}
+
+/* ---------- Bloque de la competición real ---------- */
+.bloque-competicion app-competicion {
+  display: block;
 }
