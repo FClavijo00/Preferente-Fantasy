@@ -28,6 +28,7 @@ import { AuthService } from '../../core/services/auth-service.service';
 import { Ligas, LigasService } from '../../core/services/ligas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { compartirLiga } from '../../core/utils/compartir-liga';
+import { EstadoAlineacionService } from '../../core/services/estado-alineacion.service';
 
 const ROL_ADMIN = 1;
 
@@ -45,6 +46,7 @@ export class RecepcionPage implements OnInit {
   private _navCtrl = inject(NavController);
   private _ligasService = inject(LigasService);
   private _toastService = inject(ToastService);
+  private _estadoAlineacion = inject(EstadoAlineacionService);
 
   readonly user = this._authService.currentUser;
   readonly esAdmin = computed(() => this.user()?.rol_id === ROL_ADMIN);
@@ -73,10 +75,17 @@ export class RecepcionPage implements OnInit {
     this.cargarMisLigas();
   }
 
+  /** Badge de la alineación de la próxima jornada en cada liga. */
+  avisoAlineacion(ligaId: number) {
+    return this._estadoAlineacion.aviso(ligaId);
+  }
+
   async cargarMisLigas() {
     // En recargas no vaciamos la lista: el usuario sigue viendo sus ligas mientras tanto
     if (this.misLigas().length === 0) this.estado.set('cargando');
 
+    // Los avisos de alineación se cargan a la vez (si fallan, simplemente no se muestran)
+    this._estadoAlineacion.cargar();
     try {
       const res = await firstValueFrom(this._ligasService.getMisLigas());
       this.misLigas.set(res.data);

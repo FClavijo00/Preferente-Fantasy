@@ -1,61 +1,30 @@
 <ion-tabs (ionTabsDidChange)="setCurrentTab($event)">
-  <ion-tab-bar slot="bottom" mode="ios" class="style-line custom-tab-bar">
-    <!-- Cápsula Izquierda: Botón flotante independiente de Vestuario -->
-    <!-- <div class="vestuario-capsule">
-      <ion-tab-button href="/vestuario" class="vestuario-btn">
-        <ion-icon aria-hidden="true" name="shirt-outline"></ion-icon>
-        <ion-label>Vestuario</ion-label>
-      </ion-tab-button>
-    </div> -->
-
-    <!-- Cápsula Derecha: Navegación principal de la liga -->
-    <!-- <div class="main-tabs-capsule"> -->
-      <ion-tab-button tab="home" href="/tabs/home">
-        @if (currentTab === 'home') {
-        <ion-icon aria-hidden="true" name="home"></ion-icon>
-        } @else {
-        <ion-icon aria-hidden="true" name="home-outline"></ion-icon>
+  <ion-tab-bar slot="bottom" mode="ios" class="pf-tab-bar">
+    @for (p of pestanas; track p.tab) {
+    @let activa = pestanaActual() === p.tab;
+    <ion-tab-button
+      [tab]="p.tab"
+      [href]="'/tabs/' + p.tab"
+      [class.central]="p.central"
+      [attr.aria-label]="etiqueta(p)"
+    >
+      @if (p.central) {
+      <!-- Botón central: círculo verde discreto -->
+      <span class="central-circulo" aria-hidden="true">
+        <ion-icon [name]="p.icono"></ion-icon>
+        <!-- Aviso: naranja = sin hacer o incompleta · rojo = cierra en menos de un día -->
+        @if (avisoAlineacion(); as aviso) {
+        <span [class]="'aviso-punto ' + aviso.nivel"></span>
         }
-        <!-- <ion-label>Inicio</ion-label> -->
-      </ion-tab-button>
-
-      <ion-tab-button tab="alineacion" href="/tabs/alineacion">
-        @if (currentTab === 'alineacion') {
-        <ion-icon aria-hidden="true" src="assets/images/campo-futbol-solid.svg"></ion-icon>
-        } @else {
-        <ion-icon aria-hidden="true" src="assets/images/campo-futbol-outline.svg"></ion-icon>
-        }
-        <!-- <ion-label>Alineación</ion-label> -->
-      </ion-tab-button>
-
-      <ion-tab-button tab="clasificaciones" href="/tabs/clasificaciones">
-        @if (currentTab === 'clasificaciones') {
-        <ion-icon aria-hidden="true" name="podium"></ion-icon>
-        } @else {
-        <ion-icon aria-hidden="true" name="podium-outline"></ion-icon>
-        }
-        <!-- <ion-label>Clasificación</ion-label> -->
-      </ion-tab-button>
-
-      <ion-tab-button tab="plantillas" href="/tabs/plantillas">
-        @if (currentTab === 'plantillas') {
-        <ion-icon aria-hidden="true" name="shirt"></ion-icon>
-        } @else {
-        <ion-icon aria-hidden="true" name="shirt-outline"></ion-icon>
-        }
-        <!-- <ion-label>Plantillas</ion-label> -->
-      </ion-tab-button>
-
-      <ion-tab-button tab="perfil" href="/tabs/perfil">
-        @if (currentTab === 'perfil') {
-        <ion-icon aria-hidden="true" name="person-circle"></ion-icon>
-        } @else {
-        <ion-icon aria-hidden="true" name="person-circle-outline"></ion-icon>
-        }
-        <!-- <ion-label>Plantillas</ion-label> -->
-      </ion-tab-button>
-
-      
-    <!-- </div> -->
+      </span>
+      } @else {
+      <!-- Píldora detrás del icono (se ilumina en la pestaña activa) -->
+      <span class="pildora" aria-hidden="true">
+        <ion-icon [name]="activa ? p.iconoActivo : p.icono"></ion-icon>
+      </span>
+      }
+      <ion-label>{{ p.titulo }}</ion-label>
+    </ion-tab-button>
+    }
   </ion-tab-bar>
 </ion-tabs>

@@ -100,8 +100,21 @@
       @default {
       <div class="lista">
         @for (liga of misLigas(); track liga.id) {
-        <article class="liga-card">
-          <button type="button" class="liga-entrar" (click)="entrarEnLiga(liga)">
+        @let aviso = avisoAlineacion(liga.id);
+        <article class="liga-card" [class.con-aviso]="aviso">
+          @if (aviso) {
+          <!-- Alineación de la próxima jornada: hecha / sin hacer / a punto de cerrar -->
+          <span [class]="'aviso-alineacion ' + aviso.nivel" [attr.title]="'Jornada ' + aviso.numeroJornada">
+            <span class="aviso-punto" aria-hidden="true"></span>
+            {{ aviso.texto }}
+          </span>
+          }
+          <button
+            type="button"
+            class="liga-entrar"
+            (click)="entrarEnLiga(liga)"
+            [attr.aria-description]="aviso ? 'Jornada ' + aviso.numeroJornada + ': ' + aviso.texto : null"
+          >
             <span class="liga-icono" aria-hidden="true">
               <ion-icon name="trophy"></ion-icon>
             </span>

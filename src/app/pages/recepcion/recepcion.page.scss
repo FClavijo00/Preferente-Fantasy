@@ -186,13 +186,14 @@ ion-content.reception-background {
 }
 
 .liga-card {
+  position: relative;
   border-radius: 16px;
   background: rgba(18, 29, 22, 0.85);
   border: 1px solid rgba(0, 230, 118, 0.25);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  overflow: hidden;
+  /* sin overflow: hidden, para que el badge de la alineación pueda sobresalir por arriba */
   transition:
     transform 0.15s ease,
     border-color 0.15s ease;
@@ -250,6 +251,85 @@ ion-content.reception-background {
   gap: 4px;
   flex: 1;
   min-width: 0;
+}
+
+/* Con badge, hueco extra encima para que no pise la tarjeta de arriba */
+.liga-card.con-aviso {
+  margin-top: 8px;
+}
+
+/* ---------- Badge de la alineación: flotando sobre el borde superior derecho ----------
+   Así no quita sitio al nombre de la liga. El fondo es opaco (tinte sobre el fondo de la app)
+   para tapar el filo de la tarjeta. */
+.aviso-alineacion {
+  --tinte: rgba(255, 255, 255, 0.1);
+
+  position: absolute;
+  top: 0;
+  right: 14px;
+  transform: translateY(-50%);
+  z-index: 1;
+  background: linear-gradient(var(--tinte), var(--tinte)), var(--ion-color-stadium);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  pointer-events: none; /* el toque llega a la tarjeta */
+
+  .aviso-punto {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.hecha {
+    --tinte: rgba(0, 230, 118, 0.12);
+    color: var(--ion-color-pitch);
+    border-color: rgba(0, 230, 118, 0.3);
+  }
+
+  &.pendiente,
+  &.incompleta {
+    --tinte: rgba(251, 191, 36, 0.14);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+
+  &.urgente {
+    --tinte: rgba(255, 82, 82, 0.16);
+    color: #ff8a80;
+    border-color: rgba(255, 82, 82, 0.45);
+
+    .aviso-punto {
+      animation: aviso-latido 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes aviso-latido {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-alineacion.urgente .aviso-punto {
+    animation: none;
+  }
 }
 
 .liga-nombre {

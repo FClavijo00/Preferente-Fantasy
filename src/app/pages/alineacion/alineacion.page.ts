@@ -20,6 +20,7 @@ import { FormacionesService } from '../../core/services/formaciones.service';
 import { Ligas, LigasService } from '../../core/services/ligas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth-service.service';
+import { EstadoAlineacionService } from '../../core/services/estado-alineacion.service';
 import { AlineacionesService } from '../../core/services/alineaciones.service';
 
 export interface JugadorSlot {
@@ -57,6 +58,7 @@ export class AlineacionPage implements OnInit {
   private _toastService = inject(ToastService);
   private _authService = inject(AuthService);
   private _alineacionesService = inject(AlineacionesService);
+  private _estadoAlineacion = inject(EstadoAlineacionService);
 
   // Estados reactivos (Signals)
   formaciones = signal<any[]>([]);
@@ -379,6 +381,8 @@ export class AlineacionPage implements OnInit {
           this._toastService.showSuccessToast(
             'Alineación guardada exitosamente.',
           );
+          // Quita (o actualiza) el aviso de "alineación sin hacer" de pestañas y recepción
+          this._estadoAlineacion.cargar();
           await this.cargarAlineacion(this.jornadaObjetivo().id);
         }
       },
