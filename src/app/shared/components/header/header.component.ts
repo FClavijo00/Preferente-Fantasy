@@ -1,66 +1,46 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
-import { IonTitle } from '@ionic/angular/ion-title';
+import { Component, inject, Input } from '@angular/core';
 import { IonHeader } from '@ionic/angular/ion-header';
 import { IonToolbar } from '@ionic/angular/ion-toolbar';
-import { IonButtons } from '@ionic/angular/ion-buttons';
-import { IonBackButton } from '@ionic/angular/ion-back-button';
-import { IonButton } from '@ionic/angular/ion-button';
 import { IonIcon } from '@ionic/angular/ion-icon';
 import { NavController } from '@ionic/angular/nav-controller';
-import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, chevronBackOutline, informationCircleOutline, trophyOutline } from 'ionicons/icons';
-import { Ligas, LigasService } from '../../../core/services/ligas.service';
-import { InfoPuntuacionComponent } from '../../modals/info-puntuacion/info-puntuacion.component';
+import { swapHorizontalOutline } from 'ionicons/icons';
+import { LigasService } from '../../../core/services/ligas.service';
 
-interface Liga {
-  id: number;
-  nombre: string;
-  codigo_acceso: string | null;
-  nombre_competicion: string;
-  privada: boolean;
-  total_participantes: number;
-}
+/** Nombre visible de cada sección (lo que pasan las páginas en "titulo"). */
+const NOMBRE_SECCION: Record<string, string> = {
+  Home: 'Inicio',
+};
 
-
+/**
+ * Cabecera común de las pantallas de una liga.
+ * - Izquierda: "Mis ligas" (sale de la liga y vuelve a recepción).
+ * - Centro: la sección (pequeña) y el nombre de la liga (grande): la pestaña ya dice dónde estás,
+ *   lo que no se ve en ningún otro sitio es en qué liga.
+ * - Derecha: acciones propias de cada pantalla, con
+ *   <app-header titulo="..."><button acciones class="pf-header-accion">…</button></app-header>
+ */
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [
-    IonIcon,
-    IonButton,
-    IonButtons,
-    IonToolbar,
-    IonHeader],
+  imports: [IonHeader, IonToolbar, IonIcon],
 })
 export class HeaderComponent {
-  @Input() titulo: string = '';
+  @Input() titulo = '';
 
   private _navCtrl = inject(NavController);
   private _ligasService = inject(LigasService);
-  private _modalCtrl = inject(ModalController);
 
-  public liga: Ligas | null = this._ligasService.ligaSeleccionada();
+  /** Signal: si cambia la liga seleccionada, la cabecera se actualiza sola. */
+  readonly liga = this._ligasService.ligaSeleccionada;
 
-  constructor() {
-    addIcons({
-      arrowBackOutline,
-      trophyOutline,
-      chevronBackOutline,
-      informationCircleOutline
-    });
+  get seccion(): string {
+    return NOMBRE_SECCION[this.titulo] ?? this.titulo;
   }
 
-  abrirInformacionPuntuacion() {
-    const modal = this._modalCtrl.create({
-      component: InfoPuntuacionComponent,
-      cssClass: 'card-modal-center',
-      backdropDismiss: true,
-    });
-    modal.then((modal) => {
-      modal.present();
-    })
+  constructor() {
+    addIcons({ swapHorizontalOutline });
   }
 
   backRecepcion() {

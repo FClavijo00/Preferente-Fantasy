@@ -1,90 +1,20 @@
-<ion-header>
-  <ion-toolbar mode="md">
-    @if (titulo === "Home") {
-      <ion-buttons slot="start">
-        <ion-button (click)="backRecepcion()">
-          <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
-          <!-- <ion-icon slot="icon-only" name="trophy-outline"></ion-icon> -->
-        </ion-button>
-      </ion-buttons>
-      <div class="div-img-title">
-        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
-        <div>
-          <span>{{ liga?.nombre_liga }}</span>
-          <h3 class="ion-no-margin">Inicio</h3>
-        </div>
+<ion-header class="pf-header ion-no-border">
+  <ion-toolbar>
+    <div class="fila">
+      <!-- Sale de la liga y vuelve a recepción -->
+      <button type="button" class="btn-ligas" (click)="backRecepcion()" aria-label="Mis ligas (volver a recepción)" title="Mis ligas">
+        <ion-icon name="swap-horizontal-outline" aria-hidden="true"></ion-icon>
+      </button>
+
+      <h1 class="titulos">
+        <span class="seccion">{{ seccion }}</span>
+        <span class="liga">{{ liga()?.nombre_liga }}</span>
+      </h1>
+
+      <!-- Acciones propias de cada pantalla (p. ej. la ⓘ de Clasificaciones) -->
+      <div class="acciones">
+        <ng-content select="[acciones]"></ng-content>
       </div>
-    } @else if (titulo === "Plantillas") {
-      <ion-buttons slot="start">
-        <ion-button (click)="backRecepcion()">
-          <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
-          <!-- <ion-icon slot="icon-only" name="trophy-outline"></ion-icon> -->
-        </ion-button>
-      </ion-buttons>
-      <div class="div-img-title">
-        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
-        <div>
-          <span>{{ liga?.nombre_liga }}</span>
-          <h3 class="ion-no-margin">Plantillas</h3>
-        </div>
-      </div>
-    } @else if (titulo === "Alineación") {
-      <ion-buttons slot="start">
-        <ion-button (click)="backRecepcion()">
-          <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
-          <!-- <ion-icon slot="icon-only" name="trophy-outline"></ion-icon> -->
-        </ion-button>
-      </ion-buttons>
-      <div class="div-img-title">
-        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
-        <div>
-          <span>{{ liga?.nombre_liga }}</span>
-          <h3 class="ion-no-margin">Alineación</h3>
-        </div>
-      </div>
-    } @else if (titulo === "Clasificaciones") {
-      <ion-buttons slot="start">
-        <ion-button (click)="backRecepcion()">
-          <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
-          <!-- <ion-icon slot="icon-only" name="trophy-outline"></ion-icon> -->
-        </ion-button>
-      </ion-buttons>
-      <ion-buttons slot="end">
-        <ion-button (click)="abrirInformacionPuntuacion()">
-          <ion-icon
-            slot="icon-only"
-            name="information-circle-outline"
-          ></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <div class="div-img-title">
-        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
-        <div>
-          <span>{{ liga?.nombre_liga }}</span>
-          <h3 class="ion-no-margin">Clasificaciones</h3>
-        </div>
-      </div>
-    } @else if (titulo === "Perfil") {
-      <ion-buttons slot="start">
-        <ion-button (click)="backRecepcion()">
-          <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
-          <!-- <ion-icon slot="icon-only" name="trophy-outline"></ion-icon> -->
-        </ion-button>
-      </ion-buttons>
-      <div class="div-img-title">
-        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
-        <div>
-          <span>{{ liga?.nombre_liga }}</span>
-          <h3 class="ion-no-margin">Perfil</h3>
-        </div>
-      </div>
-    } @else if (titulo === "Panel de Control") {
-      <div class="div-img-title ion-padding-start">
-        <img src="assets/images/pf-logo-v2.svg" alt="Logo PF" />
-        <div>
-          <h3 class="ion-no-margin">Panel de Control</h3>
-        </div>
-      </div>
-    }
+    </div>
   </ion-toolbar>
 </ion-header>
