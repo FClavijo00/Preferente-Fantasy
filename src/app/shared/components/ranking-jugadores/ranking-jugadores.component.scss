@@ -63,13 +63,21 @@
   gap: 4px;
 }
 
-/* Columnas: puesto · jugador · PTS · media */
+/* Columnas: puesto · jugador · PTS · media.
+   Anchos fijos (iguales en cabecera y filas para que cuadren) pensados para el peor caso:
+   puesto de 3 cifras ("100"), PTS de hasta 4 ("1000") y la palabra "MEDIA" de la cabecera.
+   Las celdas no parten línea; si algo no cabe, el que cede es el nombre (con "…"). */
 .cabecera-lista,
 .fila {
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) 34px 34px;
+  grid-template-columns: 28px minmax(0, 1fr) 42px 40px;
   align-items: center;
   column-gap: 6px;
+}
+
+.col-puesto,
+.col-num {
+  white-space: nowrap;
 }
 
 .cabecera-lista {
@@ -79,6 +87,11 @@
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: var(--ion-color-slate-muted);
+
+  /* "PTS" y "MEDIA" con menos espaciado para que entren holgados en su columna */
+  .col-num {
+    letter-spacing: 0.3px;
+  }
 }
 
 .fila {
@@ -123,7 +136,7 @@
 .col-jugador {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
 
