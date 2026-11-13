@@ -17,17 +17,26 @@ import {
   calendarOutline,
   personCircleOutline,
   starOutline,
+  warningOutline,
 } from 'ionicons/icons';
 import { JornadasAdminComponent } from './secciones/jornadas-admin/jornadas-admin.component';
 import { CalendarioAdminComponent } from './secciones/calendario-admin/calendario-admin.component';
 import { JugadoresAdminComponent } from './secciones/jugadores-admin/jugadores-admin.component';
 import { OnceIdealAdminComponent } from './secciones/once-ideal-admin/once-ideal-admin.component';
+import { SancionesAdminComponent } from './secciones/sanciones-admin/sanciones-admin.component';
 
-type Seccion = 'jornadas' | 'calendario' | 'jugadores' | 'onceideal';
+type Seccion =
+  | 'jornadas'
+  | 'calendario'
+  | 'sanciones'
+  | 'jugadores'
+  | 'onceideal'
+;
 
 const SECCIONES: { id: Seccion; titulo: string; icono: string }[] = [
   { id: 'jornadas', titulo: 'Jornadas', icono: 'calendar-number-outline' },
   { id: 'calendario', titulo: 'Calendario', icono: 'calendar-outline' },
+  { id: 'sanciones', titulo: 'Sanciones', icono: 'warning-outline' },
   { id: 'jugadores', titulo: 'Jugadores', icono: 'person-circle-outline' },
   { id: 'onceideal', titulo: '11 Ideal', icono: 'star-outline' },
 ];
@@ -55,6 +64,7 @@ const SECCIONES: { id: Seccion; titulo: string; icono: string }[] = [
     CalendarioAdminComponent,
     JugadoresAdminComponent,
     OnceIdealAdminComponent,
+    SancionesAdminComponent,
   ],
 })
 export class PanelControlPage {
@@ -64,7 +74,14 @@ export class PanelControlPage {
   readonly content = signal<Seccion>('jornadas');
 
   constructor() {
-    addIcons({ arrowBackOutline, calendarNumberOutline, calendarOutline, personCircleOutline, starOutline });
+    addIcons({
+      arrowBackOutline,
+      calendarNumberOutline,
+      calendarOutline,
+      personCircleOutline,
+      starOutline,
+      warningOutline,
+    });
   }
 
   abrirSeccion(valor: unknown) {

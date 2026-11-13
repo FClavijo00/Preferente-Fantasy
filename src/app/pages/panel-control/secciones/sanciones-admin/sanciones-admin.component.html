@@ -1,0 +1,77 @@
+<section class="seccion">
+  <header class="seccion-cabecera">
+    <div>
+      <h2>Sanciones</h2>
+      @if (estado() === 'listo' && sanciones().length > 0) {
+      <p>
+        {{ resumen().equipos }} {{ resumen().equipos === 1 ? 'equipo sancionado' : 'equipos sancionados' }} ·
+        −{{ resumen().puntos }} pts en total
+      </p>
+      } @else {
+      <p>Puntos que se restan en la clasificación</p>
+      }
+    </div>
+    <ion-button mode="md" class="btn-principal" (click)="nuevaSancion()" [disabled]="estado() === 'cargando'">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Nueva sanción
+    </ion-button>
+  </header>
+
+  @switch (estado()) {
+  @case ('cargando') {
+  <div class="lista" aria-busy="true">
+    @for (i of [1, 2]; track i) {
+    <ion-skeleton-text animated class="sk-sancion"></ion-skeleton-text>
+    }
+  </div>
+  }
+
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se han podido cargar las sanciones.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargar()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+
+  @default {
+  <ul class="lista">
+    @for (s of sanciones(); track s.id) {
+    <li class="sancion">
+      <span class="escudo" aria-hidden="true">
+        @if (s.escudo) {
+        <img [src]="s.escudo" alt="" width="36" height="36" loading="lazy" />
+        } @else {
+        <ion-icon name="shield-outline"></ion-icon>
+        }
+      </span>
+
+      <div class="info">
+        <span class="equipo">{{ s.equipo }}</span>
+        <span class="motivo" [class.sin-motivo]="!s.motivo">{{ s.motivo || 'Sin motivo' }}</span>
+        <span class="fecha">{{ fecha(s) }}</span>
+      </div>
+
+      <span class="puntos" [attr.aria-label]="'Menos ' + s.puntos + ' puntos'">−{{ s.puntos }}</span>
+
+      <div class="acciones">
+        <button type="button" class="btn-icono" (click)="editarSancion(s)" [attr.aria-label]="'Editar sanción de ' + s.equipo" title="Editar">
+          <ion-icon name="create-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="btn-icono peligro" (click)="eliminarSancion(s)" [attr.aria-label]="'Eliminar sanción de ' + s.equipo" title="Eliminar">
+          <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </li>
+    } @empty {
+    <li class="estado-vacio">
+      <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+      <p>No hay ninguna sanción. Ningún equipo pierde puntos en la clasificación.</p>
+    </li>
+    }
+  </ul>
+  }
+  }
+</section>

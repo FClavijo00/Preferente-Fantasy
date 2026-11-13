@@ -1,0 +1,224 @@
+/* Tamaño y forma del modal (sheet / diálogo): src/theme/modal-auto.scss.
+   Mismo lenguaje visual que el resto de modales del panel. */
+
+.pf-modal {
+  color: #ffffff;
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 26px 20px 10px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+}
+
+.btn-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ion-color-slate-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.pf-modal-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 10px 20px 24px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.campo-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.etiqueta,
+.campo label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ion-color-slate-muted);
+}
+
+.opcional {
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.contador {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Equipo ---------- */
+.equipo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.07);
+
+  &.invalido {
+    border-color: var(--ion-color-red-card);
+  }
+}
+
+.escudo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.select-equipo {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --placeholder-color: rgba(255, 255, 255, 0.45);
+  --placeholder-opacity: 1;
+  color: #ffffff;
+  font-weight: 700;
+
+  &::part(icon) {
+    color: var(--ion-color-pitch);
+    opacity: 1;
+  }
+}
+
+/* ---------- Puntos: [−]  −3  [+] ---------- */
+.puntos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 82, 82, 0.08);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
+.puntos-valor {
+  min-width: 70px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #ff8a80;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-paso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 1.2rem;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Motivo ---------- */
+.input-relleno {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.95rem;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  &:focus {
+    border-color: var(--ion-color-pitch);
+  }
+}
+
+.ayuda {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ion-color-slate-muted);
+}
+
+/* ---------- Botón ---------- */
+ion-button {
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 4px 0 0;
+}
+
+.btn-principal {
+  --background: var(--ion-color-pitch);
+  --background-activated: var(--ion-color-pitch-shade);
+  --background-hover: var(--ion-color-pitch-tint);
+  --color: var(--ion-color-pitch-contrast);
+  --border-radius: 12px;
+  font-weight: 800;
+  min-height: 48px;
+
+  ion-spinner {
+    color: var(--ion-color-pitch-contrast);
+    width: 22px;
+    height: 22px;
+  }
+}

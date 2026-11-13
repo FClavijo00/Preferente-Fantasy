@@ -1,0 +1,80 @@
+<div class="pf-modal">
+  <header class="cabecera">
+    <h2>{{ esEdicion ? 'Editar sanción' : 'Nueva sanción' }}</h2>
+    <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+
+  <form class="pf-modal-cuerpo" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <!-- Equipo -->
+    <div class="campo">
+      <span class="etiqueta">Equipo</span>
+      <div class="equipo" [class.invalido]="form.controls.equipo_id.touched && form.controls.equipo_id.invalid">
+        <span class="escudo" aria-hidden="true">
+          @if (escudo(); as e) {
+          <img [src]="e" alt="" width="30" height="30" />
+          } @else {
+          <ion-icon name="shield-outline"></ion-icon>
+          }
+        </span>
+        <ion-select
+          class="select-equipo"
+          mode="ios"
+          interface="alert"
+          aria-label="Equipo sancionado"
+          placeholder="Elegir equipo"
+          cancelText="Cancelar"
+          okText="Aceptar"
+          [interfaceOptions]="opcionesSelectEquipo"
+          formControlName="equipo_id"
+        >
+          @for (e of equipos; track e.id) {
+          <ion-select-option [value]="e.id">{{ e.nombre }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    </div>
+
+    <!-- Puntos que se restan -->
+    <div class="campo">
+      <span class="etiqueta" id="etiqueta-puntos">Puntos que se restan</span>
+      <div class="puntos" role="group" aria-labelledby="etiqueta-puntos">
+        <button type="button" class="btn-paso" (click)="cambiarPuntos(-1)" [disabled]="puntos() <= 1" aria-label="Uno menos">
+          <ion-icon name="remove" aria-hidden="true"></ion-icon>
+        </button>
+        <span class="puntos-valor" aria-live="polite">−{{ puntos() }}</span>
+        <button type="button" class="btn-paso" (click)="cambiarPuntos(1)" [disabled]="puntos() >= 99" aria-label="Uno más">
+          <ion-icon name="add" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Motivo -->
+    <div class="campo">
+      <div class="campo-cabecera">
+        <label for="motivo-sancion">Motivo <span class="opcional">· opcional</span></label>
+        <span class="contador">{{ form.controls.motivo.value.length }}/200</span>
+      </div>
+      <input
+        id="motivo-sancion"
+        class="input-relleno"
+        type="text"
+        maxlength="200"
+        autocomplete="off"
+        placeholder="Ej.: Alineación indebida (J4)"
+        formControlName="motivo"
+      />
+    </div>
+
+    <p class="ayuda">La clasificación resta estos puntos automáticamente.</p>
+
+    <ion-button type="submit" mode="md" expand="block" class="btn-principal" [disabled]="enviando()">
+      @if (enviando()) {
+      <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+      {{ esEdicion ? 'Guardar cambios' : 'Crear sanción' }}
+      }
+    </ion-button>
+  </form>
+</div>
