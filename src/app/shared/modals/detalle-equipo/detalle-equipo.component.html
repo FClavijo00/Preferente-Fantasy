@@ -1,0 +1,145 @@
+<!-- Botón flotante en la esquina, fuera de la tarjeta -->
+<button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+  <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+</button>
+
+<div class="tarjeta">
+  @switch (estado()) {
+  @case ('cargando') {
+  <div class="cabecera" aria-busy="true">
+    <ion-skeleton-text animated class="sk-escudo"></ion-skeleton-text>
+    <div class="sk-textos">
+      <ion-skeleton-text animated style="width: 75%; height: 16px"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <ion-skeleton-text animated class="sk-bloque"></ion-skeleton-text>
+  }
+
+  @case ('error') {
+  <div class="vacio">
+    <p>No se ha podido cargar el equipo.</p>
+    <button type="button" class="btn-reintentar" (click)="cargar()">
+      <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+      Reintentar
+    </button>
+  </div>
+  }
+
+  @default {
+  @if (equipo(); as e) {
+  <!-- ===== Cabecera: escudo · colores · nombre ===== -->
+  <div class="cabecera">
+    <img class="escudo" [src]="e.escudo || 'assets/escudos/default.png'" alt="" width="64" height="64" />
+
+    @if (colores().length) {
+    <span class="colores" role="img"
+      [attr.aria-label]="colores().length === 2 ? 'Colores del equipo' : 'Color del equipo'">
+      @for (c of colores(); track $index) {
+      <span [style.background]="c"></span>
+      }
+    </span>
+    }
+
+    <div class="identidad">
+      <h2>{{ e.nombre }}</h2>
+      @if (e.clasificacion; as c) {
+      <span class="posicion-chip">{{ c.posicion }}º · {{ c.pts }} pts</span>
+      }
+    </div>
+  </div>
+
+  <!-- ===== Estadio (abre Mapas / Google Maps) ===== -->
+  @if (e.estadio) {
+  <button type="button" class="estadio" (click)="abrirMapa(e)" [attr.aria-label]="'Abrir ' + e.estadio + ' en mapas'">
+    <ion-icon name="location-outline" class="icono-estadio" aria-hidden="true"></ion-icon>
+    <span class="estadio-nombre">{{ e.estadio }}</span>
+    <ion-icon name="navigate-outline" class="icono-ir" aria-hidden="true"></ion-icon>
+  </button>
+  }
+
+  <!-- ===== Datos de la clasificación ===== -->
+  @if (e.clasificacion; as c) {
+  <dl class="estadisticas">
+    <div class="dato"><dt title="Partidos jugados">PJ</dt><dd>{{ c.pj }}</dd></div>
+    <div class="dato"><dt title="Partidos ganados">PG</dt><dd>{{ c.g }}</dd></div>
+    <div class="dato"><dt title="Partidos empatados">PE</dt><dd>{{ c.e }}</dd></div>
+    <div class="dato"><dt title="Partidos perdidos">PP</dt><dd>{{ c.p }}</dd></div>
+    <div class="dato"><dt title="Goles a favor">GF</dt><dd>{{ c.gf }}</dd></div>
+    <div class="dato"><dt title="Goles en contra">GC</dt><dd>{{ c.gc }}</dd></div>
+    <div class="dato"><dt title="Diferencia de goles">DG</dt>
+      <dd [class.positivo]="c.dg > 0" [class.negativo]="c.dg < 0">{{ c.dg > 0 ? '+' + c.dg : c.dg }}</dd>
+    </div>
+    <div class="dato"><dt title="Puntos de sanción">SAN</dt>
+      <dd [class.negativo]="c.san > 0">{{ c.san > 0 ? '−' + c.san : 0 }}</dd>
+    </div>
+  </dl>
+  }
+
+  <div class="divider"></div>
+
+  <!-- ===== Racha: últimos 5 (más reciente a la derecha) ===== -->
+  <h3 class="seccion-titulo">Últimos 5 Partidos</h3>
+
+  @if (racha().length) {
+  <ol class="racha" aria-label="Racha de los últimos partidos, del más antiguo al más reciente">
+    @for (p of racha(); track p.partido_id) {
+    <li [class]="'resultado-' + p.resultado"      [title]="'J' + p.numero_jornada + ': ' + (p.en_casa ? 'en casa vs ' : 'fuera vs ') + p.rival + ' ' + p.goles_favor + '-' + p.goles_contra">
+      <span aria-hidden="true">{{ p.resultado }}</span>
+      <span class="oculto">{{ textoResultado(p.resultado) }} en la jornada {{ p.numero_jornada }}</span>
+    </li>
+    }
+  </ol>
+  } @else {
+  <p class="no-data">Aún no ha disputado ningún partido</p>
+  }
+
+  <div class="divider secondary"></div>
+
+  <!-- ===== Partidos disputados (más reciente primero) ===== -->
+  @if (e.partidos.length) {
+  <h3 class="titulo-lista">Partidos Disputados</h3>
+  <ul class="partidos">
+    @for (p of e.partidos; track p.partido_id) {
+    <li>
+      <button
+        type="button"
+        class="partido"
+        [class.con-acta]="p.tiene_acta"
+        [disabled]="!p.tiene_acta"
+        (click)="abrirActa(p)"
+        [attr.aria-label]="'Jornada ' + p.numero_jornada + ', ' + (p.en_casa ? 'en casa contra ' : 'fuera contra ') + p.rival + ', ' + p.goles_favor + ' a ' + p.goles_contra + (p.tiene_acta ? '. Ver acta' : '')"
+      >
+        <span class="jornada">J{{ p.numero_jornada }}</span>
+
+        <span class="rival">
+          <img [src]="p.rival_escudo || 'assets/escudos/default.png'" alt="" width="26" height="26" loading="lazy" />
+          <span class="rival-texto">
+            <span class="rival-nombre">
+              <ion-icon class="lugar" [name]="p.en_casa ? 'home' : 'airplane'"
+                [title]="p.en_casa ? 'En casa' : 'Fuera'" aria-hidden="true"></ion-icon>
+              <span class="rival-texto-nombre">{{ p.rival }}</span>
+            </span>
+            @if (fecha(p)) {
+            <span class="fecha">{{ fecha(p) }}</span>
+            }
+          </span>
+        </span>
+
+        <span [class]="'marcador resultado-' + p.resultado">{{ p.goles_favor }}-{{ p.goles_contra }}</span>
+
+        <span class="acta" aria-hidden="true">
+          @if (p.tiene_acta) {
+          <ion-icon name="document-text-outline"></ion-icon>
+          }
+        </span>
+      </button>
+    </li>
+    }
+  </ul>
+  }
+  }
+  }
+  }
+</div>

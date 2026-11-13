@@ -30,6 +30,50 @@ interface ApiResponse<T> {
   data: T;
 }
 
+/** Partido ya disputado, visto desde el equipo del detalle. */
+export interface PartidoEquipo {
+  partido_id: number;
+  numero_jornada: number;
+  /** "YYYY-MM-DDTHH:mm", hora de España tal cual */
+  fecha_local: string | null;
+  en_casa: boolean;
+  rival_id: number;
+  rival: string;
+  rival_escudo: string | null;
+  goles_favor: number;
+  goles_contra: number;
+  resultado: 'V' | 'E' | 'D';
+  tiene_acta: boolean;
+}
+
+/** Detalle de un equipo para el modal (getDetalleEquipo). */
+export interface DetalleEquipo {
+  id: number;
+  nombre: string;
+  siglas: string | null;
+  escudo: string | null;
+  color_primario: string | null;
+  color_secundario: string | null;
+  estadio: string | null;
+  estadio_lat: number | null;
+  estadio_lng: number | null;
+  clasificacion: {
+    posicion: number;
+    pj: number;
+    pts: number;
+    g: number;
+    e: number;
+    p: number;
+    gf: number;
+    gc: number;
+    dg: number;
+    /** Puntos restados por sanciones */
+    san: number;
+  } | null;
+  /** Más reciente primero */
+  partidos: PartidoEquipo[];
+}
+
 @Service()
 export class EquiposService {
   private http = inject(HttpClient);
@@ -45,6 +89,10 @@ export class EquiposService {
     return this.http
       .get<ApiResponse<Equipo[]>>(`${this.apiUrl}` + '/getEquipos')
       .pipe(map((res) => res.data));
+  }
+
+  getDetalleEquipo(equipoId: number) {
+    return this.http.post<ApiResponse<DetalleEquipo>>(`${this.apiUrl}/getDetalleEquipo`, { equipo_id: equipoId });
   }
 
   getEquiposLimpios() {
