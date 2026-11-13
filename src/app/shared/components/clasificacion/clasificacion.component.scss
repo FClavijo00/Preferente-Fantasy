@@ -1,246 +1,296 @@
-ion-card {
-  margin: 0 0 16px 0 !important;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  ion-card-header {
-    padding: 0 0 10px 0 !important;
-  }
+:host {
+  display: block;
+  color: #ffffff;
 
-  ion-card-content {
-    padding: 0 !important;
-  }
+  /* Colores de las zonas */
+  --zona-ascenso: var(--ion-color-pitch);
+  --zona-playoff: #4fc3f7;
+  --zona-copa: #fbbf24;
+  --zona-descenso: var(--ion-color-red-card);
 }
 
-.clas-rank-segment {
-  ion-segment-button {
-    font-size: 0.8rem !important;
-    font-weight: 600 !important;
-    --color-checked: var(--ion-color-pitch) !important;
-  }
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 
-.clas-table {
-  font-size: 0.7rem;
-  //border: 1px solid rgba(255, 255, 255, 0.08);
+/* ---------- Tabla ---------- */
+.tabla-scroll {
+  margin: 0 -4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
 
-  .pos-cell {
-    .clasificacion-badge {
-      padding: 3px 5px !important;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.7rem !important;
-      --background: white;
+.tabla {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 3px;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
 
-      &.ascenso {
-        --background: var(--ion-color-trophy);
-      }
+  th,
+  td {
+    padding: 8px 6px;
+    text-align: center;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.22);
+  }
 
-      &.playoff {
-        --background: var(--ion-color-grass);
-      }
+  thead th {
+    padding-top: 2px;
+    padding-bottom: 6px;
+    background: transparent;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: var(--ion-color-slate-muted);
+  }
 
-      &.copa {
-        --background: #2596be;
-      }
+  tbody td:first-child {
+    border-radius: 10px 0 0 10px;
+  }
 
-      &.descenso {
-        --background: var(--ion-color-red-card);
-      }
+  tbody td:last-child {
+    border-radius: 0 10px 10px 0;
+  }
+
+  /* Cada fila abre el detalle del equipo */
+  .fila-equipo {
+    cursor: pointer;
+
+    &:active > * {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ion-color-pitch);
+      outline-offset: -2px;
     }
   }
 
-  .equipo-cell {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    /* min-width: 130px;
-    max-width: 130px; */
+  .positivo {
+    color: var(--ion-color-pitch);
+  }
 
-    .clasificacion-escudo {
-      width: 24px;
-      height: 24px;
-    }
-
-    .clasificacion-nombre {
-      font-size: 0.65rem;
-      font-weight: 100;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  .negativo {
+    color: #ff8a80;
   }
 }
 
-.clasificacion-info {
+.col-pos {
+  width: 26px;
+  padding-right: 0 !important; /* pegado al escudo */
+}
+
+/* Barrita de color de la zona a la izquierda de la fila */
+.posicion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  font-weight: 800;
+}
+
+tr[class*='zona-'] td.col-pos {
+  box-shadow: inset 3px 0 0 var(--color-zona);
+}
+
+tr.zona-ascenso {
+  --color-zona: var(--zona-ascenso);
+}
+
+tr.zona-playoff {
+  --color-zona: var(--zona-playoff);
+}
+
+tr.zona-copa {
+  --color-zona: var(--zona-copa);
+}
+
+tr.zona-descenso {
+  --color-zona: var(--zona-descenso);
+}
+
+.col-equipo {
+  padding-left: 4px !important;
+  text-align: left !important;
+  font-weight: 700;
+  width: 100%;
+  max-width: 0; /* en modo compacto, el nombre ocupa lo que sobra y se corta con "…" */
+}
+
+.equipo {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
+  min-width: 0;
 
-  div {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-
-    ion-badge {
-      &.ascenso {
-        --background: var(--ion-color-trophy);
-      }
-
-      &.playoff {
-        --background: var(--ion-color-grass);
-      }
-
-      &.copa {
-        --background: #2596be;
-      }
-
-      &.descenso {
-        --background: var(--ion-color-red-card);
-      }
-    }
-
-    span {
-      font-size: 0.8rem;
-      font-weight: 100;
-    }
+  img {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    object-fit: contain;
   }
 }
 
-.ranking-list {
-  background: transparent;
-  padding: 0;
+.nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ranking-item {
-  --background: transparent;
-  --border-color: rgba(255, 255, 255, 0.08);
-  margin-bottom: 6px;
-  border-radius: 8px;
+.col-pts {
+  position: relative;
+  min-width: 46px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--ion-color-pitch);
+}
 
-  ion-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    &.por {
-      border: 2px solid #43a047;
-    }
-    &.def {
-      border: 2px solid #f18436;
-    }
-    &.med {
-      border: 2px solid #0288d1;
-    }
-    &.del {
-      border: 2px solid var(--ion-color-red-card);
-    }
+/* "−3" junto a los puntos de un equipo sancionado */
+.marca-sancion {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: rgba(255, 82, 82, 0.18);
+  color: #ff8a80;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+/* Con todas las estadísticas: scroll horizontal con # y Equipo fijos a la izquierda */
+.tabla-scroll.completa {
+  .tabla {
+    width: max-content;
+    min-width: 100%;
   }
 
-  h2 {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--ion-text-color, #ffffff);
+  .col-equipo {
+    width: auto;
+    max-width: 150px;
   }
 
-  .equipo-nombre {
-    font-size: 0.8rem;
-    color: var(--ion-color-medium, #92949c);
-    margin-top: 2px;
+  .col-pos,
+  .col-equipo {
+    position: sticky;
+    z-index: 1;
+    background: #0f1912; /* opaco: lo que pasa por debajo no se ve */
   }
 
-  .goles-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
+  .col-pos {
+    left: 0;
+  }
 
-    .numero-goles {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--ion-color-pitch);
-      line-height: 1;
-    }
+  .col-equipo {
+    left: 26px;
+    box-shadow: 6px 0 8px -6px rgba(0, 0, 0, 0.6);
+  }
 
-    .label-goles {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      color: var(--ion-color-medium);
-      margin-top: 2px;
-    }
+  thead .col-pos,
+  thead .col-equipo {
+    background: #121d16;
   }
 }
 
-/* Paginador inferior */
-.paginador-container {
+/* ---------- Ver más ---------- */
+.btn-ver-mas {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 0;
-  gap: 12px;
-
-  .paginador-texto {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ion-color-medium);
-  }
-
-  ion-button {
-    --color: var(--ion-color-pitch);
-  }
-}
-
-.player-pts-div {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .stat-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    padding: 6px 10px;
-    min-width: 48px;
-
-    .stat-value {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: #ffffff;
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-size: 0.6rem;
-      font-weight: 600;
-      color: #8e8e93;
-      margin-top: 3px;
-      text-transform: uppercase;
-    }
-
-    /* Resaltado especial para los Puntos Totales */
-    &.highlight {
-      background: rgba(0, 255, 102, 0.08);
-      border-color: rgba(0, 255, 102, 0.3);
-
-      .stat-value {
-        color: #00ff66;
-        text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
-      }
-
-      .stat-label {
-        color: rgba(0, 255, 102, 0.8);
-      }
-    }
-  }
-}
-
-.pts-cell {
-  font-weight: 600;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: transparent;
   color: var(--ion-color-pitch);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Leyenda ---------- */
+.leyenda {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 14px 0 0;
+  padding: 0;
+  font-size: 0.72rem;
+  color: var(--ion-color-slate-muted);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .muestra {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+
+    &.zona-ascenso {
+      background: var(--zona-ascenso);
+    }
+
+    &.zona-playoff {
+      background: var(--zona-playoff);
+    }
+
+    &.zona-copa {
+      background: var(--zona-copa);
+    }
+
+    &.zona-descenso {
+      background: var(--zona-descenso);
+    }
+  }
+}
+
+/* ---------- Carga / error ---------- */
+.sk-fila {
+  height: 38px;
+  margin: 0 0 4px;
+  border-radius: 10px;
+  --background: rgba(255, 255, 255, 0.06);
+}
+
+.vacio {
+  padding: 18px 8px;
+  text-align: center;
+
+  p {
+    margin: 0 0 10px;
+    font-size: 0.88rem;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.btn-reintentar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 230, 118, 0.55);
+  background: transparent;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }

@@ -1,137 +1,137 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { IonBadge } from '@ionic/angular/ion-badge';
-import { IonCard } from '@ionic/angular/ion-card';
-import { IonCardHeader } from '@ionic/angular/ion-card-header';
-import { IonCardSubtitle } from '@ionic/angular/ion-card-subtitle';
-import { IonCardTitle } from '@ionic/angular/ion-card-title';
-import { IonCardContent } from '@ionic/angular/ion-card-content';
-import { IonSegment } from '@ionic/angular/ion-segment';
-import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
-import { IonLabel } from '@ionic/angular/ion-label';
-import { IonSegmentView } from '@ionic/angular/ion-segment-view';
-import { IonSegmentContent } from '@ionic/angular/ion-segment-content';
-import { IonItem } from '@ionic/angular/ion-item';
-import { IonList } from '@ionic/angular/ion-list';
-import { IonAvatar } from '@ionic/angular/ion-avatar';
-import { IonButton } from '@ionic/angular/ion-button';
+import { firstValueFrom } from 'rxjs';
 import { IonIcon } from '@ionic/angular/ion-icon';
-import { EquiposService } from '../../../core/services/equipos-service';
-import { JugadoresService } from '../../../core/services/jugadores-service';
+import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
-import { DecimalPipe } from '@angular/common';
+import { chevronDown, chevronUp, refreshOutline, warning } from 'ionicons/icons';
+import { EquiposService } from '../../../core/services/equipos-service';
+import { DetalleEquipoComponent } from '../../modals/detalle-equipo/detalle-equipo.component';
 
-export interface Clasificacion {
+/** Fila de la clasificación tal como llega del backend (vista_clasificacion). */
+interface ClasificacionApi {
   equipo_id: number;
   equipo: string;
-  escudo_url: string;
   escudo: string;
-  partidos_jugados: number;
-  ganados: number;
-  perdidos: number;
-  empatados: number;
-  goles_favor: number;
-  goles_contra: number;
-  diferencia_goles: number;
-  puntos: number;
-  san: number;
+  partidos_jugados: number | string;
+  puntos: number | string;
+  ganados: number | string;
+  empatados: number | string;
+  perdidos: number | string;
+  goles_favor: number | string;
+  goles_contra: number | string;
+  diferencia_goles: number | string;
+  /** Puntos restados por sanciones */
+  san: number | string;
+  sanciones?: { puntos: number; motivo: string | null }[];
 }
 
-interface JugadorRanking {
-  apellidos: string;
-  apodo: string;
+export interface FilaClasificacion {
+  posicion: number;
+  equipoId: number;
   equipo: string;
-  foto: string;
-  foto_url: string;
-  jornadas_jugadas: number;
-  jugador_id: number;
-  nombre: string;
-  posicion: string;
-  puntos_totales_temporada: number;
+  escudo: string;
+  pj: number;
+  g: number;
+  e: number;
+  p: number;
+  gf: number;
+  gc: number;
+  dg: number;
+  san: number;
+  pts: number;
+  zona: Zona | null;
+  sanciones: { puntos: number; motivo: string | null }[];
 }
 
+type Zona = 'ascenso' | 'playoff' | 'copa' | 'descenso';
+
+/** Zonas por posición en 1ª Andaluza (18 equipos). */
+const ZONAS: { zona: Zona; desde: number; hasta: number; texto: string }[] = [
+  { zona: 'ascenso', desde: 1, hasta: 1, texto: 'Ascenso a División de Honor' },
+  { zona: 'playoff', desde: 2, hasta: 3, texto: 'Playoff de Ascenso y Copa Andalucía' },
+  { zona: 'copa', desde: 4, hasta: 5, texto: 'Copa Andalucía' },
+  { zona: 'descenso', desde: 15, hasta: 18, texto: 'Descenso' },
+];
+
+const zonaDe = (posicion: number): Zona | null =>
+  ZONAS.find((z) => posicion >= z.desde && posicion <= z.hasta)?.zona ?? null;
+
+/**
+ * Clasificación de la competición real (pestaña "Clasificación").
+ * Los puntos ya llegan con las sanciones restadas; aquí se enseña cuánto y por qué.
+ */
 @Component({
   selector: 'app-clasificacion',
   templateUrl: './clasificacion.component.html',
   styleUrls: ['./clasificacion.component.scss'],
-  imports: [IonIcon, IonButton, IonAvatar,
-    IonList,
-    IonItem,
-    IonBadge,
-    IonLabel,
-    IonSegmentButton,
-    IonSegment,
-    IonCardContent,
-    IonCardHeader,
-    IonCard,
-    IonSegmentView,
-    IonSegmentContent,
-    DecimalPipe
-  ],
+  imports: [IonIcon, IonSkeletonText],
 })
 export class ClasificacionComponent implements OnInit {
   private _equiposService = inject(EquiposService);
-  private _jugadoresService = inject(JugadoresService);
+  private _modalCtrl = inject(ModalController);
 
-  public clasificacion = signal<Clasificacion[]>([]);
-  public ranking = signal<JugadorRanking[]>([]);
+  readonly filas = signal<FilaClasificacion[]>([]);
+  readonly estado = signal<'cargando' | 'listo' | 'error'>('cargando');
+  /** Tabla compacta (Pos · Equipo · PJ · DG · PTS) o con todas las estadísticas. */
+  readonly completa = signal(false);
 
-  // Estado paginator
-  paginaActual = signal<number>(1);
-  elementoPorPagina = signal<number>(10);
-
-  jugadoresPaginados = computed(() => {
-    const inicio = (this.paginaActual() - 1) * this.elementoPorPagina();
-    const fin = inicio + this.elementoPorPagina();
-    return this.ranking().slice(inicio, fin);
-  });
-
-  totalPaginas = computed(() => {
-    return Math.ceil(this.ranking().length / this.elementoPorPagina()) || 1;
-  });
-
-  // Método para navegar entre páginas
-  cambiarPagina(nuevaPagina: number) {
-    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas()) {
-      this.paginaActual.set(nuevaPagina);
-    }
-  }
+  readonly zonas = ZONAS;
 
   constructor() {
-    addIcons({
-      chevronForwardOutline,
-      chevronBackOutline
-    })
-  }
-
-  async getClasificacion() {
-    this._equiposService.getClasificacion().subscribe({
-      next: (data: any) => {
-        this.clasificacion.set(data);
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  async getRanking() {
-    this._jugadoresService.getRanking().subscribe({
-      next: (data: any) => {
-        this.ranking.set(data);
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
-  }
-
-  segmentChanged(ev: any) {
-    /* console.log('Segment changed', ev.detail.value); */
+    addIcons({ chevronDown, chevronUp, refreshOutline, warning });
   }
 
   ngOnInit() {
-    this.getClasificacion();
-    this.getRanking();
+    this.cargar();
+  }
+
+  async cargar() {
+    this.estado.set('cargando');
+    try {
+      const datos = (await firstValueFrom(this._equiposService.getClasificacion())) as unknown as ClasificacionApi[];
+      // Los BIGINT de Postgres llegan como texto: se pasan a número
+      this.filas.set(
+        (datos ?? []).map((d, i) => ({
+          posicion: i + 1,
+          equipoId: d.equipo_id,
+          equipo: d.equipo,
+          escudo: d.escudo,
+          pj: Number(d.partidos_jugados),
+          g: Number(d.ganados),
+          e: Number(d.empatados),
+          p: Number(d.perdidos),
+          gf: Number(d.goles_favor),
+          gc: Number(d.goles_contra),
+          dg: Number(d.diferencia_goles),
+          san: Number(d.san ?? 0),
+          pts: Number(d.puntos),
+          zona: zonaDe(i + 1),
+          sanciones: d.sanciones ?? [],
+        })),
+      );
+      this.estado.set('listo');
+    } catch {
+      this.estado.set('error');
+    }
+  }
+
+  dg(valor: number): string {
+    return valor > 0 ? `+${valor}` : String(valor);
+  }
+
+  async abrirEquipo(f: FilaClasificacion) {
+    const modal = await this._modalCtrl.create({
+      component: DetalleEquipoComponent,
+      cssClass: 'card-modal-center',
+      backdropDismiss: true,
+      componentProps: { equipoId: f.equipoId },
+    });
+    await modal.present();
+  }
+
+  textoSancion(f: FilaClasificacion): string {
+    const motivos = f.sanciones.map((s) => (s.motivo ? `−${s.puntos} (${s.motivo})` : `−${s.puntos}`));
+    return motivos.length ? motivos.join(' · ') : `−${f.san} pts`;
   }
 }

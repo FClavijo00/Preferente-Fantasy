@@ -1,90 +1,112 @@
-<ion-card class="calendario-card">
-  <!-- HEADER CON SELECTOR HORIZONTAL Y ESTADO -->
-  <ion-card-header>
-    <!-- Scroll de Jornadas (1 a 34) -->
-    <div class="scroll-jornadas" #scrollJornadasRef>
-      @for (j of jornadasTotales(); track j; let i = $index) {
-        <button
-          class="btn-jornada"
-          [class.active]="jornadaSeleccionada() === i + 1"
-          (click)="seleccionarJornada(i + 1)"
-        >
-          J{{ i + 1 }}
-        </button>
-      }
-    </div>
-  </ion-card-header>
-
-  <!-- CONTENT CON LISTA DE PARTIDOS -->
-  <ion-card-content>
-    @if (jornadaActual(); as j) {
-      <div class="partidos-list">
-        @for (partido of j.partidos; track partido.partido_id) {
-          <div class="partido-item" (click)="abrirActaPartido(partido)">
-            <!-- Fecha u Hora -->
-            <div class="partido-meta">
-              @if (partido.fecha_partido) {
-                <span>{{ partido.fecha }} - {{ partido.hora }}</span>
-              } @else {
-                <span>Horario por confirmar</span>
-              }
-            </div>
-
-            <!-- Enfrentamiento (Local vs Visitante) -->
-            <div class="match-row">
-              <!-- Local -->
-              <div class="equipo local">
-                <span class="nombre">{{ partido.local.nombre }}</span>
-                <img
-                  [src]="partido.local.escudo || 'assets/escudos/default.png'"
-                  [alt]="partido.local.nombre"
-                  class="escudo"
-                />
-              </div>
-
-              <!-- Resultado / VS -->
-              <div class="marcador-box">
-                @if (
-                  j.jornada_estado === "CERRADA" ||
-                  j.jornada_estado === "EN_JUEGO"
-                ) {
-                  <div class="marcador">
-                    @if (partido.jugado === true) {
-                      <span class="goles">{{ partido.goles_local }}</span>
-                      <span class="guion">-</span>
-                      <span class="goles">{{ partido.goles_visitante }}</span>
-                    } @else {
-                      <div class="vs-badge">VS</div>
-                    }
-                  </div>
-                } @else {
-                  <div class="vs-badge">VS</div>
-                }
-              </div>
-
-              <!-- Visitante -->
-              <div class="equipo visitante">
-                <img
-                  [src]="
-                    partido.visitante.escudo || 'assets/escudos/default.png'
-                  "
-                  [alt]="partido.visitante.nombre"
-                  class="escudo"
-                />
-                <span class="nombre">{{ partido.visitante.nombre }}</span>
-              </div>
-            </div>
-          </div>
-        } @empty {
-          <div class="empty-state">
-            <p>No hay partidos programados en esta jornada.</p>
-          </div>
-        }
-      </div>
-    } @else {
-      <div class="empty-state">
-        <p>No hay partidos programados en esta jornada.</p>
-      </div>
+<section class="calendario" aria-label="Partidos">
+  @switch (estado()) {
+  @case ('cargando') {
+  <div class="chips" aria-busy="true">
+    @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+    <ion-skeleton-text animated class="sk-chip"></ion-skeleton-text>
     }
-  </ion-card-content>
-</ion-card>
+  </div>
+  @for (i of [1, 2, 3]; track i) {
+  <ion-skeleton-text animated class="sk-partido"></ion-skeleton-text>
+  }
+  }
+
+  @case ('error') {
+  <div class="vacio">
+    <p>No se ha podido cargar el calendario.</p>
+    <button type="button" class="btn-reintentar" (click)="cargar()">
+      <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+      Reintentar
+    </button>
+  </div>
+  }
+
+  @default {
+  @if (jornadas().length === 0) {
+  <div class="vacio"><p>Todavía no hay partidos en el calendario.</p></div>
+  } @else {
+  <!-- Selector de jornadas -->
+  <div class="chips" #selector role="tablist" aria-label="Jornadas">
+    @for (j of jornadas(); track j.jornada_id) {
+    <button
+      type="button"
+      role="tab"
+      class="chip"
+      [class.activo]="j.jornada_id === jornadaId()"
+      [class.en-juego]="j.jornada_estado === 'EN_JUEGO'"
+      [attr.data-jornada]="j.jornada_id"
+      [attr.aria-selected]="j.jornada_id === jornadaId()"
+      [attr.aria-label]="'Jornada ' + j.numero_jornada + ', ' + textoEstado[j.jornada_estado]"
+      (click)="seleccionar(j.jornada_id)"
+    >
+      J{{ j.numero_jornada }}
+      <!-- Badge: verde parpadeante = en juego · amarillo = la próxima por jugar · cerradas sin badge -->
+      @if (j.jornada_estado === 'EN_JUEGO') {
+      <span class="punto en_juego" aria-hidden="true"></span>
+      } @else if (j.jornada_id === idSiguiente()) {
+      <span class="punto siguiente" aria-hidden="true"></span>
+      }
+    </button>
+    }
+  </div>
+
+  @if (jornada(); as j) {
+  <div class="cabecera-jornada">
+    <h3>Jornada {{ j.numero_jornada }}</h3>
+    <span [class]="'estado ' + j.jornada_estado.toLowerCase()">{{ textoEstado[j.jornada_estado] }}</span>
+  </div>
+
+  @for (g of grupos(); track g.titulo) {
+  <h4 class="dia">{{ g.titulo }}</h4>
+  <ul class="partidos">
+    @for (p of g.partidos; track p.partido_id) {
+    @let c = centro(p);
+    <li>
+      <!-- Solo los partidos con acta se pueden abrir -->
+      <button
+        type="button"
+        class="partido"
+        [class.con-acta]="p.tiene_acta"
+        [disabled]="!p.tiene_acta"
+        (click)="abrirActa(p)"
+        [attr.aria-label]="
+          p.local.nombre + ' contra ' + p.visitante.nombre + (c.tipo === 'resultado' ? ', ' + c.texto : '') +
+          (p.tiene_acta ? '. Ver acta' : '')
+        "
+      >
+        <span class="fecha" [class.sin-fecha]="!p.fecha_local">{{ fechaCompleta(p) }}</span>
+
+        <span class="equipo local">
+          <span class="nombre">{{ p.local.nombre }}</span>
+          <img class="escudo" [src]="p.local.escudo || 'assets/escudos/default.png'" alt="" width="30" height="30" loading="lazy" />
+        </span>
+
+        <span [class]="'centro ' + c.tipo">{{ c.texto }}</span>
+
+        <span class="equipo visitante">
+          <img class="escudo" [src]="p.visitante.escudo || 'assets/escudos/default.png'" alt="" width="30" height="30" loading="lazy" />
+          <span class="nombre">{{ p.visitante.nombre }}</span>
+        </span>
+
+        @if (p.tiene_acta) {
+        <span class="ver-acta" aria-hidden="true">
+          <ion-icon name="document-text-outline"></ion-icon>
+          Acta
+          <ion-icon name="chevron-forward"></ion-icon>
+        </span>
+        }
+      </button>
+    </li>
+    }
+  </ul>
+  } @empty {
+  <div class="sin-partidos">
+    <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
+    <p><strong>Partidos por asignar</strong>Aún no se han asignado los partidos de la jornada {{ j.numero_jornada }}.</p>
+  </div>
+  }
+  }
+  }
+  }
+  }
+</section>
