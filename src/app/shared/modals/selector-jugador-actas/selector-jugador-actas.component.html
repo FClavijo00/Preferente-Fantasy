@@ -27,7 +27,7 @@
     }
   </header>
 
-  <div class="pf-modal-cuerpo">
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
     @if (permitirVacio && !busqueda()) {
     <button type="button" class="opcion vaciar" [class.activa]="seleccionado === null" (click)="elegir(null)">
       <span class="chip-vacio" aria-hidden="true"><ion-icon name="remove-circle-outline"></ion-icon></span>

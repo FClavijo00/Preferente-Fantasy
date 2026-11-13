@@ -4,7 +4,16 @@
    - .pf-dialogo: escritorio. Tarjeta centrada.
    El componente de dentro NO debe usar ion-content (Ionic no calcula la altura automática con él):
    usa .pf-modal-cuerpo, que hace scroll si el contenido no cabe.
+   IMPORTANTE: .pf-modal-cuerpo debe llevar también la clase "ion-content-scroll-host".
+   Es lo que mira el gesto del sheet para saber si hay scroll: sin ella, al hacer scroll
+   hacia arriba el sheet se arrastra y puede cerrarse.
+     <div class="pf-modal-cuerpo ion-content-scroll-host">…</div>
    ========================================================================== */
+
+/* El scroll del cuerpo no se "contagia" al sheet ni rebota la página de detrás */
+.pf-modal-cuerpo {
+  overscroll-behavior: contain;
+}
 
 ion-modal.pf-sheet,
 ion-modal.pf-dialogo {

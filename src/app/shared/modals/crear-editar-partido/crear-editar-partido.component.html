@@ -11,7 +11,7 @@
     </button>
   </header>
 
-  <form class="pf-modal-cuerpo" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <form class="pf-modal-cuerpo ion-content-scroll-host" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
     <!-- Aviso: editar un partido con acta la borra -->
     @if (tieneActa()) {
     <div class="aviso-acta" [class.activo]="hayCambios()" role="status">

@@ -6,7 +6,7 @@
     </button>
   </header>
 
-  <form class="pf-modal-cuerpo" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <form class="pf-modal-cuerpo ion-content-scroll-host" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
     <!-- ===== Foto (aro del color de la posición) ===== -->
     <div class="foto-bloque">
       <label [class]="'foto ' + (posicion()?.toLowerCase() ?? '')" title="Cambiar foto">
