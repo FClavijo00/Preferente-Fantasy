@@ -1,0 +1,256 @@
+/* Ranking de jugadores: filtro por posición, filas pulsables y "Ver más" */
+
+:host {
+  display: block;
+}
+
+/* ---------- Filtro por posición ---------- */
+.filtros {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filtro {
+  --c: #ffffff;
+  --c-rgb: 255, 255, 255;
+
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ion-color-slate-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &.todos { --c: var(--ion-color-pitch); --c-rgb: 0, 230, 118; }
+  &.por { --c: #81c784; --c-rgb: var(--pf-pos-por-rgb); }
+  &.def { --c: #ffb27a; --c-rgb: var(--pf-pos-def-rgb); }
+  &.med { --c: #4fc3f7; --c-rgb: var(--pf-pos-med-rgb); }
+  &.del { --c: #ff8a80; --c-rgb: var(--pf-pos-del-rgb); }
+
+  &.activo {
+    color: var(--c);
+    border-color: rgba(var(--c-rgb), 0.55);
+    background: rgba(var(--c-rgb), 0.16);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Lista ---------- */
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Columnas: puesto · jugador · PTS · media */
+.cabecera-lista,
+.fila {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 34px 34px;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.cabecera-lista {
+  padding: 0 10px 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ion-color-slate-muted);
+}
+
+.fila {
+  width: 100%;
+  padding: 8px 10px;
+  /* Mismo fondo y filo que las filas de la clasificación y las cards de partidos */
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 1px;
+  }
+}
+
+.col-puesto {
+  text-align: center;
+}
+
+/* Solo el número de cada fila; el "#" de la cabecera hereda su tamaño */
+.fila .col-puesto {
+  font-size: 0.85rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--ion-color-slate-muted);
+
+  &.puesto-1 { color: #fbbf24; }
+  &.puesto-2 { color: #cbd5e1; }
+  &.puesto-3 { color: #d97706; }
+}
+
+.col-jugador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.identidad {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+
+  .nombre {
+    max-width: 100%;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pf-chip-pos {
+    width: 32px;
+    height: 20px;
+    font-size: 0.58rem;
+    border-radius: 5px;
+  }
+}
+
+.col-num {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.fila .pts {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--ion-color-pitch);
+}
+
+.fila .media {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ion-color-slate-muted);
+}
+
+/* ---------- Ver más ---------- */
+.btn-ver-mas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  .restantes {
+    font-weight: 600;
+    color: var(--ion-color-slate-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Carga / error / vacío ---------- */
+.esqueleto {
+  cursor: default;
+
+  ion-skeleton-text {
+    margin: 0;
+    --background: rgba(255, 255, 255, 0.08);
+  }
+
+  .sk-puesto {
+    width: 16px;
+    height: 14px;
+    justify-self: center;
+  }
+
+  .sk-avatar {
+    display: none;
+  }
+
+  .sk-nombre {
+    grid-column: 2 / -1;
+    height: 50px;
+    border-radius: 25px;
+  }
+}
+
+.vacio {
+  padding: 24px 8px;
+  text-align: center;
+
+  p {
+    margin: 0 0 12px;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.vacio-texto {
+  margin: 0;
+  padding: 20px 8px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--ion-color-slate-muted);
+}
+
+.btn-reintentar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 230, 118, 0.55);
+  background: transparent;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

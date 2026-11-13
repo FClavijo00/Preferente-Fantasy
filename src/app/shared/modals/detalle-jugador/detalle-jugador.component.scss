@@ -1,340 +1,385 @@
-.jugador-detalle-content {
-  --background: var(--ion-color-stadium);
+/* Detalle del jugador: tarjeta centrada (cssClass "card-modal-center") con detalles neón */
+
+:host {
+  position: relative;
+  display: block;
 }
 
-.jugador-card {
+.tarjeta {
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 16px 14px;
+  border-radius: 20px;
   background: #121212;
-  border: 1px solid rgba(0, 255, 102, 0.15);
-  border-radius: 16px;
-  margin: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-  min-height: 65vh;
+  color: #ffffff;
+}
 
-  ion-card-content {
-    padding: 14px;
+/* Cerrar: flotando sobre la esquina superior derecha, fuera de la tarjeta
+   (cards-modal.scss deja el contenido del modal sin recortar para este modal) */
+.btn-cerrar {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 255, 102, 0.45);
+  background: #121212;
+  color: #ffffff;
+  font-size: 1.15rem;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(0, 255, 102, 0.25);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #00ff66;
+    outline-offset: 2px;
   }
 }
 
-.jugador-header {
+/* ---------- Cabecera ---------- */
+.cabecera {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-
-  /* Avatar con anillo neón */
-  .jugador-avatar {
-    width: 58px;
-    height: 58px;
-    min-width: 58px;
-    border-radius: 50%;
-    /* border: 2px solid #00ff66; */
-    box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
-    overflow: hidden;
-
-    &.por {
-      border: 2px solid #43a047;
-    }
-    &.def {
-      border: 2px solid #f18436;
-    }
-    &.med {
-      border: 2px solid #0288d1;
-    }
-    &.del {
-      border: 2px solid var(--ion-color-red-card);
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  /* Info central */
-  .player-info-div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    min-width: 0; // Evita saltos raros si el nombre es muy largo
-
-    .jugador-nombre {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-
-    .posicion-badge {
-      //background: rgba(0, 255, 102, 0.12);
-      //color: #00ff66;
-      //border: 1px solid rgba(0, 255, 102, 0.4);
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-
-      &.por {
-        background: rgba(67, 160, 71, 0.12);
-        border: 1px solid rgba(67, 160, 71, 0.4);
-        color: #43a047;
-      }
-      &.def {
-        background: rgba(241, 132, 54, 0.12);
-        border: 1px solid rgba(241, 132, 54, 0.4);
-        color: #f18436;
-      }
-      &.med {
-        background: rgba(2, 136, 209, 0.12);
-        border: 1px solid #0288d1;
-        color: #0288d1;
-      }
-      &.del {
-        background: rgba(255, 0, 0, 0.12);
-        border: 1px solid var(--ion-color-red-card);
-        color: var(--ion-color-red-card);
-      }
-    }
-  }
-
-  /* Bloque de estadísticas */
-  .player-pts-div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .stat-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 6px 10px;
-      min-width: 48px;
-
-      .stat-value {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #ffffff;
-        line-height: 1;
-      }
-
-      .stat-label {
-        font-size: 0.6rem;
-        font-weight: 600;
-        color: #8e8e93;
-        margin-top: 3px;
-        text-transform: uppercase;
-      }
-
-      /* Resaltado especial para los Puntos Totales */
-      &.highlight {
-        background: rgba(0, 255, 102, 0.08);
-        border-color: rgba(0, 255, 102, 0.3);
-
-        .stat-value {
-          color: #00ff66;
-          text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
-        }
-
-        .stat-label {
-          color: rgba(0, 255, 102, 0.8);
-        }
-      }
-    }
-  }
 }
 
-.equipo-logo {
-        position: absolute;
-    width: 25px;
-    height: 25px;
-    bottom: 10px;
-    left: 50px;
-    opacity: 0.9;
+.avatar {
+  filter: drop-shadow(0 0 8px rgba(0, 255, 102, 0.3));
 }
 
-.lesion-div, .disponible-div {
+.identidad {
+  flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
+  min-width: 0;
+
+  h2 {
+    width: 100%;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+/* La posición usa el chip global .pf-chip-pos (theme/posiciones.scss) */
+/* Igual que en el panel de Jugadores: píldora roja suave, sin neón */
+.lesion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 82, 82, 0.14);
+  color: #ff8a80;
+  font-size: 0.66rem;
+  font-weight: 700;
 
   ion-icon {
-    font-size: 1rem;
-    color: #ffffff;
-  }
-
-  span {
-    color: #ffffff;
-    margin: 0;
+    font-size: 0.8rem;
   }
 }
 
-/* Líneas divisorias neón */
+/* PTS y media */
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  .stat-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-label {
+    margin-top: 3px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #8e8e93;
+    text-transform: uppercase;
+  }
+
+  &.highlight {
+    background: rgba(0, 255, 102, 0.08);
+    border-color: rgba(0, 255, 102, 0.3);
+
+    .stat-value {
+      color: #00ff66;
+      text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+    }
+
+    .stat-label {
+      color: rgba(0, 255, 102, 0.8);
+    }
+  }
+}
+
+/* ---------- Separadores: neón y gris ---------- */
 .divider {
   height: 1px;
+  margin: 16px 0;
   background: linear-gradient(
-    90deg, 
-    rgba(0, 255, 102, 0) 0%, 
-    rgba(0, 255, 102, 0.3) 50%, 
+    90deg,
+    rgba(0, 255, 102, 0) 0%,
+    rgba(0, 255, 102, 0.3) 50%,
     rgba(0, 255, 102, 0) 100%
   );
-  margin: 16px 0;
 
   &.secondary {
+    margin: 12px 0 16px;
     background: rgba(255, 255, 255, 0.08);
-    margin: 12px 0 16px 0;
   }
 }
 
-/* Carrusel horizontal de Jornadas (Scroll sin scrollbar) */
-.jornadas-scroll-container {
+/* ---------- Jornadas (más reciente primero) ---------- */
+.jornadas {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0 -14px;
+  padding: 6px 14px;
   overflow-x: auto;
-  padding: 4px 2px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Oculta barra en Firefox */
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    display: none; /* Oculta barra en Chrome/Safari */
-  }
-
-  .jornada-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 52px;
-    padding: 8px 6px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    .jornada-num {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: #8e8e93;
-      text-transform: uppercase;
-    }
-
-    .jornada-pts {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #ffffff;
-      margin-top: 2px;
-
-      &.positive {
-        color: #00ff66;
-      }
-      &.zero {
-        color: #8e8e93;
-      }
-    }
-
-    /* Estado cuando la jornada está seleccionada */
-    &.active {
-      background: rgba(0, 255, 102, 0.12);
-      border-color: #00ff66;
-      box-shadow: 0 0 12px rgba(0, 255, 102, 0.25);
-      transform: scale(1.05);
-
-      .jornada-num {
-        color: #00ff66;
-      }
-    }
-  }
-
-  .no-data {
-    font-size: 0.8rem;
-    color: #8e8e93;
-    width: 100%;
-    text-align: center;
+    display: none;
   }
 }
 
-/* Sección Desglose de Puntos */
-.desglose-section {
-  .desglose-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
+.jornada-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 52px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  font: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-    h3 {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin: 0;
-    }
+  .jornada-num {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #8e8e93;
+    text-transform: uppercase;
+  }
 
-    .total-badge {
-      background: rgba(0, 255, 102, 0.15);
+  /* Gris (0), verde (positivo) o rojo (negativo), sin tonos intermedios */
+  .jornada-pts {
+    margin-top: 2px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #8e8e93;
+
+    &.positive {
       color: #00ff66;
-      border: 1px solid rgba(0, 255, 102, 0.3);
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 8px;
+    }
+    &.negative {
+      color: #ff4d4d;
     }
   }
 
-  .desglose-grid {
+  /* Seleccionada: neón del color de su puntuación (verde, rojo o gris) */
+  --neon: #00ff66;
+  --neon-rgb: 0, 255, 102;
+
+  &.negative {
+    --neon: #ff4d4d;
+    --neon-rgb: 255, 77, 77;
+  }
+
+  &.zero {
+    --neon: #8e8e93;
+    --neon-rgb: 142, 142, 147;
+  }
+
+  &.active {
+    background: rgba(var(--neon-rgb), 0.12);
+    border-color: var(--neon);
+    box-shadow: 0 0 12px rgba(var(--neon-rgb), 0.25);
+    transform: scale(1.05);
+
+    .jornada-num {
+      color: var(--neon);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #00ff66;
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Desglose ---------- */
+.desglose-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+}
+
+.total-badge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: rgba(0, 255, 102, 0.15);
+  color: #00ff66;
+  border: 1px solid rgba(0, 255, 102, 0.3);
+
+  &.zero {
+    background: rgba(255, 255, 255, 0.06);
+    color: #8e8e93;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &.negative {
+    background: rgba(255, 77, 77, 0.12);
+    color: #ff4d4d;
+    border-color: rgba(255, 77, 77, 0.35);
+  }
+}
+
+.desglose-grid {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
 
-  .desglose-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+.desglose-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 
-    .stat-name {
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #e0e0e0;
-    }
-
-    .stat-val {
-      font-size: 0.88rem;
-      font-weight: 700;
-
-      &.positive {
-        color: #00ff66;
-        text-shadow: 0 0 6px rgba(0, 255, 102, 0.3);
-      }
-      &.negative {
-        color: #ff4d4d;
-        text-shadow: 0 0 6px rgba(255, 77, 77, 0.3);
-      }
-      &.neutral {
-        color: #8e8e93;
-      }
-    }
+  .stat-name {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #e0e0e0;
   }
 
-  .no-desglose {
-    font-size: 0.8rem;
+  .stat-val {
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
     color: #8e8e93;
-    text-align: center;
-    padding: 12px 0;
+
+    &.positive {
+      color: #00ff66;
+      text-shadow: 0 0 6px rgba(0, 255, 102, 0.3);
+    }
+    &.negative {
+      color: #ff4d4d;
+      text-shadow: 0 0 6px rgba(255, 77, 77, 0.3);
+    }
   }
 }
+
+.no-data {
+  width: 100%;
+  margin: 0;
+  padding: 12px 0;
+  font-size: 0.8rem;
+  color: #8e8e93;
+  text-align: center;
+}
+
+/* ---------- Carga / error ---------- */
+.sk-avatar {
+  width: 58px;
+  height: 58px;
+  margin: 0;
+  flex-shrink: 0;
+  border-radius: 50%;
+  --background: rgba(255, 255, 255, 0.08);
+}
+
+.sk-textos {
+  flex: 1;
+
+  ion-skeleton-text {
+    border-radius: 6px;
+    --background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.sk-bloque {
+  height: 160px;
+  margin: 0;
+  border-radius: 12px;
+  --background: rgba(255, 255, 255, 0.06);
+}
+
+.vacio {
+  padding: 24px 8px 8px;
+  text-align: center;
+
+  p {
+    margin: 0 0 12px;
+    color: #8e8e93;
+  }
+}
+
+.btn-reintentar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 102, 0.45);
+  background: transparent;
+  color: #00ff66;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }

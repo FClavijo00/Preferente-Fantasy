@@ -1,0 +1,84 @@
+<!-- Filtro por posición -->
+<div class="filtros" role="tablist" aria-label="Filtrar por posición">
+  @for (f of filtros; track f) {
+  <button
+    type="button"
+    role="tab"
+    [class]="'filtro ' + f.toLowerCase()"
+    [class.activo]="filtro() === f"
+    [attr.aria-selected]="filtro() === f"
+    (click)="filtrar(f)"
+  >
+    {{ f === 'TODOS' ? 'Todos' : f }}
+  </button>
+  }
+</div>
+
+@switch (estado()) {
+@case ('cargando') {
+<div class="lista" aria-busy="true">
+  @for (_ of esqueletos; track $index) {
+  <div class="fila esqueleto">
+    <ion-skeleton-text animated class="sk-puesto"></ion-skeleton-text>
+    <ion-skeleton-text animated class="sk-avatar"></ion-skeleton-text>
+    <ion-skeleton-text animated class="sk-nombre"></ion-skeleton-text>
+  </div>
+  }
+</div>
+}
+
+@case ('error') {
+<div class="vacio">
+  <p>No se ha podido cargar el ranking.</p>
+  <button type="button" class="btn-reintentar" (click)="cargar()">
+    <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+    Reintentar
+  </button>
+</div>
+}
+
+@default {
+<div class="lista">
+  <div class="cabecera-lista" aria-hidden="true">
+    <span class="col-puesto">#</span>
+    <span class="col-jugador">Jugador</span>
+    <span class="col-num">PTS</span>
+    <span class="col-num">Media</span>
+  </div>
+
+  @for (j of mostradas(); track j.jugador_id) {
+  <button
+    type="button"
+    class="fila"
+    (click)="abrirDetalle(j)"
+    [attr.aria-label]="j.puesto + '. ' + nombre(j) + ', ' + j.puntos_totales_temporada + ' puntos'"
+  >
+    <span [class]="'col-puesto puesto-' + j.puesto">{{ j.puesto }}</span>
+
+    <span class="col-jugador">
+      <app-avatar-jugador [foto]="j.foto" [escudo]="j.escudo" [posicion]="j.posicion" [tamano]="50" />
+      <span class="identidad">
+        <span class="nombre">{{ nombre(j) }}</span>
+        <span [class]="'pf-chip-pos ' + j.posicion.toLowerCase()">{{ j.posicion }}</span>
+      </span>
+    </span>
+
+    <span class="col-num pts">{{ j.puntos_totales_temporada }}</span>
+    <span class="col-num media">{{ j.media | number: '1.1-1' }}</span>
+  </button>
+  } @empty {
+  <p class="vacio-texto">
+    {{ filtro() === 'TODOS' ? 'Aún no hay puntos registrados.' : 'Ningún jugador de esta posición ha puntuado aún.' }}
+  </p>
+  }
+</div>
+
+@if (restantes() > 0) {
+<button type="button" class="btn-ver-mas" (click)="verMas()">
+  Ver más
+  <span class="restantes">({{ restantes() }})</span>
+  <ion-icon name="chevron-down-outline" aria-hidden="true"></ion-icon>
+</button>
+}
+}
+}

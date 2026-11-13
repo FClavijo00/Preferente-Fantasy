@@ -1,101 +1,103 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
-import { IonContent } from '@ionic/angular/ion-content';
-import { IonAvatar } from '@ionic/angular/ion-avatar';
-import { IonCardContent } from '@ionic/angular/ion-card-content';
-import { IonCard } from '@ionic/angular/ion-card';
-import { IonBadge } from '@ionic/angular/ion-badge';
-import { IonIcon } from '@ionic/angular/ion-icon';
+import { afterNextRender, Component, computed, ElementRef, inject, Injector, Input, OnInit, signal, viewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { checkmarkCircle, medkit } from 'ionicons/icons';
+import { firstValueFrom } from 'rxjs';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
+import { closeOutline, medkitOutline, refreshOutline } from 'ionicons/icons';
+import { ConceptoPuntos, DetalleJugador, JugadoresService } from '../../../core/services/jugadores-service';
+import { AvatarJugadorComponent } from '../../components/avatar-jugador/avatar-jugador.component';
 
+/**
+ * Detalle de un jugador (modal centrado, cssClass "card-modal-center").
+ * Genérico: recibe solo el id y carga lo demás al abrirse.
+ *
+ *   modalCtrl.create({ component: DetalleJugadorComponent, cssClass: 'card-modal-center',
+ *                      componentProps: { jugadorId: 186 } })
+ */
 @Component({
   selector: 'app-detalle-jugador',
   templateUrl: './detalle-jugador.component.html',
   styleUrls: ['./detalle-jugador.component.scss'],
-  imports: [
-    IonCard,
-    IonCardContent,
-    IonAvatar,
-    DecimalPipe
-  ],
+  imports: [IonIcon, IonSkeletonText, DecimalPipe, AvatarJugadorComponent],
 })
 export class DetalleJugadorComponent implements OnInit {
-  @Input() jugador: any;
+  /** Lo pasa quien abre el modal con componentProps */
+  @Input() jugadorId!: number;
 
-  public media = signal<number>(0);
+  private _jugadoresService = inject(JugadoresService);
+  private _modalCtrl = inject(ModalController);
+  private _injector = inject(Injector);
 
-  // Signal para controlar qué jornada se muestra abajo
-  jornadaSeleccionada = signal<any | null>(null);
+  private readonly chipsRef = viewChild<ElementRef<HTMLElement>>('chips');
+
+  readonly jugador = signal<DetalleJugador | null>(null);
+  readonly estado = signal<'cargando' | 'listo' | 'error'>('cargando');
+  readonly jornadaId = signal<number | null>(null);
+
+  readonly jornada = computed(
+    () => this.jugador()?.historial.find((h) => h.jornada_id === this.jornadaId()) ?? null,
+  );
+
+  /** Desglose en orden lógico: participación, resultado, goles, tarjetas, bonus y destacado. */
+  readonly desglose = computed(() => {
+    const d = this.jornada()?.desglose;
+    if (!d) return [];
+    const filas = [
+      d.participacion,
+      d.resultado,
+      ...(d.goles ?? []),
+      ...(d.tarjetas ?? []),
+      ...(d.bonusEquipo ?? []),
+      d.destacado,
+    ];
+    return filas.filter((f): f is ConceptoPuntos => !!f && !!f.concepto);
+  });
 
   constructor() {
-    addIcons({
-      medkit,
-      checkmarkCircle
-    })
-  }
-
-  calcularMedia() {
-    let media = 0;
-    if (this.jugador.puntuaciones_jornada.length > 0) {
-      this.jugador.puntuaciones_jornada.forEach((puntuacion: any) => {
-        media += puntuacion.puntos;
-      });
-      media = media / this.jugador.puntuaciones_jornada.length;
-    }
-    return media || 0;
-  }
-
-  // Convierte el objeto JSON de desglose en una lista simple para el template
-  getDesgloseArray(desglose: any): Array<{ concepto: string; puntos: number }> {
-    if (!desglose) return [];
-
-    const items: Array<{ concepto: string; puntos: number }> = [];
-
-    // 1. Array de tarjetas (amarilla, roja)
-    if (Array.isArray(desglose.tarjetas)) {
-      desglose.tarjetas.forEach((t: any) => {
-        if (t.puntos !== 0) items.push({ concepto: t.concepto, puntos: t.puntos });
-      });
-    }
-
-    // 2. Array de goles
-    if (Array.isArray(desglose.goles)) {
-      desglose.goles.forEach((g: any) => {
-        if (g.puntos !== 0) items.push({ concepto: g.concepto, puntos: g.puntos });
-      });
-    }
-
-    // 3. Array de bonus de equipo (ej. Portería a cero)
-    if (Array.isArray(desglose.bonusEquipo)) {
-      desglose.bonusEquipo.forEach((b: any) => {
-        if (b.puntos !== 0) items.push({ concepto: b.concepto, puntos: b.puntos });
-      });
-    }
-
-    // 4. Objetos individuales: participacion, resultado, destacado
-    const objetosClave = ['participacion', 'resultado', 'destacado'];
-    objetosClave.forEach((key) => {
-      const item = desglose[key];
-      if (item && item.concepto && item.puntos !== undefined) {
-        // Opcional: Si quieres ocultar conceptos de 0 puntos (como "Partido Perdido"), filtra aquí.
-        // Si prefieres mostrarlos, quita la condición `item.puntos !== 0`.
-        items.push({ concepto: item.concepto, puntos: item.puntos });
-      }
-    });
-
-    return items;
-  }
-
-  seleccionarJornada(item: any) {
-    this.jornadaSeleccionada.set(item);
+    addIcons({ closeOutline, medkitOutline, refreshOutline });
   }
 
   ngOnInit() {
-    if (this.jugador?.puntuaciones_jornada?.length > 0) {
-      const ultimaJornada = this.jugador.puntuaciones_jornada[0];
-      this.jornadaSeleccionada.set(ultimaJornada);
+    this.cargar();
+  }
+
+  async cargar() {
+    this.estado.set('cargando');
+    try {
+      const res = await firstValueFrom(this._jugadoresService.getDetalleJugador(this.jugadorId));
+      this.jugador.set(res.data);
+      this.estado.set('listo');
+      // Se abre la jornada más reciente
+      const ultima = res.data.historial[0];
+      if (ultima) this.seleccionar(ultima.jornada_id, 'auto');
+    } catch {
+      this.estado.set('error');
     }
-    this.media.set(this.calcularMedia());
+  }
+
+  nombre(j: DetalleJugador): string {
+    return j.apodo?.trim() || `${j.nombre} ${j.apellidos ?? ''}`.trim();
+  }
+
+  seleccionar(jornadaId: number, desplazamiento: ScrollBehavior = 'smooth') {
+    this.jornadaId.set(jornadaId);
+    // Centra el chip elegido en la fila de jornadas
+    afterNextRender(
+      () => {
+        const chip = this.chipsRef()?.nativeElement.querySelector<HTMLElement>(`[data-jornada="${jornadaId}"]`);
+        chip?.scrollIntoView({ behavior: desplazamiento, inline: 'center', block: 'nearest' });
+      },
+      { injector: this._injector },
+    );
+  }
+
+  signo(puntos: number): string {
+    return puntos > 0 ? `+${puntos}` : String(puntos);
+  }
+
+  cerrar() {
+    this._modalCtrl.dismiss();
   }
 }

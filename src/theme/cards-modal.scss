@@ -22,6 +22,13 @@
     overflow: hidden;
   }
 
+  /* Detalles de jugador y equipo: el botón de cerrar flota sobre la esquina, así que el
+     contenido no se recorta (la propia tarjeta lleva el redondeo y el scroll) */
+  &:has(app-detalle-jugador)::part(content),
+  &:has(app-detalle-equipo)::part(content) {
+    overflow: visible;
+  }
+
   &::part(backdrop) {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px); /* Compatibilidad con Safari/iOS */

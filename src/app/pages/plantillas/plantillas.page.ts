@@ -137,9 +137,7 @@ export class PlantillasPage implements OnInit {
       component: DetalleJugadorComponent,
       cssClass: 'card-modal-center', // Clase CSS para estilizar el modal
       backdropDismiss: true,
-      componentProps: {
-        jugador: jugador
-      },
+      componentProps: { jugadorId: jugador.id },
     });
 
     await modal.present();
