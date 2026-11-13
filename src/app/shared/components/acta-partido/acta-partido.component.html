@@ -1,138 +1,168 @@
-<ion-content class="acta-partido-container">
-
-  @if(partido()) {
-
-  <!-- 1. MARCADOR DEL PARTIDO -->
-  <div class="match-header-card">
-    <div class="scoreboard">
-      <!-- Equipo Local -->
-      <div class="team local">
-        <img [src]="partido()?.escudo_local" class="shield" [alt]="partido()?.nombre_local" />
-        <span class="siglas">{{ partido()?.siglas_local }}</span>
-      </div>
-
-      <!-- Resultado / Goles -->
-      <div class="score-box">
-        <span class="goals">{{ partido()?.goles_local ?? 0 }}</span>
-        <span class="divider-match">-</span>
-        <span class="goals">{{ partido()?.goles_visitante ?? 0 }}</span>
-      </div>
-
-      <!-- Equipo Visitante -->
-      <div class="team visitante">
-        <span class="siglas">{{ partido()?.siglas_visitante }}</span>
-        <img [src]="partido()?.escudo_visitante" class="shield" [alt]="partido()?.nombre_visitante" />
-      </div>
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      @if (acta(); as a) {
+      <h2>Jornada {{ a.numero_jornada }}</h2>
+      @if (fecha(); as f) {
+      <span class="fecha">{{ f }}</span>
+      }
+      } @else {
+      <h2>Acta del partido</h2>
+      }
     </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
 
-    <!-- Subtítulo de Jornada y Estado -->
-    <div class="match-info">
-      <span class="jornada-badge">Jornada {{ partido()?.numero_jornada }}</span>
+  <div class="pf-modal-cuerpo">
+    @switch (estado()) {
+    @case ('cargando') {
+    <ion-skeleton-text animated class="sk-marcador"></ion-skeleton-text>
+    <ion-skeleton-text animated class="sk-bloque"></ion-skeleton-text>
+    }
+
+    @case ('error') {
+    <div class="vacio">
+      <p>No se ha podido cargar el acta.</p>
+      <button type="button" class="btn-reintentar" (click)="cargar()">
+        <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+        Reintentar
+      </button>
     </div>
+    }
+
+    @default {
+    @if (acta(); as a) {
+    <!-- ===== Marcador ===== -->
+    <section class="marcador" [attr.aria-label]="a.nombre_local + ' ' + a.goles_local + ', ' + a.nombre_visitante + ' ' + a.goles_visitante">
+      <div class="equipo">
+        <img [src]="a.escudo_local || 'assets/escudos/default.png'" alt="" width="56" height="56" />
+        <span class="nombre-equipo">{{ a.nombre_local }}</span>
+      </div>
+
+      <div class="resultado" aria-hidden="true">
+        <span>{{ a.goles_local }}</span>
+        <span class="guion">-</span>
+        <span>{{ a.goles_visitante }}</span>
+      </div>
+
+      <div class="equipo">
+        <img [src]="a.escudo_visitante || 'assets/escudos/default.png'" alt="" width="56" height="56" />
+        <span class="nombre-equipo">{{ a.nombre_visitante }}</span>
+      </div>
+    </section>
+
+    @if (a.estadio) {
+    <p class="estadio">
+      <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
+      {{ a.estadio }}
+    </p>
+    }
+
+    <!-- ===== Eventos: goles · tarjetas · destacado ===== -->
+    @if (hayEventos()) {
+    <section class="eventos" aria-label="Eventos del partido">
+      @if (linea().length) {
+      <!-- Línea de tiempo: barra central, local a la izquierda y visitante a la derecha -->
+      <ol class="linea">
+        @for (ev of linea(); track ev.clave) {
+        <li [class]="'evento ' + ev.lado">
+          <span class="evento-contenido">
+            @if (ev.tipo === 'gol') {
+            <ion-icon name="football" class="icono-gol" aria-hidden="true"></ion-icon>
+            } @else {
+            <span [class]="'tarjeta grande ' + ev.tarjeta" aria-hidden="true"></span>
+            }
+            <span class="evento-nombre">{{ ev.jugador }}</span>
+            @if (ev.marca) { <small>{{ ev.marca }}</small> }
+            <span class="oculto">
+              {{ ev.tipo === 'gol' ? 'gol' : ev.tarjeta === 'roja' ? 'tarjeta roja' : ev.tarjeta === 'doble' ? 'doble amarilla' : 'tarjeta amarilla' }}
+            </span>
+          </span>
+          <span class="evento-hito" aria-hidden="true">
+            @if (ev.minuto !== null) {
+            <span class="minuto">{{ ev.minuto }}'</span>
+            } @else {
+            <span class="punto"></span>
+            }
+          </span>
+        </li>
+        }
+      </ol>
+      }
+
+      @if (a.eventos.destacado; as d) {
+      <p class="destacado">
+        <ion-icon name="star" aria-hidden="true"></ion-icon>
+        <span>Jugador Destacado: <strong>{{ d.jugador }}</strong></span>
+      </p>
+      }
+    </section>
+    }
+
+    <div class="divider"></div>
+
+    <!-- ===== Alineaciones (local | visitante) ===== -->
+    <section class="alineaciones" aria-label="Alineaciones y puntos">
+      @for (lado of [
+        { nombre: a.siglas_local || a.nombre_local, escudo: a.escudo_local, titulares: titularesLocal(), suplentes: suplentesLocal() },
+        { nombre: a.siglas_visitante || a.nombre_visitante, escudo: a.escudo_visitante, titulares: titularesVisitante(), suplentes: suplentesVisitante() }
+      ]; track $index) {
+      <div class="columna">
+        <h3 class="columna-titulo">
+          <img [src]="lado.escudo || 'assets/escudos/default.png'" [alt]="lado.nombre" width="20" height="20" />
+          Titulares
+        </h3>
+
+        @if (lado.titulares.length || lado.suplentes.length) {
+        <ul class="jugadores">
+          @for (j of lado.titulares; track j.id) {
+          <li>
+            <ng-container [ngTemplateOutlet]="filaJugador" [ngTemplateOutletContext]="{ $implicit: j }" />
+          </li>
+          }
+        </ul>
+
+        @if (lado.suplentes.length) {
+        <span class="grupo">Suplentes</span>
+        <ul class="jugadores">
+          @for (j of lado.suplentes; track j.id) {
+          <li>
+            <ng-container [ngTemplateOutlet]="filaJugador" [ngTemplateOutletContext]="{ $implicit: j }" />
+          </li>
+          }
+        </ul>
+        }
+        } @else {
+        <p class="sin-datos">Sin datos de alineación</p>
+        }
+      </div>
+      }
+    </section>
+    }
+    }
+    }
   </div>
+</div>
 
-  <!-- 2. LISTADO EN 2 COLUMNAS (LOCAL vs VISITANTE) -->
-  <div class="teams-grid">
-
-    <!-- Columna Equipo Local -->
-    <div class="team-column">
-      <div class="column-header">
-        <h3>{{ partido()?.nombre_local }}</h3>
-      </div>
-
-      <ion-list class="players-list">
-        @for (jugador of jugadoresLocalTitulares(); track jugador.id) {
-        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
-          detail="false">
-          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
-            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
-          </ion-avatar>
-
-          <ion-label>
-            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
-            <p class="player-pos">{{ jugador.posicion }}</p>
-          </ion-label>
-
-          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
-            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
-          </div>
-        </ion-item>
-        } @empty {
-        <div class="empty-col">Sin datos de alineación</div>
-        }
-
-        <div class="divider"></div>
-
-        @for (jugador of jugadoresLocalSuplentes(); track jugador.id) {
-        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
-          detail="false">
-          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
-            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
-          </ion-avatar>
-
-          <ion-label>
-            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
-            <p class="player-pos">{{ jugador.posicion }}</p>
-          </ion-label>
-
-          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
-            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
-          </div>
-        </ion-item>
-        }
-      </ion-list>
-    </div>
-
-    <!-- Columna Equipo Visitante -->
-    <div class="team-column">
-      <div class="column-header">
-        <h3>{{ partido()?.nombre_visitante }}</h3>
-      </div>
-
-      <ion-list class="players-list">
-        @for (jugador of jugadoresVisitanteTitulares(); track jugador.id) {
-        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
-          detail="false">
-          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
-            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
-          </ion-avatar>
-
-          <ion-label>
-            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
-            <p class="player-pos">{{ jugador.posicion }}</p>
-          </ion-label>
-
-          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
-            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
-          </div>
-        </ion-item>
-        } @empty {
-        <div class="empty-col">Sin datos de alineación</div>
-        }
-
-        <div class="divider"></div>
-
-        @for (jugador of jugadoresVisitanteSuplentes(); track jugador.id) {
-        <ion-item mode="ios" button class="player-item" (click)="verDesglosePuntos(jugador)" lines="none"
-          detail="false">
-          <ion-avatar slot="start" class="player-avatar" [class]="jugador.posicion.toLowerCase()">
-            <img [src]="jugador.foto || 'assets/images/default-player.png'" [alt]="jugador.apodo" />
-          </ion-avatar>
-
-          <ion-label>
-            <h2 class="player-name">{{ jugador.apodo || jugador.nombre + ' ' + jugador.apellidos }}</h2>
-            <p class="player-pos">{{ jugador.posicion }}</p>
-          </ion-label>
-
-          <div slot="end" class="pts-badge" [class.negative]="jugador.puntos_jornada < 0">
-            {{ jugador.puntos_jornada > 0 ? '+' : '' }}{{ jugador.puntos_jornada }}
-          </div>
-        </ion-item>
-        }
-      </ion-list>
-    </div>
-
-  </div>
-  }
-
-</ion-content>
+<!-- Fila de un jugador: foto, nombre, eventos y puntos (abre el desglose de la jornada) -->
+<ng-template #filaJugador let-j>
+  <button type="button" class="jugador" (click)="verDesglosePuntos(j)"
+    [attr.aria-label]="nombre(j) + ', ' + j.puntos_jornada + ' puntos. Ver desglose'">
+    <app-avatar-jugador [foto]="j.foto" [posicion]="j.posicion" [tamano]="32" />
+    <span class="jugador-textos">
+      <span class="jugador-nombre">{{ nombre(j) }}</span>
+      @if (resumen(j); as r) {
+      <span class="jugador-eventos" aria-hidden="true">
+        @if (r.destacado) { <ion-icon name="star" class="ev-destacado"></ion-icon> }
+        @for (g of repetir(r.goles); track g) { <ion-icon name="football" class="ev-gol"></ion-icon> }
+        @for (t of r.tarjetas; track $index) { <span [class]="'tarjeta ' + t"></span> }
+      </span>
+      }
+    </span>
+    <span class="puntos" [class.positivo]="j.puntos_jornada > 0" [class.negativo]="j.puntos_jornada < 0">
+      {{ signo(j.puntos_jornada) }}
+    </span>
+  </button>
+</ng-template>

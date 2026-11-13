@@ -56,6 +56,59 @@ export interface PayloadActa {
   jugador_destacado_id: number | null;
 }
 
+/* ---------- Acta pública (getActaPartidoPuntos) ---------- */
+
+export interface JugadorActaPublica {
+  id: number;
+  nombre: string;
+  apellidos: string | null;
+  apodo: string | null;
+  posicion: string;
+  foto: string | null;
+  /** Equipo con el que jugó ESE partido */
+  equipo_id: number;
+  titular: boolean;
+  puntos_jornada: number;
+  desglose: unknown;
+}
+
+export interface EventoActaPublica {
+  id: number;
+  jugador_id: number;
+  jugador: string;
+  /** Goles: equipo al que sube el gol (también en propia). Tarjetas: equipo del jugador. */
+  equipo_id: number;
+  tipo: string;
+  minuto: number | null;
+}
+
+export interface ActaPublica {
+  partido_id: number;
+  jornada_id: number;
+  numero_jornada: number;
+  goles_local: number;
+  goles_visitante: number;
+  jugado: boolean;
+  tiene_acta: boolean;
+  fecha_local: string | null;
+  estadio: string | null;
+  equipo_local_id: number;
+  nombre_local: string;
+  siglas_local: string | null;
+  escudo_local: string | null;
+  equipo_visitante_id: number;
+  nombre_visitante: string;
+  siglas_visitante: string | null;
+  escudo_visitante: string | null;
+  jugadores_local: JugadorActaPublica[];
+  jugadores_visitante: JugadorActaPublica[];
+  eventos: {
+    goles: EventoActaPublica[];
+    tarjetas: EventoActaPublica[];
+    destacado: { jugador_id: number; jugador: string; equipo_id: number | null } | null;
+  };
+}
+
 @Service()
 export class PartidosService {
   private http = inject(HttpClient);
@@ -94,6 +147,8 @@ export class PartidosService {
   }
 
   getActaPartidoPuntos(partidoId: number) {
-    return this.http.post(`${this.apiUrl}/getActaPartidoPuntos`, { partido_id: partidoId });
+    return this.http.post<{ ok: boolean; data: ActaPublica }>(`${this.apiUrl}/getActaPartidoPuntos`, {
+      partido_id: partidoId,
+    });
   }
 }
