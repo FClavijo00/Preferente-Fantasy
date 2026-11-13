@@ -146,6 +146,7 @@ export class PerfilPage implements OnInit {
     if (this.usersLiga().length > 1) {
       const alert = await this._alertCtrl.create({
         mode: 'ios',
+        cssClass: ['pf-alert', 'pf-alert-peligro'],
         backdropDismiss: false,
         header: `Abandonar "${this.liga?.nombre_liga}"`,
         message:
@@ -168,10 +169,11 @@ export class PerfilPage implements OnInit {
     } else {
       const alert = await this._alertCtrl.create({
         mode: 'ios',
+        cssClass: ['pf-alert', 'pf-alert-peligro'],
         backdropDismiss: false,
         header: `Abandonar "${this.liga?.nombre_liga}"`,
         message:
-          `Eres el unico usuario en la liga. Si abandonas la liga, perderas tu equipo y puntos y además, desaparecerá tu liga. ¿Deseas abandonar la liga?`,
+          `Eres el único usuario de la liga. Si la abandonas, perderás tu equipo y tus puntos, y la liga desaparecerá. ¿Deseas abandonarla?`,
         buttons: [
           {
             text: 'Cancelar',
@@ -251,6 +253,7 @@ export class PerfilPage implements OnInit {
   async abrirEliminarCuenta() {
     const alert = await this._alertCtrl.create({
       mode: 'ios',
+      cssClass: ['pf-alert', 'pf-alert-peligro'],
       backdropDismiss: false,
       header: 'Eliminar cuenta',
       message:

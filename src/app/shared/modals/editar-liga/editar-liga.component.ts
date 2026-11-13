@@ -7,24 +7,22 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import {
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonTitle,
-  ModalController,
-  IonContent,
-  IonIcon,
-  IonInput,
-  IonToggle,
-  IonItem,
-  IonLabel,
-  IonBadge,
-  IonAvatar,
-  IonList,
-  AlertController,
-} from '@ionic/angular';
+import { IonHeader } from '@ionic/angular/ion-header';
+import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonButtons } from '@ionic/angular/ion-buttons';
+import { IonButton } from '@ionic/angular/ion-button';
+import { IonTitle } from '@ionic/angular/ion-title';
+import { ModalController } from '@ionic/angular/modal-controller';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonInput } from '@ionic/angular/ion-input';
+import { IonToggle } from '@ionic/angular/ion-toggle';
+import { IonItem } from '@ionic/angular/ion-item';
+import { IonLabel } from '@ionic/angular/ion-label';
+import { IonBadge } from '@ionic/angular/ion-badge';
+import { IonAvatar } from '@ionic/angular/ion-avatar';
+import { IonList } from '@ionic/angular/ion-list';
+import { AlertController } from '@ionic/angular/alert-controller';
 import { addIcons } from 'ionicons';
 import { keyOutline, trashOutline, trophyOutline } from 'ionicons/icons';
 import { LoadingService } from '../../../core/services/loading.service';
@@ -81,16 +79,17 @@ export class EditarLigaComponent implements OnInit {
   async confirmarEliminarUsuario(usuario: any) {
     const alert = await this._alertCtrl.create({
       mode: 'ios',
+      cssClass: ['pf-alert', 'pf-alert-peligro'],
       backdropDismiss: false,
-      header: `Eliminar al usuario:  ${usuario.nombre_usuario}`,
-      message: `¿Deseas eliminar al usuario de la liga: ${this.ligaData?.nombre_liga}?`,
+      header: `¿Expulsar a @${usuario.nombre_usuario}?`,
+      message: `Saldrá de «${this.ligaData?.nombre_liga}» y perderá su equipo y sus puntos en esta liga.`,
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
         },
         {
-          text: 'Eliminar',
+          text: 'Expulsar',
           handler: () => {
             this.eliminarUsuarioLiga(usuario);
           },
