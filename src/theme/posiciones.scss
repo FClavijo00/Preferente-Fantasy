@@ -15,38 +15,50 @@
 }
 
 /*
- * Chip con la abreviatura de la posición: <span class="pf-chip-pos def">DEF</span>
- * El texto se aclara un poco para que se lea bien sobre el fondo oscuro.
+ * Chip con la abreviatura de la posición, estilo neón: <span class="pf-chip-pos def">DEF</span>
+ * Fondo suave, filo y texto del color de la posición. El contenido va centrado
+ * (box-sizing para que el filo no lo desplace y padding-left que compensa el letter-spacing).
  */
 .pf-chip-pos {
+  --pos: #ffffff;
+  --pos-rgb: 255, 255, 255;
+
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 38px;
-  height: 26px;
+  height: 22px;
+  padding: 0 0 0 0.5px;
   flex-shrink: 0;
-  border-radius: 7px;
-  font-size: 0.66rem;
-  font-weight: 900;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--pos-rgb), 0.45);
+  background: rgba(var(--pos-rgb), 0.12);
+  color: var(--pos);
+  font-size: 0.64rem;
+  font-weight: 800;
+  line-height: 1;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px rgba(var(--pos-rgb), 0.35);
 
   &.por {
-    color: #81c784;
-    background: rgba(var(--pf-pos-por-rgb), 0.18);
+    --pos: var(--pf-pos-por);
+    --pos-rgb: var(--pf-pos-por-rgb);
   }
 
   &.def {
-    color: #ffb27a;
-    background: rgba(var(--pf-pos-def-rgb), 0.18);
+    --pos: var(--pf-pos-def);
+    --pos-rgb: var(--pf-pos-def-rgb);
   }
 
   &.med {
-    color: #4fc3f7;
-    background: rgba(var(--pf-pos-med-rgb), 0.2);
+    --pos: #29a3e6; /* algo más claro que --pf-pos-med para que se lea sobre oscuro */
+    --pos-rgb: var(--pf-pos-med-rgb);
   }
 
   &.del {
-    color: #ff8a80;
-    background: rgba(var(--pf-pos-del-rgb), 0.18);
+    --pos: var(--pf-pos-del);
+    --pos-rgb: var(--pf-pos-del-rgb);
   }
 }
