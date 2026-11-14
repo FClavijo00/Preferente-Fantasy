@@ -30,6 +30,27 @@ interface ApiResponse<T> {
   data: T;
 }
 
+/** Jugador en activo de un equipo, para la pantalla Plantillas (getPlantillaEquipo). */
+export interface JugadorPlantillaEquipo {
+  id: number;
+  nombre: string;
+  apellidos: string | null;
+  apodo: string | null;
+  posicion: 'POR' | 'DEF' | 'MED' | 'DEL';
+  lesionado: boolean;
+  foto: string | null;
+  puntos_totales: number;
+  /** Jornadas en las que ha puntuado (para la media) */
+  jornadas_jugadas: number;
+}
+
+export interface PlantillaEquipo {
+  /** Puesto y puntos en la clasificación (null si aún no hay) */
+  clasificacion: { posicion: number; pts: number } | null;
+  /** Ordenados por posición y, dentro de cada una, por puntos */
+  jugadores: JugadorPlantillaEquipo[];
+}
+
 /** Partido ya disputado, visto desde el equipo del detalle. */
 export interface PartidoEquipo {
   partido_id: number;
@@ -85,10 +106,9 @@ export class EquiposService {
       .pipe(map((res) => res.data));
   }
 
-  getEquipos(): Observable<Equipo[]> {
-    return this.http
-      .get<ApiResponse<Equipo[]>>(`${this.apiUrl}` + '/getEquipos')
-      .pipe(map((res) => res.data));
+  /** Jugadores de un equipo con puntos y media, y su puesto en la clasificación (pantalla Plantillas). */
+  getPlantillaEquipo(equipoId: number) {
+    return this.http.post<ApiResponse<PlantillaEquipo>>(`${this.apiUrl}/getPlantillaEquipo`, { equipo_id: equipoId });
   }
 
   getDetalleEquipo(equipoId: number) {

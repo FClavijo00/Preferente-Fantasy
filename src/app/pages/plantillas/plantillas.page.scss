@@ -1,242 +1,473 @@
-/* Header y Título */
-ion-content {
+/* Plantillas: misma estructura que la sección de jugadores del panel, con puntos y media */
+
+.plantillas-content {
   --background: var(--ion-color-stadium);
+  color: #ffffff;
 }
 
-.fantasy-title {
-  font-family: "Titillium Web", sans-serif;
-  font-weight: 700;
-  color: #00e676;
-  letter-spacing: 0.8px;
-}
-
-/* Fila Horizontal Scrollable de Escudos */
-.team-selector-scroll {
+/* ---------- Barra de equipos ---------- */
+.equipos {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 12px;
-  background-color: var(--ion-color-stadium);
-  border-bottom: 1px solid #1a3023;
-  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  scroll-snap-type: x proximity;
+  /* Sin esto, el ajuste del scroll pega el primer/último botón al borde ignorando el padding */
+  scroll-padding-inline: 16px;
+  scrollbar-width: none;
 
-  /* Ocultar scrollbar estándar en móviles */
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 
-  .team-badge-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 68px;
-    cursor: pointer;
-    opacity: 0.4;
-    transition:
-      transform 0.2s ease,
-      opacity 0.2s ease;
-
-    .shield-container {
-      width: 54px;
-      height: 54px;
-      //border-radius: 50%;
-      //background-color: var(--ion-item-background, #121F17);
-      //border: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      //padding: 6px;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-    }
-
-    .team-name {
-      margin-top: 6px;
-      font-size: 0.7rem;
-      color: #ffffff;
-      text-align: center;
-      white-space: nowrap;
-      max-width: 72px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Estado Seleccionado */
-    &.active {
-      opacity: 1;
-      transform: scale(1.1);
-
-      /* .shield-container {
-        border-color: var(--ion-color-primary, #00E676);
-        box-shadow: 0 0 12px rgba(0, 230, 118, 0.35);
-        background-color: #172B1F;
-      } */
-
-      .team-name {
-        color: var(--ion-color-primary, #00e676);
-        font-weight: 700;
-      }
-    }
+  /* En un contenedor con scroll, el padding derecho se pierde: este hueco lo sustituye */
+  &::after {
+    content: '';
+    flex: 0 0 8px;
   }
 }
 
-/* Sección de la plantilla */
-.section-header {
+.equipo {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ion-color-slate-muted);
+  font: inherit;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+
+  &.activo {
+    border-color: var(--ion-color-pitch);
+    background: rgba(0, 230, 118, 0.1);
+    box-shadow: 0 0 12px rgba(0, 230, 118, 0.2);
+  }
+
+  &.esqueleto ion-skeleton-text {
+    --background: rgba(255, 255, 255, 0.08);
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    border-radius: 50%;
+  }
+}
+
+.escudo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+
+  img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+  }
+
+  ion-icon {
+    font-size: 1.6rem;
+  }
+}
+
+.equipos-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--ion-color-slate-muted);
+}
+
+.btn-texto {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Cabecera del equipo ---------- */
+.seccion {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px 16px 32px;
+}
+
+.seccion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+
+  img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+}
+
+.titulo-textos {
+  min-width: 0;
 
   h2 {
-    font-family: "Titillium Web", sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
     margin: 0;
-    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .player-count {
+  p {
+    margin: 2px 0 0;
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: var(--ion-color-slate-muted);
   }
 }
 
-/* Lista de Jugadores */
-.fantasy-player-list {
+/* Puesto en la clasificación: abre el detalle del equipo */
+.btn-clasificacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 8px 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 230, 118, 0.45);
+  background: rgba(0, 230, 118, 0.1);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+
+  .puesto {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--ion-color-pitch);
+    text-shadow: 0 0 6px rgba(0, 230, 118, 0.35);
+  }
+
+  .pts {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ion-color-slate-muted);
+    white-space: nowrap;
+  }
+
+  ion-icon {
+    font-size: 0.95rem;
+    color: var(--ion-color-slate-muted);
+  }
+
+  &:active {
+    background: rgba(0, 230, 118, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Buscador y orden ---------- */
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
+
+  &:focus-within {
+    border-color: var(--ion-color-pitch);
+  }
+
+  ion-icon {
+    color: var(--ion-color-slate-muted);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+.orden {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  button {
+    flex: 1;
+    height: 30px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ion-color-slate-muted);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &.activo {
+      background: rgba(0, 230, 118, 0.16);
+      color: var(--ion-color-pitch);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ion-color-pitch);
+      outline-offset: 1px;
+    }
+  }
+}
+
+/* ---------- Lista ---------- */
+/* Columnas: jugador · PTS · media (las mismas en la cabecera y en las filas) */
+.columnas,
+.jugador {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px 40px;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.columnas {
+  margin-top: 14px;
+  /* Mismo padding (+ el borde) que las filas, para que las columnas cuadren */
+  padding: 0 11px 2px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--ion-color-slate-muted);
+}
+
+.col-num {
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.grupo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 8px;
+  padding-left: 10px;
+  border-left: 3px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  &.por { color: var(--pf-pos-por); }
+  &.def { color: var(--pf-pos-def); }
+  &.med { color: var(--pf-pos-med); }
+  &.del { color: var(--pf-pos-del); }
+
+  .contador {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ion-color-slate-muted);
+    letter-spacing: 0;
+  }
+}
+
+/* Sin grupos (orden por puntos o media): separación con la cabecera de columnas */
+.columnas + .lista {
+  margin-top: 6px;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jugador {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 1px;
+  }
+}
+
+.col-jugador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nombre {
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detalle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 0.72rem;
+  color: var(--ion-color-slate-muted);
+
+  .pf-chip-pos {
+    width: 34px;
+    height: 20px;
+    font-size: 0.6rem;
+  }
+
+  .completo {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-weight: 700;
+
+  &.lesion {
+    color: #ff8a80;
+    background: rgba(255, 82, 82, 0.14);
+  }
+}
+
+/* El dato por el que se ordena, resaltado */
+.pts,
+.media {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ion-color-slate-muted);
+
+  &.destacado {
+    font-size: 1.02rem;
+    font-weight: 900;
+    color: var(--ion-color-pitch);
+  }
+}
+
+/* ---------- Carga / error / vacío ---------- */
+.sk-fila {
+  height: 62px;
+  margin: 0;
+  border-radius: 14px;
+  --background: rgba(255, 255, 255, 0.07);
+}
+
+.lista[aria-busy='true'] {
+  margin-top: 14px;
+}
+
+.estado-vacio {
+  margin-top: 14px;
+  padding: 32px 20px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  text-align: center;
+
+  ion-icon {
+    font-size: 2rem;
+    color: var(--ion-color-pitch);
+  }
+
+  p {
+    margin: 8px 0 14px;
+    color: var(--ion-color-slate-muted);
+    font-size: 0.9rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.btn-reintentar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 230, 118, 0.55);
   background: transparent;
-  padding: 0 16px;
-
-  .player-item {
-    --background: #121f17;
-    --border-radius: 12px;
-    margin-bottom: 8px;
-    --border-width: 1px;
-    --border-color: rgba(255, 255, 255, 0.1);
-
-    //padding: 8px 0px;
-
-    .pos-avatar {
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.75rem;
-      border-radius: 8px;
-
-      &.por {
-        background-color: #ffb300;
-        color: #000;
-      }
-      &.def {
-        background-color: #1e88e5;
-        color: #fff;
-      }
-      &.med {
-        background-color: #43a047;
-        color: #fff;
-      }
-      &.del {
-        background-color: #e53935;
-        color: #fff;
-      }
-    }
-
-    .player-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      &.por {
-        border: 2px solid #43a047;
-      }
-      &.def {
-        border: 2px solid #f18436;
-      }
-      &.med {
-        border: 2px solid #0288d1;
-      }
-      &.del {
-        border: 2px solid var(--ion-color-red-card);
-      }
-    }
-
-    .player-name {
-      font-family: "Titillium Web", sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .player-value {
-      font-size: 0.8rem;
-      color: #94a3b8;
-    }
-
-    .pts-label {
-      font-size: 0.65rem;
-      display: block;
-      color: #94a3b8;
-      margin-bottom: 2px;
-    }
-
-    .pts-badge {
-      font-size: 0.85rem;
-      padding: 4px 8px;
-    }
-
-    .player-stats {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      .puntos-span {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--ion-color-pitch);
-        line-height: 1;
-      }
-      .pts-label {
-        font-size: 0.75rem;
-        display: block;
-        color: #94a3b8;
-        margin: 2px 0 0 0;
-      }
-    }
-  }
-}
-
-ion-segment {
-  --background: var(--ion-color-turf-surface);
-  border-radius: 0 !important;
-
-  ion-segment-button {
-    &.por-segment {
-      --indicator-color: #43a047;
-    }
-    &.def-segment {
-      --indicator-color: #f18436;
-    }
-    &.med-segment {
-      --indicator-color: #0288d1;
-    }
-    &.del-segment {
-      --indicator-color: var(--ion-color-red-card);
-    }
-  }
-}
-
-.lesion-icon {
-  position: relative;
-  bottom: 55px;
-  left: 35px;
-  width: 20px;
-  height: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
