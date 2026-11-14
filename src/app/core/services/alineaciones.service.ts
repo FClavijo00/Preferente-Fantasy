@@ -2,21 +2,59 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
+export type RolHueco = 'POR' | 'DEF' | 'MED' | 'DEL';
+
+/** Jugador guardado en un hueco de la alineación del usuario (cargarAlineacion). */
+export interface JugadorPlantilla {
+    hueco_index: number;
+    posicion: RolHueco;
+    id: number;
+    nombre: string;
+    apodo: string | null;
+    foto: string | null;
+    lesionado: boolean | null;
+    activo: boolean | null;
+    equipo_id: number;
+    equipo_nombre: string;
+    equipo_escudo: string | null;
+}
+
+export interface PlantillaUsuario {
+    /** false si no hay nada guardado para la jornada (o si es la propuesta de una anterior) */
+    existe: boolean;
+    /** Con "anterior": número de la jornada de la que se ha copiado la propuesta */
+    de_jornada?: number | null;
+    formacion_id: number;
+    jugadores: JugadorPlantilla[];
+}
+
+export interface PayloadAlineacion {
+    liga_id: number;
+    jornada_id: number;
+    formacion_id: number;
+    jugadores: { jugador_id: number; posicion: RolHueco; hueco_index: number }[];
+}
+
 @Service()
 export class AlineacionesService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiBaseURL}/alineaciones`;
 
-    cargarAlineacion(data: any) {
-        return this.http.post(`${this.apiUrl}/cargarAlineacion`, data);
+    /**
+     * Alineación de un usuario en una jornada. Con anterior = true (solo la tuya), si aún no hay
+     * nada guardado devuelve la última de una jornada anterior, sin guardarla (existe = false).
+     */
+    cargarAlineacion(data: { liga_id: number; usuario_id: number; jornada_id: number; anterior?: boolean }) {
+        return this.http.post<PlantillaUsuario>(`${this.apiUrl}/cargarAlineacion`, data);
     }
 
     cargarAlineacionesJornadas(data: any) {
         return this.http.post(`${this.apiUrl}/cargarAlineacionesJornadas`, data);
     }
 
-    guardarAlineacion(payload: any) {
-        return this.http.post(`${this.apiUrl}/guardarAlineacion`, payload);
+    /** El backend valida la hora de cierre y el once (409 si la jornada ya empezó, 400 si no es válido). */
+    guardarAlineacion(payload: PayloadAlineacion) {
+        return this.http.post<{ ok: boolean; mensaje?: string }>(`${this.apiUrl}/guardarAlineacion`, payload);
     }
 
     cargarOnceIdeal(jornadaID: number) {

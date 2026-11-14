@@ -9,6 +9,7 @@ describe('MiniCalendarioComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MiniCalendarioComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('partidos', []);
     fixture.detectChanges();
   });
 

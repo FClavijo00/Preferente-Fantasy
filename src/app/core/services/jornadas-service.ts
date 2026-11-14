@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { map, Observable } from 'rxjs';
+import type { PartidoMini } from '../../shared/components/mini-calendario/mini-calendario.component';
 
 interface ApiResponse<T> {
   ok: boolean;
@@ -12,6 +13,17 @@ interface ApiResponse<T> {
 export type EstadoJornada = 'PENDIENTE' | 'EN_JUEGO' | 'CERRADA';
 
 /** Jornada tal como la ve el panel de control. Fechas en hora de España: "YYYY-MM-DDTHH:mm". */
+/** Próxima jornada pendiente (jornadas/getSiguienteJornada). */
+export interface SiguienteJornada {
+  id: number;
+  numero_jornada: number;
+  estado: EstadoJornada;
+  /** Hora de España tal cual: "YYYY-MM-DDTHH:mm". Es la hora de cierre de las alineaciones. */
+  fecha_limite: string;
+  /** Segundos que faltan para el cierre, calculados en el servidor (negativo si ya pasó) */
+  segundos_restantes: number;
+}
+
 export interface JornadaAdmin {
   id: number;
   numero_jornada: number;
@@ -58,9 +70,9 @@ export class JornadasService {
       .pipe(map((res) => res.data));
   }
 
-  getSiguienteJornada(): Observable<[]> {
+  getSiguienteJornada(): Observable<SiguienteJornada> {
     return this.http
-      .get<ApiResponse<[]>>(`${this.apiUrl}` + '/getSiguienteJornada')
+      .get<ApiResponse<SiguienteJornada>>(`${this.apiUrl}` + '/getSiguienteJornada')
       .pipe(map((res) => res.data));
   }
 
@@ -86,8 +98,9 @@ export class JornadasService {
     return this.http.get(`${this.apiUrl}/getJornadasOnceIdeal`);
   }
 
-  cargarPartidosJornada(jornada: number) {
-    return this.http.post(`${this.apiUrl}/cargarPartidosJornada`, {jornadaId: jornada});
+  /** Partidos de una jornada. Cada pantalla usa los campos que necesita (por defecto, los del mini calendario). */
+  cargarPartidosJornada<T = PartidoMini>(jornada: number) {
+    return this.http.post<ApiResponse<T[]>>(`${this.apiUrl}/cargarPartidosJornada`, { jornadaId: jornada });
   }
 
   cambiarEstadoJornada(data: { jornadaId: number; estado: EstadoJornada }) {

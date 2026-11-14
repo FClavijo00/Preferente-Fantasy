@@ -1,30 +1,20 @@
-<div class="mini-calendario-grid">
-  @for (partido of miniCalendario; track partido.partido_id) {
-    <div class="mini-match-card">
-      <!-- Equipo Local -->
-      <div class="equipo local" [title]="partido.local_nombre">
-        <img 
-          [src]="partido.local_escudo || 'assets/images/default-shield.png'" 
-          [alt]="partido.local_nombre" 
-          class="escudo" 
-        />
-      </div>
-
-      <!-- VS Badge -->
-      <div class="marcador-box">
-        <span class="vs-badge">VS</span>
-      </div>
-
-      <!-- Equipo Visitante -->
-      <div class="equipo visitante" [title]="partido.visitante_nombre">
-        <img 
-          [src]="partido.visitante_escudo || 'assets/images/default-shield.png'" 
-          [alt]="partido.visitante_nombre" 
-          class="escudo" 
-        />
-      </div>
+<ul class="rejilla" aria-label="Partidos de la jornada">
+  @for (p of partidos(); track p.partido_id) {
+  <li class="partido" [attr.aria-label]="p.local_nombre + ' contra ' + p.visitante_nombre + ', ' + (cuando(p) ?? 'fecha por confirmar')">
+    <div class="enfrentamiento" aria-hidden="true">
+      <img class="escudo" [src]="p.local_escudo || 'assets/escudos/default.png'" alt="" width="22" height="22"
+        loading="lazy" [title]="p.local_nombre" />
+      <span class="vs">VS</span>
+      <img class="escudo" [src]="p.visitante_escudo || 'assets/escudos/default.png'" alt="" width="22" height="22"
+        loading="lazy" [title]="p.visitante_nombre" />
     </div>
+    @if (cuando(p); as c) {
+    <span class="cuando" aria-hidden="true">{{ c }}</span>
+    } @else {
+    <span class="cuando sin-fecha" aria-hidden="true">Por confirmar</span>
+    }
+  </li>
   } @empty {
-    <div class="empty-state">No hay partidos cargados</div>
+  <li class="vacio">No hay partidos cargados</li>
   }
-</div>
+</ul>

@@ -160,9 +160,7 @@ export class CalendarioAdminComponent implements OnInit {
 
     this.estadoPartidos.set('cargando');
     try {
-      const res = (await firstValueFrom(this._jornadasService.cargarPartidosJornada(id))) as {
-        data: PartidoJornada[];
-      };
+      const res = await firstValueFrom(this._jornadasService.cargarPartidosJornada<PartidoJornada>(id));
       // Si mientras tanto se eligió otra jornada, esta respuesta ya no vale
       if (this.jornadaId() !== id) return;
       this.partidos.set(res.data ?? []);

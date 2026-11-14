@@ -1,99 +1,143 @@
 <app-header titulo="Alineación"></app-header>
 
 <ion-content class="alineacion-content" [fullscreen]="true">
-  <!-- Contenedor principal del campo de fútbol -->
-  <div class="pitch-container">
-    <!-- Banner de Jornada Objetivo -->
-    @if (jornadaObjetivo(); as j) {
-    <div class="jornada-header-banner">
-      <div class="jornada-info">
-        <span class="badge-jornada">Alineación J{{ j.numero_jornada }}</span>
-        @if (j.estado === 'PENDIENTE') {
-        <span class="fecha-limite">Fecha Limite: {{ j.fecha_inicio_formateada}} - {{ j.hora_inicio_formateada }}</span>
-        }
-      </div>
-      <div class="guardar-div">
-        <ion-button class="neon-button" (click)="guardarAlineacion()">
-          Guardar
-        </ion-button>
-      </div>
-    </div>
-    <div class="jornada-header-banner">
-      <app-mini-calendario [jornada]="jornadaObjetivo()" [miniCalendario]="miniCalendario()"></app-mini-calendario>
+  <div class="pagina">
+    @switch (estado()) {
+    @case ('cargando') {
+    <ion-skeleton-text animated class="sk-cabecera"></ion-skeleton-text>
+    <ion-skeleton-text animated class="sk-campo"></ion-skeleton-text>
+    }
+
+    @case ('error') {
+    <div class="vacio">
+      <p>No se ha podido cargar la alineación.</p>
+      <button type="button" class="btn-reintentar" (click)="cargar()">
+        <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+        Reintentar
+      </button>
     </div>
     }
 
-    <!-- Selector de Formación Flotante -->
-    <div class="formation-selector-wrapper">
-      <ion-select interface="popover" [value]="formacionSeleccionada()" (ionChange)="cambiarFormacion($event)"
-        class="neon-select">
-        @for (f of formaciones(); track f.id) {
-        <ion-select-option [value]="f.id">{{ f.formacion }}</ion-select-option>
+    @case ('sin-jornada') {
+    <div class="vacio">
+      <p>No hay ninguna jornada pendiente para alinear.</p>
+    </div>
+    }
+
+    @default {
+    @if (jornada(); as j) {
+    <!-- ===== Cabecera: jornada, cierre y guardar ===== -->
+    <section class="tarjeta cabecera">
+      <!-- Jornada y fecha límite a la izquierda; guardar a la derecha, del alto de los dos textos -->
+      <div class="cabecera-fila">
+        <div class="cabecera-textos">
+          <h2>Jornada {{ j.numero_jornada }}</h2>
+          @if (fechaCierre(); as f) {
+          <span class="fecha-cierre">{{ abierta() ? 'Fecha límite' : 'Cerró' }}: {{ f }}</span>
+          }
+        </div>
+
+        @if (abierta()) {
+        <button type="button" class="btn-guardar" [class.listo]="puedeGuardar()"
+          [class.guardado]="!hayCambios() && alineados() === 11" [disabled]="!puedeGuardar()" (click)="guardar()">
+          @if (alineados() < 11) {
+          <span class="contador-once">{{ alineados() }}/11</span>
+          } @else if (!hayCambios()) {
+          <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
+          Guardada
+          } @else {
+          Guardar
+          }
+        </button>
         }
-      </ion-select>
-    </div>
-
-    <!-- Terreno de juego con las filas generadas dinámicamente -->
-    <div class="pitch-grass">
-      <!-- Líneas decorativas del campo -->
-      <div class="pitch-lines">
-        <div class="center-circle"></div>
-        <div class="center-line"></div>
-        <div class="penalty-box top"></div>
-        <div class="penalty-box bottom"></div>
       </div>
 
-      <!-- Jugadores renderizados con Flexbox -->
-      <div class="players-grid">
-        <!-- Línea de Delanteros -->
-        <div class="pitch-row">
-          @for (slot of delanteros(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Línea de Mediocampistas -->
-        <div class="pitch-row">
-          @for (slot of medios(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Línea de Defensas -->
-        <div class="pitch-row">
-          @for (slot of defensas(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Portero -->
-        <div class="pitch-row">
-          @for (slot of portero(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-      </div>
-    </div>
-    <!-- Template reutilizable para cada slot de jugador -->
-    <ng-template #slotTemplate let-slot>
-      <div class="player-slot">
-        @if (slot.jugador) {
-        <div class="player-card" [class]="slot.rol !== slot.jugador.posicion ? 'out-position' : ''"
-          (click)="abrirSelectorJugador(slot)">
-          <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
-          @if (slot.rol !== slot.jugador.posicion) {
-          <ion-icon class="warning-icon" name="warning"></ion-icon>
-          }
-          <span class="player-name">{{ slot.jugador.apodo || slot.jugador.nombre }}</span>
-          <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
-        </div>
+      <!-- Avisos debajo -->
+      @if (!abierta()) {
+      <p class="aviso aviso-cerrada">
+        <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
+        Jornada en juego · alineación bloqueada
+      </p>
+      }
+      @if (abierta() && hayCambios() && (copiadaDe() || (alineados() === 11 && !bajas()))) {
+      <p class="aviso aviso-cambios">
+        @if (copiadaDe(); as n) {
+        Cargada tu alineación de la jornada {{ n }}: revísala y guárdala para esta jornada.
         } @else {
-        <div class="empty-slot" (click)="abrirSelectorJugador(slot)">
-          <ion-icon name="add"></ion-icon>
-          <span class="rol-badge">{{ slot.rol }}</span>
+        Tienes cambios sin guardar
+        }
+      </p>
+      }
+      @if (bajas()) {
+      <p class="aviso aviso-baja">
+        <ion-icon name="warning" aria-hidden="true"></ion-icon>
+        {{ bajas() === 1 ? 'Un jugador de tu once ya no está disponible: cámbialo para guardar.' : bajas() + ' jugadores de tu once ya no están disponibles: cámbialos para guardar.' }}
+      </p>
+      }
+
+      <!-- ===== Mini calendario de la jornada ===== -->
+      @if (partidos().length) {
+      <div class="separador"></div>
+      <app-mini-calendario [partidos]="partidos()" />
+      }
+    </section>
+
+    <!-- ===== Formación ===== -->
+    <div class="formaciones" role="radiogroup" aria-label="Formación">
+      @for (f of formaciones(); track f.id) {
+      <button type="button" role="radio" class="formacion" [class.activa]="formacionId() === f.id"
+        [attr.aria-checked]="formacionId() === f.id" [disabled]="!abierta() && formacionId() !== f.id"
+        (click)="cambiarFormacion(f)">
+        {{ f.formacion }}
+      </button>
+      }
+    </div>
+
+    <!-- ===== Campo ===== -->
+    <section class="campo" [class.bloqueado]="!abierta()" aria-label="Tu once">
+      <div class="lineas-campo" aria-hidden="true">
+        <span class="area arriba"></span>
+        <span class="medio-campo"></span>
+        <span class="circulo"></span>
+        <span class="area abajo"></span>
+      </div>
+
+      <div class="filas">
+        @for (linea of porLinea(); track linea.rol) {
+        <div class="fila" [attr.aria-label]="linea.rol">
+          @for (h of linea.huecos; track h.index) {
+          <ng-container *ngTemplateOutlet="huecoTpl; context: { $implicit: h }" />
+          }
         </div>
         }
       </div>
-    </ng-template>
+    </section>
+    }
+    }
+    }
   </div>
 </ion-content>
+
+<!-- Un hueco del campo: jugador o "+" -->
+<ng-template #huecoTpl let-h>
+  @if (h.jugador; as j) {
+  <button type="button" class="hueco" [disabled]="!abierta()" (click)="abrirSelector(h)"
+    [attr.aria-label]="h.rol + ': ' + nombre(j) + (j.lesionado ? ', lesionado' : '') + (!j.activo ? ', no disponible' : '') + (abierta() ? '. Cambiar' : '')">
+    <span class="foto" [class.baja]="!j.activo">
+      <app-avatar-jugador [foto]="j.foto" [escudo]="j.equipo_escudo" [posicion]="j.posicion" [tamano]="50" />
+      @if (!j.activo) {
+      <span class="marca baja" aria-hidden="true"><ion-icon name="warning"></ion-icon></span>
+      } @else if (j.lesionado) {
+      <span class="marca lesion" aria-hidden="true"><ion-icon name="medkit"></ion-icon></span>
+      }
+    </span>
+    <span class="nombre">{{ nombre(j) }}</span>
+  </button>
+  } @else {
+  <button type="button" [class]="'hueco vacio-hueco ' + h.rol.toLowerCase()" [disabled]="!abierta()"
+    (click)="abrirSelector(h)" [attr.aria-label]="'Elegir ' + h.rol">
+    <span class="mas" aria-hidden="true"><ion-icon name="add"></ion-icon></span>
+    <span [class]="'pf-chip-pos ' + h.rol.toLowerCase()" aria-hidden="true">{{ h.rol }}</span>
+  </button>
+  }
+</ng-template>

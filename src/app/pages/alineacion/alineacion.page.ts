@@ -1,56 +1,109 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NgTemplateOutlet } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { IonContent } from '@ionic/angular/ion-content';
 import { IonIcon } from '@ionic/angular/ion-icon';
-import { IonSelect } from '@ionic/angular/ion-select';
-import { IonSelectOption } from '@ionic/angular/ion-select-option';
+import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
 import { ModalController } from '@ionic/angular/modal-controller';
-import { IonButton } from '@ionic/angular/ion-button';
+import { addIcons } from 'ionicons';
+import {
+  add,
+  checkmarkCircle,
+  lockClosedOutline,
+  medkit,
+  refreshOutline,
+  warning,
+} from 'ionicons/icons';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { LoadingService } from '../../core/services/loading.service';
-import { JornadasService } from '../../core/services/jornadas-service';
-import { addIcons } from 'ionicons';
-import { add, warning } from 'ionicons/icons';
-import { JugadoresService } from '../../core/services/jugadores-service';
-import { SelectJugadoresComponent } from '../../shared/modals/select-jugadores/select-jugadores.component';
+import { JornadasService, SiguienteJornada } from '../../core/services/jornadas-service';
+import { JugadorDisponible } from '../../core/services/jugadores-service';
 import { EquiposService } from '../../core/services/equipos-service';
-import { MiniCalendarioComponent } from '../../shared/components/mini-calendario/mini-calendario.component';
 import { FormacionesService } from '../../core/services/formaciones.service';
-import { Ligas, LigasService } from '../../core/services/ligas.service';
+import { LigasService } from '../../core/services/ligas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth-service.service';
 import { EstadoAlineacionService } from '../../core/services/estado-alineacion.service';
-import { AlineacionesService } from '../../core/services/alineaciones.service';
+import {
+  AlineacionesService,
+  JugadorPlantilla,
+  RolHueco,
+} from '../../core/services/alineaciones.service';
+import { SelectJugadoresComponent } from '../../shared/modals/select-jugadores/select-jugadores.component';
+import {
+  MiniCalendarioComponent,
+  PartidoMini,
+} from '../../shared/components/mini-calendario/mini-calendario.component';
+import { AvatarJugadorComponent } from '../../shared/components/avatar-jugador/avatar-jugador.component';
+import { opcionesModalAuto } from '../../core/utils/modal-auto';
 
-export interface JugadorSlot {
+/** Lo que se pinta en un hueco del campo */
+export interface JugadorHueco {
+  id: number;
+  nombre: string;
+  apodo: string | null;
+  foto: string | null;
+  posicion: RolHueco;
+  lesionado: boolean;
+  /** false = dado de baja: hay que cambiarlo para poder guardar */
+  activo: boolean;
+  equipo_id: number;
+  equipo_nombre: string;
+  equipo_escudo: string | null;
+}
+
+export interface Hueco {
   index: number;
-  rol: 'POR' | 'DEF' | 'MED' | 'DEL';
-  jugador: any | null; // Nulo significa hueco vacío
+  rol: RolHueco;
+  jugador: JugadorHueco | null;
+}
+
+interface Formacion {
+  id: number;
+  formacion: string;
+}
+
+interface EquipoLimpio {
+  id: number;
+  nombre: string;
   escudo: string | null;
 }
+
+const JUGADORES_ONCE = 11;
+const MAX_POR_EQUIPO = 2;
+/** Orden de las líneas en el campo (de arriba abajo) y de los huecos (index) */
+const LINEAS: RolHueco[] = ['DEL', 'MED', 'DEF', 'POR'];
+const FECHA_CIERRE = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+
+/** Rol de cada hueco de una formación "DEF-MED-DEL": delanteros, medios, defensas y portero. */
+const rolesFormacion = (formacion: string): RolHueco[] => {
+  const [def, med, del] = formacion.split('-').map(Number);
+  return [
+    ...Array<RolHueco>(del).fill('DEL'),
+    ...Array<RolHueco>(med).fill('MED'),
+    ...Array<RolHueco>(def).fill('DEF'),
+    'POR',
+  ];
+};
 
 @Component({
   selector: 'app-alineacion',
   templateUrl: './alineacion.page.html',
   styleUrls: ['./alineacion.page.scss'],
   imports: [
-    IonButton,
-    IonIcon,
     IonContent,
-    FormsModule,
-    HeaderComponent,
-    IonSelect,
-    IonSelectOption,
+    IonIcon,
+    IonSkeletonText,
     NgTemplateOutlet,
+    HeaderComponent,
     MiniCalendarioComponent,
+    AvatarJugadorComponent,
   ],
 })
-export class AlineacionPage implements OnInit {
-  // Inyección de servicios
+export class AlineacionPage {
   private _loadingService = inject(LoadingService);
   private _jornadasService = inject(JornadasService);
-  private _jugadoresService = inject(JugadoresService);
   private _modalCtrl = inject(ModalController);
   private _equiposService = inject(EquiposService);
   private _formacionesService = inject(FormacionesService);
@@ -60,337 +113,260 @@ export class AlineacionPage implements OnInit {
   private _alineacionesService = inject(AlineacionesService);
   private _estadoAlineacion = inject(EstadoAlineacionService);
 
-  // Estados reactivos (Signals)
-  formaciones = signal<any[]>([]);
-  formacionSeleccionada = signal<number>(0);
-  jornadaObjetivo = signal<any | null>(null);
-  equipos = signal<any[]>([]);
-  miniCalendario = signal<any[]>([]);
-  slots = signal<JugadorSlot[]>([]);
+  readonly estado = signal<'cargando' | 'listo' | 'sin-jornada' | 'error'>('cargando');
+  readonly formaciones = signal<Formacion[]>([]);
+  readonly formacionId = signal<number | null>(null);
+  readonly jornada = signal<SiguienteJornada | null>(null);
+  readonly partidos = signal<PartidoMini[]>([]);
+  readonly huecos = signal<Hueco[]>([]);
+  readonly guardando = signal(false);
+  /** Si no había nada guardado, número de la jornada de la que se ha cargado la propuesta */
+  readonly copiadaDe = signal<number | null>(null);
+  private equipos: EquipoLimpio[] = [];
 
-  // Datos de usuario y liga activa
-  public liga = this._ligasService.ligaSeleccionada();
-  public user = this._authService.currentUser();
+  /** Lo último guardado (o cargado), para saber si hay cambios */
+  private readonly firmaGuardada = signal('');
+  /** Liga con la que se cargó la pantalla: si cambia, se recarga */
+  private ligaCargada: number | null = null;
 
-  // Computeds para pintar las filas en la plantilla por rol
-  delanteros = computed(() => this.slots().filter((s) => s.rol === 'DEL'));
-  medios = computed(() => this.slots().filter((s) => s.rol === 'MED'));
-  defensas = computed(() => this.slots().filter((s) => s.rol === 'DEF'));
-  portero = computed(() => this.slots().filter((s) => s.rol === 'POR'));
+  /** Momento (ms, reloj del móvil) en que cierra la jornada, a partir de los segundos del servidor */
+  private readonly cierre = signal<number | null>(null);
+  private readonly ahora = signal(Date.now());
 
-  // Contador de jugadores asignados por equipo (máximo 3)
-  conteoEquipos = computed(() => {
+  readonly restante = computed(() => {
+    const c = this.cierre();
+    return c === null ? null : c - this.ahora();
+  });
+
+  /** Se puede editar: jornada pendiente y antes de la hora de cierre */
+  readonly abierta = computed(() => {
+    const r = this.restante();
+    return this.jornada()?.estado === 'PENDIENTE' && r !== null && r > 0;
+  });
+
+  /** "sáb, 14 nov · 15:00" */
+  readonly fechaCierre = computed(() => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})/.exec(this.jornada()?.fecha_limite ?? '');
+    if (!m) return null;
+    return `${FECHA_CIERRE.format(new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])))} · ${m[4]}`;
+  });
+
+  readonly porLinea = computed(() => {
+    const huecos = this.huecos();
+    return LINEAS.map((rol) => ({ rol, huecos: huecos.filter((h) => h.rol === rol) }));
+  });
+
+  readonly alineados = computed(() => this.huecos().filter((h) => h.jugador).length);
+
+  readonly conteoEquipos = computed(() => {
     const mapa = new Map<number, number>();
-    this.slots().forEach((s) => {
-      if (s.jugador?.equipo_id) {
-        const count = mapa.get(s.jugador.equipo_id) || 0;
-        mapa.set(s.jugador.equipo_id, count + 1);
-      }
-    });
+    for (const h of this.huecos()) {
+      if (h.jugador) mapa.set(h.jugador.equipo_id, (mapa.get(h.jugador.equipo_id) ?? 0) + 1);
+    }
     return mapa;
   });
 
+  readonly bajas = computed(() => this.huecos().filter((h) => h.jugador && !h.jugador.activo).length);
+
+  private readonly firma = computed(() =>
+    `${this.formacionId()}|${this.huecos().map((h) => h.jugador?.id ?? '-').join(',')}`,
+  );
+  readonly hayCambios = computed(() => this.firma() !== this.firmaGuardada());
+
+  readonly puedeGuardar = computed(
+    () => this.abierta() && this.hayCambios() && this.alineados() === JUGADORES_ONCE && this.bajas() === 0 && !this.guardando(),
+  );
+
   constructor() {
-    addIcons({ add, warning });
+    addIcons({ add, checkmarkCircle, lockClosedOutline, medkit, refreshOutline, warning });
+    const reloj = setInterval(() => this.ahora.set(Date.now()), 15_000);
+    inject(DestroyRef).onDestroy(() => clearInterval(reloj));
   }
 
-  ngOnInit() {
-    this.inicializarModulo();
+  ionViewWillEnter() {
+    this.ahora.set(Date.now());
+    const liga = this._ligasService.ligaSeleccionada()?.id ?? null;
+    // Se recarga al entrar, salvo que haya cambios sin guardar en la misma liga
+    if (liga !== this.ligaCargada || !this.hayCambios()) this.cargar();
   }
 
-  // Carga secuencial e inicial del módulo
-  private async inicializarModulo() {
+  async cargar() {
+    const liga = this._ligasService.ligaSeleccionada();
+    const usuario = this._authService.currentUser();
+    this.ligaCargada = liga?.id ?? null;
+    if (this.estado() !== 'listo') this.estado.set('cargando');
     this._loadingService.show();
     try {
-      await this.getEquipos();
-      await this.getFormaciones();
-      await this.cargarProximaJornada();
+      const [formaciones, equipos, jornada] = await Promise.all([
+        this.formaciones().length
+          ? Promise.resolve(this.formaciones())
+          : firstValueFrom(this._formacionesService.getFormaciones()).then((r: any) => (r?.data ?? []) as Formacion[]),
+        this.equipos.length
+          ? Promise.resolve(this.equipos)
+          : firstValueFrom(this._equiposService.getEquiposLimpios()).then((r: any) => (r?.data ?? []) as EquipoLimpio[]),
+        firstValueFrom(this._jornadasService.getSiguienteJornada()).catch((e: HttpErrorResponse) => {
+          if (e.status === 404) return null; // no quedan jornadas pendientes
+          throw e;
+        }),
+      ]);
+      this.formaciones.set(formaciones);
+      this.equipos = equipos;
+
+      if (!jornada || !liga || !usuario) {
+        this.jornada.set(null);
+        this.estado.set('sin-jornada');
+        return;
+      }
+      this.jornada.set(jornada);
+      this.cierre.set(Date.now() + jornada.segundos_restantes * 1000);
+      this.ahora.set(Date.now());
+
+      const [partidos, plantilla] = await Promise.all([
+        firstValueFrom(this._jornadasService.cargarPartidosJornada(jornada.id))
+          .then((r) => r.data ?? [])
+          .catch(() => [] as PartidoMini[]),
+        firstValueFrom(
+          this._alineacionesService.cargarAlineacion({
+            liga_id: liga.id,
+            usuario_id: usuario.id,
+            jornada_id: jornada.id,
+            anterior: true,
+          }),
+        ),
+      ]);
+      this.partidos.set(partidos);
+
+      const formacion = formaciones.find((f) => f.id === plantilla.formacion_id) ?? formaciones[0];
+      this.formacionId.set(formacion?.id ?? null);
+      this.huecos.set(
+        formacion ? this.colocar(rolesFormacion(formacion.formacion), plantilla.jugadores) : [],
+      );
+      // La propuesta de una jornada anterior no está guardada: cuenta como cambio hasta guardarla
+      const copiada = plantilla.existe ? null : (plantilla.de_jornada ?? null);
+      this.copiadaDe.set(copiada);
+      this.firmaGuardada.set(copiada === null ? this.firma() : '');
+      this.estado.set('listo');
     } catch (error) {
-      console.error('Error al inicializar la pantalla de alineaciones:', error);
+      console.error('Error al cargar la alineación:', error);
+      this.estado.set('error');
     } finally {
       this._loadingService.hide();
     }
   }
 
-  private getEquipos(): Promise<void> {
-    return new Promise((resolve) => {
-      this._equiposService.getEquiposLimpios().subscribe({
-        next: (resp: any) => {
-          this.equipos.set(resp.data || []);
-          resolve();
-        },
-        error: (err) => {
-          console.error('Error al cargar equipos:', err);
-          resolve();
-        },
-      });
+  /** Huecos de la formación con los jugadores guardados en su hueco_index */
+  private colocar(roles: RolHueco[], guardados: JugadorPlantilla[]): Hueco[] {
+    const porHueco = new Map(guardados.map((j) => [j.hueco_index, j]));
+    return roles.map((rol, index) => {
+      const j = porHueco.get(index);
+      return { index, rol, jugador: j ? this.aHueco(j) : null };
     });
   }
 
-  private getFormaciones(): Promise<void> {
-    return new Promise((resolve) => {
-      this._formacionesService.getFormaciones().subscribe({
-        next: (resp: any) => {
-          if (resp.ok && resp.data.length > 0) {
-            this.formaciones.set(resp.data);
-            this.formacionSeleccionada.set(resp.data[0].id);
-          }
-          resolve();
-        },
-        error: (err) => {
-          console.error('Error al cargar formaciones:', err);
-          resolve();
-        },
-      });
-    });
-  }
-
-  private cargarProximaJornada(): Promise<void> {
-    return new Promise((resolve) => {
-      this._jornadasService.getSiguienteJornada().subscribe({
-        next: async (jornada: any) => {
-          this.jornadaObjetivo.set(jornada);
-          if (jornada?.id) {
-            await Promise.all([
-              this.cargarMiniCalendario(jornada.id),
-              this.cargarAlineacion(jornada.id),
-            ]);
-          }
-          resolve();
-        },
-        error: (err) => {
-          console.error('Error al obtener siguiente jornada:', err);
-          resolve();
-        },
-      });
-    });
-  }
-
-  private cargarMiniCalendario(jornadaId: number): Promise<void> {
-    return new Promise((resolve) => {
-      this._jornadasService.cargarPartidosJornada(jornadaId).subscribe({
-        next: (resp: any) => {
-          if (resp.ok) this.miniCalendario.set(resp.data);
-          resolve();
-        },
-        error: (err) => {
-          console.error('Error al cargar mini calendario:', err);
-          resolve();
-        },
-      });
-    });
-  }
-
-  private cargarAlineacion(jornadaId: number): Promise<void> {
-    return new Promise((resolve) => {
-      const payload = {
-        liga_id: this.liga?.id,
-        usuario_id: this.user?.id,
-        jornada_id: jornadaId,
-      };
-
-      this._alineacionesService.cargarAlineacion(payload).subscribe({
-        next: (res: any) => {
-          const formacionDefaultId = this.formaciones()[0]?.id || 1;
-          const formacionAUsar =
-            res.plantilla?.formacion_id ||
-            res.formacion_id ||
-            formacionDefaultId;
-
-          this.formacionSeleccionada.set(formacionAUsar);
-          this.reconstruirSlots(formacionAUsar);
-
-          // Si hay jugadores guardados previamente, los asignamos en sus slots
-          if (res.jugadores && res.jugadores.length > 0) {
-            this.slots.update((listaSlots) => {
-              const copy = [...listaSlots];
-              res.jugadores.forEach((jGuardado: any) => {
-                const slotIdx = copy.findIndex(
-                  (s) => s.index === jGuardado.hueco_index,
-                );
-                if (slotIdx !== -1) {
-                  copy[slotIdx].jugador = {
-                    id: jGuardado.id || jGuardado.jugador_id,
-                    nombre: jGuardado.nombre,
-                    apodo: jGuardado.apodo,
-                    foto: jGuardado.foto,
-                    equipo_id: jGuardado.equipo_id,
-                    equipo_nombre: jGuardado.equipo_nombre,
-                    equipo_escudo: jGuardado.equipo_escudo,
-                    posicion: jGuardado.posicion,
-                  };
-                }
-              });
-              return copy;
-            });
-          }
-          resolve();
-        },
-        error: (err) => {
-          console.error('Error al obtener la alineación:', err);
-          const formacionDefaultId = this.formaciones()[0]?.id || 0;
-          this.reconstruirSlots(formacionDefaultId);
-          resolve();
-        },
-      });
-    });
-  }
-
-  cambiarFormacion(event: any) {
-    const nuevaFormacionId = event.detail.value;
-    this.formacionSeleccionada.set(nuevaFormacionId);
-    this.reconstruirSlots(nuevaFormacionId);
-  }
-
-  private reconstruirSlots(idFormacion: number) {
-    const formacionObj = this.formaciones().find((f) => f.id === idFormacion);
-    if (!formacionObj) return;
-
-    const partes = formacionObj.formacion.split('-').map(Number);
-    const distribucion = [
-      { rol: 'DEL' as const, cantidad: partes[2] },
-      { rol: 'MED' as const, cantidad: partes[1] },
-      { rol: 'DEF' as const, cantidad: partes[0] },
-      { rol: 'POR' as const, cantidad: 1 },
-    ];
-
-    let idx = 0;
-    const slotsPrevios = this.slots();
-    const nuevosSlots: JugadorSlot[] = [];
-
-    distribucion.forEach((grupo) => {
-      for (let i = 0; i < grupo.cantidad; i++) {
-        // Mantiene el jugador si ya existía en el índice correspondiente
-        const jugadorPrevio = slotsPrevios[idx]?.jugador || null;
-        nuevosSlots.push({
-          index: idx,
-          rol: grupo.rol,
-          jugador: jugadorPrevio,
-          escudo: jugadorPrevio?.equipo_escudo || null,
-        });
-        idx++;
-      }
-    });
-
-    this.slots.set(nuevosSlots);
-  }
-
-  // Validación de cupo por equipo (máximo 3)
-  validarSeleccionJugador(nuevoJugador: any): {
-    valido: boolean;
-    mensaje?: string;
-  } {
-    const conteoActual = this.conteoEquipos().get(nuevoJugador.equipo_id) || 0;
-    if (conteoActual >= 2) {
-      return {
-        valido: false,
-        mensaje: `Ya tienes 2 jugadores de ${nuevoJugador.equipo_nombre} en tu 11.`,
-      };
-    }
-    return { valido: true };
-  }
-
-  async abrirSelectorJugador(slot: JugadorSlot) {
-    const idsSeleccionados = this.slots()
-      .map((s) => s.jugador?.id)
-      .filter((id): id is number => id !== undefined && id !== null);
-
-    this._jugadoresService.getJugadores(slot.rol, idsSeleccionados).subscribe({
-      next: async (resp: any) => {
-        const modal = await this._modalCtrl.create({
-          component: SelectJugadoresComponent,
-          cssClass: 'card-modal-center',
-          backdropDismiss: true,
-          componentProps: {
-            posicion: slot.rol,
-            listaJugadores: resp.data,
-            alineacionActual: this.slots(),
-            listaEquipos: this.equipos(),
-          },
-        });
-
-        await modal.present();
-
-        const { data: jugadorElegido, role } = await modal.onDidDismiss();
-
-        if (jugadorElegido !== null && role === 'confirm') {
-          const validacion = this.validarSeleccionJugador(jugadorElegido);
-          if (!validacion.valido) {
-            this._toastService.showErrorToast(validacion.mensaje!);
-            return;
-          }
-          this.asignarJugadorASlot(slot.index, jugadorElegido);
-        } else if (jugadorElegido === null && role === 'confirm') {
-          this.asignarJugadorASlot(slot.index, null);
-        }
-      },
-      error: (err) => console.error('Error al cargar futbolistas:', err),
-    });
-  }
-
-  asignarJugadorASlot(index: number, jugador: any) {
-    this.slots.update((lista) => {
-      const copy = [...lista];
-      copy[index].jugador = jugador;
-      return copy;
-    });
-  }
-
-  async guardarAlineacion() {
-    const jugadoresAlineados = this.slots()
-      .filter((slot) => slot.jugador !== null)
-      .map((slot) => ({
-        jugador_id: slot.jugador.id,
-        posicion: slot.rol,
-        hueco_index: slot.index,
-      }));
-
-    if (jugadoresAlineados.length !== 11) {
-      this._toastService.showErrorToast(
-        'Debes completar los 11 jugadores de la alineación.',
-      );
-      return;
-    }
-
-    // Comparar posición jugadores con posición de slots para validar que no haya jugadores en posiciones incorrectas
-    const jugadoresEnPosicionesIncorrectas = jugadoresAlineados.some((jugador) => {
-      const slot = this.slots().find((s) => s.jugador?.id === jugador.jugador_id);
-      return slot?.rol !== jugador.posicion;
-    });
-
-    if (jugadoresEnPosicionesIncorrectas) {
-      this._toastService.showErrorToast(
-        'Los jugadores no pueden estar en posiciones incorrectas.',
-      );
-      return;
-    }
-
-    const payload = {
-      liga_id: this.liga?.id,
-      usuario_id: this.user?.id,
-      jornada_id: this.jornadaObjetivo()?.id,
-      formacion_id: this.formacionSeleccionada(),
-      jugadores: jugadoresAlineados,
+  private aHueco(j: JugadorPlantilla | JugadorDisponible): JugadorHueco {
+    return {
+      id: j.id,
+      nombre: j.nombre,
+      apodo: j.apodo,
+      foto: j.foto,
+      posicion: j.posicion,
+      lesionado: !!j.lesionado,
+      activo: 'activo' in j ? j.activo !== false : true,
+      equipo_id: j.equipo_id,
+      equipo_nombre: j.equipo_nombre,
+      equipo_escudo: j.equipo_escudo,
     };
+  }
 
-    this._loadingService.show();
-    this._alineacionesService.guardarAlineacion(payload).subscribe({
-      next: async (resp: any) => {
-        this._loadingService.hide();
-        if (resp.ok) {
-          this._toastService.showSuccessToast(
-            'Alineación guardada exitosamente.',
-          );
-          // Quita (o actualiza) el aviso de "alineación sin hacer" de pestañas y recepción
-          this._estadoAlineacion.cargar();
-          await this.cargarAlineacion(this.jornadaObjetivo().id);
-        }
-      },
-      error: (error) => {
-        this._loadingService.hide();
-        console.error('Error al guardar alineación:', error);
-        this._toastService.showErrorToast('Error al guardar la alineación.');
+  /**
+   * Cambia la formación manteniendo a cada jugador en su línea. Si en la nueva hay menos
+   * huecos de una línea, se quedan fuera los últimos de esa línea.
+   */
+  cambiarFormacion(f: Formacion) {
+    if (!this.abierta() || f.id === this.formacionId()) return;
+    const porRol = new Map<RolHueco, JugadorHueco[]>(LINEAS.map((r) => [r, []]));
+    for (const h of this.huecos()) if (h.jugador) porRol.get(h.jugador.posicion)?.push(h.jugador);
+
+    const huecos = rolesFormacion(f.formacion).map((rol, index) => ({
+      index,
+      rol,
+      jugador: porRol.get(rol)?.shift() ?? null,
+    }));
+    const fuera = [...porRol.values()].reduce((n, l) => n + l.length, 0);
+
+    this.formacionId.set(f.id);
+    this.huecos.set(huecos);
+    if (fuera > 0) {
+      this._toastService.showErrorToast(
+        fuera === 1 ? 'Un jugador se ha quedado fuera con esta formación.' : `${fuera} jugadores se han quedado fuera con esta formación.`,
+      );
+    }
+  }
+
+  async abrirSelector(hueco: Hueco) {
+    if (!this.abierta()) return;
+
+    // El cupo por equipo sin contar al jugador que se va a cambiar
+    const conteo = new Map(this.conteoEquipos());
+    if (hueco.jugador) conteo.set(hueco.jugador.equipo_id, (conteo.get(hueco.jugador.equipo_id) ?? 1) - 1);
+
+    const modal = await this._modalCtrl.create({
+      component: SelectJugadoresComponent,
+      ...opcionesModalAuto(),
+      componentProps: {
+        posicion: hueco.rol,
+        idsExcluidos: this.huecos().flatMap((h) => (h.jugador ? [h.jugador.id] : [])),
+        conteo,
+        maxPorEquipo: MAX_POR_EQUIPO,
+        equipos: this.equipos,
+        puedeQuitar: !!hueco.jugador,
       },
     });
+    await modal.present();
+
+    const { data, role } = await modal.onDidDismiss<JugadorDisponible | null>();
+    if (role === 'confirm' && data) this.asignar(hueco.index, this.aHueco(data));
+    else if (role === 'quitar') this.asignar(hueco.index, null);
+  }
+
+  private asignar(index: number, jugador: JugadorHueco | null) {
+    this.huecos.update((lista) => lista.map((h) => (h.index === index ? { ...h, jugador } : h)));
+  }
+
+  nombre(j: JugadorHueco): string {
+    return j.apodo?.trim() || j.nombre;
+  }
+
+  async guardar() {
+    const liga = this._ligasService.ligaSeleccionada();
+    const jornada = this.jornada();
+    const formacionId = this.formacionId();
+    if (!this.puedeGuardar() || !liga || !jornada || formacionId === null) return;
+
+    this.guardando.set(true);
+    this._loadingService.show();
+    try {
+      await firstValueFrom(
+        this._alineacionesService.guardarAlineacion({
+          liga_id: liga.id,
+          jornada_id: jornada.id,
+          formacion_id: formacionId,
+          jugadores: this.huecos().map((h) => ({ jugador_id: h.jugador!.id, posicion: h.rol, hueco_index: h.index })),
+        }),
+      );
+      this.firmaGuardada.set(this.firma());
+      this.copiadaDe.set(null);
+      this._toastService.showSuccessToast('Alineación guardada.');
+      // Quita (o actualiza) el aviso de "alineación sin hacer" de pestañas y recepción
+      this._estadoAlineacion.cargar();
+    } catch (e) {
+      const error = e as HttpErrorResponse;
+      this._toastService.showErrorToast(error.error?.message ?? 'Error al guardar la alineación.');
+      // La jornada ya empezó: se recarga para mostrarla bloqueada
+      if (error.status === 409) this.cargar();
+    } finally {
+      this.guardando.set(false);
+      this._loadingService.hide();
+    }
   }
 }
