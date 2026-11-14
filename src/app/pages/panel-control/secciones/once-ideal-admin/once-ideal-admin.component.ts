@@ -22,14 +22,10 @@ import { AlineacionesService } from '../../../../core/services/alineaciones.serv
 import { LoadingService } from '../../../../core/services/loading.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { OnceIdealComponent } from '../../../../shared/modals/once-ideal/once-ideal.component';
+import { opcionesModalAlto } from '../../../../core/utils/modal-auto';
 
-/** El modal del 11 ideal es a pantalla completa (campo de fútbol). */
-const OPCIONES_MODAL_COMPLETO = {
-  initialBreakpoint: 1,
-  breakpoints: [0, 1],
-  handle: false,
-  mode: 'md' as const,
-};
+/** El modal del 11 ideal es grande (campo de fútbol): sheet casi a pantalla completa. */
+const OPCIONES_MODAL_COMPLETO = opcionesModalAlto();
 
 @Component({
   selector: 'app-once-ideal-admin',

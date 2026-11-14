@@ -25,7 +25,7 @@ import { formatearFechaJornada } from '../../../../core/utils/fechas-jornada';
 import { PartidosService } from '../../../../core/services/partidos.service';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { opcionesModalAuto } from '../../../../core/utils/modal-auto';
+import { opcionesModalAlto, opcionesModalAuto } from '../../../../core/utils/modal-auto';
 import { CrearEditarPartidoComponent } from '../../../../shared/modals/crear-editar-partido/crear-editar-partido.component';
 import { CrearEditarActaPartidoComponent } from '../../../../shared/modals/crear-editar-acta-partido/crear-editar-acta-partido.component';
 
@@ -58,13 +58,8 @@ const TEXTO_ESTADO: Record<EstadoJornada, string> = {
   CERRADA: 'Cerrada',
 };
 
-/** Opciones visuales del modal del acta (es de pantalla completa). */
-const OPCIONES_MODAL_COMPLETO = {
-  initialBreakpoint: 1,
-  breakpoints: [0, 1],
-  handle: false,
-  mode: 'md' as const,
-};
+/** El modal del acta es grande: sheet casi a pantalla completa. */
+const OPCIONES_MODAL_COMPLETO = opcionesModalAlto();
 
 @Component({
   selector: 'app-calendario-admin',

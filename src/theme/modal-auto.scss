@@ -42,8 +42,9 @@ ion-modal.pf-sheet {
   }
 
   &::part(handle) {
-    background: rgba(255, 255, 255, 0.25);
-    width: 40px;
+    background: rgba(255, 255, 255, 0.45);
+    width: 44px;
+    height: 5px;
     top: 8px;
   }
 
@@ -63,5 +64,40 @@ ion-modal.pf-dialogo {
 
   .pf-modal-cuerpo {
     max-height: calc(80vh - 70px);
+  }
+}
+
+/* ==========================================================================
+   Modales grandes (opcionesModalAlto): sheet que llega casi arriba del todo pero deja ver
+   los bordes redondeados y el tirador. El alto deja libre la barra de estado + un margen.
+   ========================================================================== */
+ion-modal.pf-sheet-alto {
+  --height: calc(100% - env(safe-area-inset-top) - 36px);
+  --border-radius: 22px;
+  --background: var(--ion-color-stadium);
+  --backdrop-opacity: 0.6;
+
+  /* Ya no está bajo la barra de estado: lo de dentro no tiene que dejarle hueco */
+  --ion-safe-area-top: 0px;
+
+  &::part(content) {
+    border-top: 1px solid rgba(0, 230, 118, 0.3);
+  }
+
+  &::part(handle) {
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.45);
+    width: 44px;
+    height: 5px;
+    top: 8px;
+  }
+
+  &::part(backdrop) {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  @media (min-width: 768px) {
+    --width: min(560px, 100%);
   }
 }

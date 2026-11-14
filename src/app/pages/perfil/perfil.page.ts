@@ -32,6 +32,7 @@ import { LigasService } from '../../core/services/ligas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { asyncScheduler } from 'rxjs';
 import { EditarLigaComponent } from '../../shared/modals/editar-liga/editar-liga.component';
+import { opcionesModalAlto } from '../../core/utils/modal-auto';
 
 @Component({
   selector: 'app-perfil',
@@ -81,10 +82,7 @@ export class PerfilPage implements OnInit {
   async abrirEditarPerfil() {
     const modal = await this._modalCtrl.create({
       component: EditarPerfilComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
+      ...opcionesModalAlto(),
       componentProps: {
         userData: this.user(),
       },
@@ -103,10 +101,7 @@ export class PerfilPage implements OnInit {
   async abrirEditarLiga() {
     const modal = await this._modalCtrl.create({
       component: EditarLigaComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
+      ...opcionesModalAlto(),
       componentProps: {
         userData: this.user(),
         ligaData: this.liga,
