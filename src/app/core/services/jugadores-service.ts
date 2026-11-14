@@ -26,6 +26,22 @@ export interface JugadorAdmin {
   tiene_historial: boolean;
 }
 
+/** Jugador que se puede elegir para la alineación (jugadores/getJugadores). */
+export interface JugadorDisponible {
+  id: number;
+  nombre: string;
+  apellidos: string | null;
+  apodo: string | null;
+  posicion: 'POR' | 'DEF' | 'MED' | 'DEL';
+  lesionado: boolean | null;
+  foto: string | null;
+  equipo_id: number;
+  equipo_nombre: string;
+  equipo_escudo: string | null;
+  puntos_totales: number;
+  jornadas_jugadas: number;
+}
+
 /** Una jornada del historial de un jugador, con el partido de esa jornada. */
 export interface JornadaJugador {
   jornada_id: number;
@@ -124,10 +140,11 @@ export class JugadoresService {
     return this.http.post<ApiResponse<void> & { message?: string }>(`${this.apiUrl}/eliminarJugador`, { id });
   }
 
-  getJugadores(posicion: string, idsExcluidos: number[]): Observable<any[]> {
-    return this.http.post<any[]>(`${this.apiUrl}/getJugadores`, {
-      posicion: posicion,
-      idsExcluidos
+  /** Jugadores en activo de una posición para la alineación (sin los ya alineados), por puntos. */
+  getJugadores(posicion: string, idsExcluidos: number[]) {
+    return this.http.post<ApiResponse<JugadorDisponible[]>>(`${this.apiUrl}/getJugadores`, {
+      posicion,
+      idsExcluidos,
     });
   }
 

@@ -1,125 +1,138 @@
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
-import { IonHeader } from '@ionic/angular/ion-header';
-import { IonAvatar } from '@ionic/angular/ion-avatar';
-import { IonToolbar } from '@ionic/angular/ion-toolbar';
-import { IonButtons } from '@ionic/angular/ion-buttons';
-import { IonButton } from '@ionic/angular/ion-button';
+import { DecimalPipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { IonIcon } from '@ionic/angular/ion-icon';
-import { IonContent } from '@ionic/angular/ion-content';
-import { IonTitle } from '@ionic/angular/ion-title';
+import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
 import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { add, close, trash } from 'ionicons/icons';
+import { closeOutline, medkitOutline, refreshOutline, searchOutline, trashOutline } from 'ionicons/icons';
+import { JugadorDisponible, JugadoresService } from '../../../core/services/jugadores-service';
+import { AvatarJugadorComponent } from '../../components/avatar-jugador/avatar-jugador.component';
 
-export interface JugadorMercado {
-  id: number;
-  apodo: string;
-  equipo_escudo: string;
-  equipo_id: number;
-  equipo_nombre: string;
-  foto: string;
-  nombre: string;
-  posicion: string;
-  puntos_totales: number;
-}
+type Posicion = JugadorDisponible['posicion'];
+type Orden = 'puntos' | 'media';
 
+const NOMBRE_POSICION: Record<Posicion, string> = {
+  POR: 'Portero',
+  DEF: 'Defensa',
+  MED: 'Mediocampista',
+  DEL: 'Delantero',
+};
+
+/** Quita tildes y pasa a minúsculas para buscar "garcia" y encontrar "García". */
+const normalizar = (t: string) =>
+  t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/**
+ * Elegir el jugador de un hueco de la alineación (sheet en el móvil / tarjeta en el escritorio).
+ * Carga los jugadores de la posición, con buscador, filtro por equipo y orden por puntos o media.
+ *
+ * Al cerrar devuelve:
+ *   - role 'confirm' + el JugadorDisponible elegido
+ *   - role 'quitar' para vaciar el hueco
+ *   - cualquier otro role: no se cambia nada
+ */
 @Component({
   selector: 'app-select-jugadores',
   templateUrl: './select-jugadores.component.html',
   styleUrls: ['./select-jugadores.component.scss'],
-  imports: [
-    IonTitle,
-    IonIcon,
-    IonButton,
-    IonButtons,
-    IonToolbar,
-    IonAvatar,
-    IonHeader
-  ],
+  imports: [IonIcon, IonSkeletonText, DecimalPipe, AvatarJugadorComponent],
 })
 export class SelectJugadoresComponent implements OnInit {
-  @Input() posicion!: 'POR' | 'DEF' | 'MED' | 'DEL';
-  @Input() alineacionActual: any[] = [];
-  @Input() listaJugadores: JugadorMercado[] = [];
-  @Input() listaEquipos: Array<{ id: number; nombre: string; escudo: string }> = [];
+  @Input({ required: true }) posicion!: Posicion;
+  /** Jugadores que ya están en el once (no se ofrecen) */
+  @Input() idsExcluidos: number[] = [];
+  /** equipo_id → jugadores ya alineados de ese equipo (sin contar el del hueco que se cambia) */
+  @Input() conteo: ReadonlyMap<number, number> = new Map();
+  @Input() maxPorEquipo = 2;
+  @Input() equipos: { id: number; nombre: string; escudo: string | null }[] = [];
+  /** El hueco ya tiene jugador: se muestra "Quitar" */
+  @Input() puedeQuitar = false;
 
+  private _jugadoresService = inject(JugadoresService);
   private _modalCtrl = inject(ModalController);
 
-  // ID de equipo seleccionado (null = Federación/Todos)
-  equipoFiltro = signal<number | null>(null);
+  readonly estado = signal<'cargando' | 'listo' | 'error'>('cargando');
+  readonly jugadores = signal<JugadorDisponible[]>([]);
+  readonly busqueda = signal('');
+  readonly equipoFiltro = signal<number | null>(null);
+  readonly orden = signal<Orden>('puntos');
 
-  // Lista base interna (limpia de jugadores ya alineados)
-  private _listaDisponibles: JugadorMercado[] = [];
+  readonly esqueletos = Array.from({ length: 6 });
 
-  // Señal con los jugadores a mostrar en la vista
-  jugadoresFiltrados = signal<JugadorMercado[]>([]);
-
-  // Mapa para controlar el límite de 3 por equipo
-  conteoPorEquipo = computed(() => {
-    const mapa = new Map<number, number>();
-    this.alineacionActual.forEach((slot) => {
-      if (slot.jugador?.equipo_id) {
-        const count = mapa.get(slot.jugador.equipo_id) || 0;
-        mapa.set(slot.jugador.equipo_id, count + 1);
-      }
-    });
-    return mapa;
+  readonly lista = computed(() => {
+    const texto = normalizar(this.busqueda().trim());
+    const equipo = this.equipoFiltro();
+    const filtrados = this.jugadores().filter(
+      (j) =>
+        (equipo === null || j.equipo_id === equipo) &&
+        (!texto || normalizar(`${j.apodo ?? ''} ${j.nombre} ${j.apellidos ?? ''} ${j.equipo_nombre}`).includes(texto)),
+    );
+    if (this.orden() === 'media') {
+      return [...filtrados].sort((a, b) => this.media(b) - this.media(a) || b.puntos_totales - a.puntos_totales);
+    }
+    return filtrados; // el backend ya los manda por puntos
   });
 
   constructor() {
-    addIcons({ add, close, trash });
+    addIcons({ closeOutline, medkitOutline, refreshOutline, searchOutline, trashOutline });
+  }
+
+  get titulo(): string {
+    return `Elegir ${NOMBRE_POSICION[this.posicion]}`;
   }
 
   ngOnInit() {
-    // 1. Filtramos los jugadores que ya están puestos en la alineación actual
-    this.eliminarJugadoresYaAlineados();
-
-    // 2. Aplicamos el filtro inicial por defecto (Todos)
-    this.filtrarPorEquipo(null);
+    this.cargar();
   }
 
-  eliminarJugadoresYaAlineados() {
-    // Extraemos los IDs de los jugadores actualmente en el 11
-    const idsAlineados = new Set(
-      this.alineacionActual
-        .map((slot) => slot.jugador?.id)
-        .filter((id): id is number => id !== null && id !== undefined)
-    );
-
-    // Guardamos la lista excluyendo los alineados
-    this._listaDisponibles = (this.listaJugadores || []).filter(
-      (jugador) => !idsAlineados.has(jugador.id)
-    );
-  }
-
-  filtrarPorEquipo(equipoId: number | null) {
-    this.equipoFiltro.set(equipoId);
-
-    if (equipoId === null) {
-      this.jugadoresFiltrados.set(this._listaDisponibles);
-    } else {
-      this.jugadoresFiltrados.set(
-        this._listaDisponibles.filter((j) => j.equipo_id === equipoId)
-      );
+  async cargar() {
+    this.estado.set('cargando');
+    try {
+      const res = await firstValueFrom(this._jugadoresService.getJugadores(this.posicion, this.idsExcluidos));
+      this.jugadores.set(res.data ?? []);
+      this.estado.set('listo');
+    } catch {
+      this.estado.set('error');
     }
   }
 
-  esEquipoBloqueado(equipoId: number): boolean {
-    return (this.conteoPorEquipo().get(equipoId) || 0) >= 2;
+  media(j: JugadorDisponible): number {
+    return j.jornadas_jugadas > 0 ? j.puntos_totales / j.jornadas_jugadas : 0;
   }
 
-  seleccionarJugador(jugador: JugadorMercado) {
-    if (this.esEquipoBloqueado(jugador.equipo_id)) {
-      return; // Bloqueado si el club ya tiene 2 elegidos
-    }
-    this._modalCtrl.dismiss(jugador, 'confirm');
+  /** Apodo si lo tiene; si no, nombre y apellidos */
+  nombre(j: JugadorDisponible): string {
+    return j.apodo?.trim() || `${j.nombre} ${j.apellidos ?? ''}`.trim();
   }
 
-  vaciarHueco() {
-    this._modalCtrl.dismiss(null, 'confirm');
+  cupo(equipoId: number): number {
+    return this.conteo.get(equipoId) ?? 0;
   }
 
-  cerrarModal() {
+  bloqueado(equipoId: number): boolean {
+    return this.cupo(equipoId) >= this.maxPorEquipo;
+  }
+
+  /** Pulsar el equipo ya elegido (o la federación) vuelve a mostrar todos */
+  filtrarEquipo(id: number | null) {
+    this.equipoFiltro.set(this.equipoFiltro() === id ? null : id);
+  }
+
+  buscar(evento: Event) {
+    this.busqueda.set((evento.target as HTMLInputElement).value);
+  }
+
+  elegir(j: JugadorDisponible) {
+    if (this.bloqueado(j.equipo_id)) return;
+    this._modalCtrl.dismiss(j, 'confirm');
+  }
+
+  quitar() {
+    this._modalCtrl.dismiss(null, 'quitar');
+  }
+
+  cerrar() {
     this._modalCtrl.dismiss(null, 'cancel');
   }
 }

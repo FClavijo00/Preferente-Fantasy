@@ -1,80 +1,119 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar class="modal-toolbar" mode="md">
-    <ion-title>Seleccionar {{ posicion }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="vaciarHueco()" class="btn-vaciar" mode="ios">
-        <ion-icon slot="icon-only" name="trash"></ion-icon>
-      </ion-button>
-      <ion-button (click)="cerrarModal()" class="btn-close" mode="ios">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <!-- Scroll Horizontal de Equipos -->
-  <div class="equipos-scroll-container">
-    <!-- 1. Primer elemento: Logo Federación (Todos los equipos) -->
-    <div class="equipo-item" [class.active]="equipoFiltro() === null" (click)="filtrarPorEquipo(null)">
-      <div class="escudo-wrapper federacion">
-        <img src="assets/images/rfaf-white.png" alt="Federación" />
-      </div>
-      <!-- <span class="equipo-label">Todos</span> -->
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="titulo">
+      <h2>{{ titulo }}</h2>
+      <!-- <span [class]="'pf-chip-pos ' + posicion.toLowerCase()">{{ posicion }}</span> -->
     </div>
-
-    <!-- 2. Lista de Equipos de la Competición -->
-    @for (equipo of listaEquipos; track equipo.id) {
-    <div class="equipo-item" [class.active]="equipoFiltro() === equipo.id"
-      [class.disabled]="esEquipoBloqueado(equipo.id)" (click)="filtrarPorEquipo(equipo.id)">
-      <div class="escudo-wrapper">
-        <img [src]="equipo.escudo" [alt]="equipo.nombre" />
-        @if (conteoPorEquipo().get(equipo.id); as count) {
-        <span class="count-badge" [class.max]="count >= 2">{{ count }}/2</span>
-        }
-      </div>
-      <!-- <span class="equipo-label">{{ equipo.nombre }}</span> -->
+    <div class="acciones">
+      @if (puedeQuitar) {
+      <button type="button" class="btn-quitar" (click)="quitar()">
+        <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        Quitar
+      </button>
+      }
+      <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+        <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+      </button>
     </div>
+  </header>
+
+  <!-- Buscador -->
+  <label class="buscador">
+    <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+    <input type="search" placeholder="Buscar jugador o equipo" aria-label="Buscar jugador o equipo"
+      [value]="busqueda()" (input)="buscar($event)" enterkeyhint="search" />
+  </label>
+
+  <!-- Filtro por equipo, con lo que llevas de cada uno -->
+  <div class="equipos" role="group" aria-label="Filtrar por equipo">
+    <!-- Primero: todos los equipos (logo de la federación). Volver a pulsar un escudo también quita el filtro -->
+    <button type="button" class="equipo todos" [class.activo]="equipoFiltro() === null"
+      [attr.aria-pressed]="equipoFiltro() === null" aria-label="Todos los equipos" (click)="filtrarEquipo(null)">
+      <img src="assets/images/rfaf-white.png" alt="" width="30" height="30" />
+    </button>
+
+    @for (e of equipos; track e.id) {
+    @let n = cupo(e.id);
+    <button type="button" class="equipo" [class.activo]="equipoFiltro() === e.id" [class.lleno]="bloqueado(e.id)"
+      [attr.aria-pressed]="equipoFiltro() === e.id"
+      [attr.aria-label]="e.nombre + (n ? ', ' + n + ' de ' + maxPorEquipo + ' alineados' : '')"
+      (click)="filtrarEquipo(e.id)">
+      <img [src]="e.escudo || 'assets/escudos/default.png'" alt="" width="30" height="30" loading="lazy" />
+      @if (n) {
+      <span class="contador" aria-hidden="true">{{ n }}/{{ maxPorEquipo }}</span>
+      }
+    </button>
     }
   </div>
-</ion-header>
 
-<div class="modal-container">
-  <div class="jugadores-list">
-    @for (jugador of jugadoresFiltrados(); track jugador.id) {
-    @let estaBloqueado = esEquipoBloqueado(jugador.equipo_id);
-
-    <div class="jugador-item-card" [class.blocked]="estaBloqueado" (click)="seleccionarJugador(jugador)">
-      <!-- Foto Jugador -->
-      <ion-avatar class="jugador-avatar">
-        <img [src]="jugador.foto || 'assets/images/default-player.png'" />
-      </ion-avatar>
-
-      <!-- Detalle Jugador -->
-      <div class="jugador-info">
-        <span class="jugador-nombre">
-          {{ jugador.apodo || jugador.nombre }}
-        </span>
-        <div class="equipo-row">
-          <img [src]="jugador.equipo_escudo" class="mini-escudo" />
-          <span class="equipo-nombre">{{ jugador.equipo_nombre }}</span>
-        </div>
-      </div>
-
-      <!-- Puntos Totales y Estado -->
-      <div class="jugador-stats">
-        <div class="pts-box">
-          <span class="pts-val">{{ jugador.puntos_totales }}</span>
-          <span class="pts-lbl">PTS</span>
-        </div>
-
-        @if (estaBloqueado) {
-        <span class="blocked-badge">Máx 2/2</span>
-        }
-      </div>
+  <!-- Orden -->
+  <div class="barra-orden">
+    <span class="total">
+      @if (estado() === 'listo') { {{ lista().length }} jugadores }
+    </span>
+    <div class="orden" role="group" aria-label="Ordenar por">
+      <button type="button" [class.activo]="orden() === 'puntos'" [attr.aria-pressed]="orden() === 'puntos'"
+        (click)="orden.set('puntos')">Puntos</button>
+      <button type="button" [class.activo]="orden() === 'media'" [attr.aria-pressed]="orden() === 'media'"
+        (click)="orden.set('media')">Media</button>
     </div>
-    } @empty {
-    <div class="empty-state">
-      <p>No hay futbolistas disponibles para esta posición.</p>
+  </div>
+
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
+    @switch (estado()) {
+    @case ('cargando') {
+    @for (_ of esqueletos; track $index) {
+    <ion-skeleton-text animated class="sk-fila"></ion-skeleton-text>
+    }
+    }
+
+    @case ('error') {
+    <div class="vacio">
+      <p>No se han podido cargar los jugadores.</p>
+      <button type="button" class="btn-reintentar" (click)="cargar()">
+        <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+        Reintentar
+      </button>
     </div>
+    }
+
+    @default {
+    <ul class="lista">
+      @for (j of lista(); track j.id) {
+      @let lleno = bloqueado(j.equipo_id);
+      <li>
+        <button type="button" class="jugador" [class.bloqueado]="lleno" [disabled]="lleno"
+          [attr.aria-label]="nombre(j) + ', ' + j.equipo_nombre + ', ' + j.puntos_totales + ' puntos' + (j.lesionado ? ', lesionado' : '') + (lleno ? ', cupo del equipo completo' : '')"
+          (click)="elegir(j)">
+          <app-avatar-jugador [foto]="j.foto" [escudo]="j.equipo_escudo" [posicion]="j.posicion" [tamano]="44" />
+          <span class="textos">
+            <span class="nombre">{{ nombre(j) }}</span>
+            <span class="detalle">
+              @if (j.lesionado) {
+              <span class="lesionado"><ion-icon name="medkit-outline" aria-hidden="true"></ion-icon> Lesionado</span>
+              }
+              @if (lleno) {
+              <span class="cupo">Cupo {{ maxPorEquipo }}/{{ maxPorEquipo }}</span>
+              } @else if (!j.lesionado) {
+              <span class="equipo-nombre">{{ j.equipo_nombre }}</span>
+              }
+            </span>
+          </span>
+          <span class="dato pts" [class.destacado]="orden() === 'puntos'">
+            {{ j.puntos_totales }}<small>PTS</small>
+          </span>
+          <span class="dato" [class.destacado]="orden() === 'media'">
+            {{ media(j) | number: '1.1-1' }}<small>MEDIA</small>
+          </span>
+        </button>
+      </li>
+      } @empty {
+      <li class="vacio-texto">
+        {{ busqueda() || equipoFiltro() !== null ? 'Ningún jugador coincide con el filtro.' : 'No hay jugadores disponibles para esta posición.' }}
+      </li>
+      }
+    </ul>
+    }
     }
   </div>
 </div>
