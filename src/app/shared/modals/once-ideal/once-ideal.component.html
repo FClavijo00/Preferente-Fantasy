@@ -1,248 +1,123 @@
-@if (esVista) {
-<ion-header class="ion-no-border once-ideal-header">
-  <div class="header-banner">
-    <!-- Botón de cerrar modal flotante -->
-    <ion-button fill="clear" class="close-btn" (click)="cerrarModal()">
-      <ion-icon name="close-outline"></ion-icon>
-    </ion-button>
+<!-- ===== Cabecera: logos y título deportivo (la misma en ver, crear y editar) ===== -->
+<ion-header class="ion-no-border">
+  <div class="banner">
+    <div class="banner-fondo" aria-hidden="true"></div>
 
-    <!-- Fondo de brochazo neón (efecto gráfico) -->
-    <div class="brush-bg"></div>
+    <button type="button" class="btn-cerrar" (click)="cerrarModal()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
 
-    <!-- Logos Solapados -->
-    <div class="logos-container">
-      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="logo-pf" />
-      <img src="assets/images/albero-y-mikasa.png" alt="Albero y Mikasa" class="logo-aym" />
+    <div class="logos" aria-hidden="true">
+      <img src="assets/images/pf-logo-v2.svg" alt="" class="logo-pf" />
+      <img src="assets/images/albero-y-mikasa.png" alt="" class="logo-aym" />
     </div>
 
-    <!-- Título Tipográfico Dinámico -->
-    <div class="title-container">
-      <div class="top-row">
+    <h1 class="titulo">
+      <span class="fila-1">
         <span class="txt-el">EL</span>
         <span class="txt-11">11</span>
         <span class="txt-ideal">IDEAL</span>
-      </div>
-      <div class="middle-row">
+      </span>
+      <span class="fila-2">
         <span class="txt-de">DE</span>
-        <span class="txt-brand">PREFERENTE <span class="highlight">FANTASY</span></span>
-      </div>
-      <div class="bottom-row">
-        <span class="txt-jornada">JORNADA {{ jornada.numero_jornada }}</span>
-      </div>
-    </div>
+        <span class="txt-marca">PREFERENTE <span class="neon">FANTASY</span></span>
+      </span>
+      @if (numeroJornada; as n) {
+      <span class="fila-3">JORNADA {{ n }}</span>
+      }
+    </h1>
   </div>
 </ion-header>
 
-<ion-content fullscreen="true" class="once-ideal-content">
-  <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
-  <div class="pitch-container">
-    <!-- Terreno de juego con las filas generadas dinámicamente -->
-    <div class="pitch-grass">
-      <!-- Líneas decorativas del campo -->
-      <div class="pitch-lines">
-        <div class="center-circle"></div>
-        <div class="center-line"></div>
-        <div class="penalty-box top"></div>
-        <div class="penalty-box bottom"></div>
-      </div>
-
-      <!-- Jugadores renderizados con Flexbox -->
-      <div class="players-grid">
-        <!-- Línea de Delanteros -->
-        <div class="pitch-row">
-          @for (slot of delanteros(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Línea de Mediocampistas -->
-        <div class="pitch-row">
-          @for (slot of medios(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Línea de Defensas -->
-        <div class="pitch-row">
-          @for (slot of defensas(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Portero -->
-        <div class="pitch-row">
-          @for (slot of portero(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
+<ion-content class="contenido">
+  <div class="cuerpo">
+    @if (!esVista) {
+    <!-- ===== Crear / editar (panel) ===== -->
+    @if (!jornadaFija) {
+    <div class="bloque">
+      <span class="etiqueta">Jornada</span>
+      <div class="chips" role="radiogroup" aria-label="Jornada">
+        @for (j of jornadasDisponibles(); track j.id) {
+        <button type="button" role="radio" class="chip" [class.activo]="jornadaSeleccionada()?.id === j.id"
+          [attr.aria-checked]="jornadaSeleccionada()?.id === j.id" (click)="cambiarJornada(j)">J{{ j.numero_jornada }}</button>
+        } @empty {
+        <span class="sin-datos">No quedan jornadas cerradas sin 11 ideal</span>
+        }
       </div>
     </div>
-    <!-- Template reutilizable para cada slot de jugador -->
-    <ng-template #slotTemplate let-slot>
-      <div class="player-slot">
-        @if (slot.jugador) {
-        <div class="player-card" (click)="abrirDetalleJugador(slot)">
-          <!-- Badge de Puntos sobre el jugador -->
-          <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
-            [class.neutral]="slot.jugador.puntos_jornada === 0">
-            {{ slot.jugador.puntos_jornada }}
-          </div>
-          <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
-          <!-- @if (slot.rol !== slot.jugador.posicion) {
-          <ion-icon class="warning-icon" name="warning"></ion-icon>
-          } -->
-          <span class="player-name">{{
-            slot.jugador.apodo || slot.jugador.nombre
-            }}</span>
-          <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
-        </div>
-        } @else {
-        <div class="empty-slot">
-          <img src="assets/images/default-player.png" class="empty-slot-img" />
-          <span class="rol-badge">{{ slot.rol }}</span>
+    }
+
+    <div class="bloque">
+      <span class="etiqueta">Formación</span>
+      <div class="chips" role="radiogroup" aria-label="Formación">
+        @for (f of formaciones(); track f.id) {
+        <button type="button" role="radio" class="chip" [class.activo]="formacionSeleccionada()?.id === f.id"
+          [attr.aria-checked]="formacionSeleccionada()?.id === f.id" (click)="cambiarFormacion(f)">{{ f.formacion }}</button>
+        }
+      </div>
+    </div>
+    }
+
+    @if (esVista && vacio()) {
+    <div class="vacio">
+      <p>Esta jornada todavía no tiene 11 ideal publicado.</p>
+    </div>
+    } @else if (slots().length) {
+    @if (esVista && formacionSeleccionada(); as f) {
+    <span class="formacion-vista">{{ f.formacion }}</span>
+    }
+
+    <!-- ===== Campo ===== -->
+    <section class="campo" aria-label="11 ideal">
+      <div class="lineas-campo" aria-hidden="true">
+        <span class="area arriba"></span>
+        <span class="medio-campo"></span>
+        <span class="circulo"></span>
+        <span class="area abajo"></span>
+      </div>
+
+      <div class="filas">
+        @for (linea of lineas(); track linea.rol) {
+        <div class="fila">
+          @for (slot of linea.huecos; track slot.index) {
+          @if (slot.jugador; as j) {
+          <button type="button" class="hueco" (click)="pulsarHueco(slot)"
+            [attr.aria-label]="nombre(j) + ', ' + j.puntos_jornada + ' puntos' + (esVista ? '. Ver desglose' : '. Cambiar')">
+            <span class="foto">
+              <app-avatar-jugador [foto]="j.foto" [escudo]="j.equipo_escudo" [posicion]="j.posicion" [tamano]="50" />
+              @if (j.puntos_jornada !== null && j.puntos_jornada !== undefined) {
+              <span class="puntos" [class.positivo]="j.puntos_jornada > 0" [class.negativo]="j.puntos_jornada < 0"
+                aria-hidden="true">{{ signo(j.puntos_jornada) }}</span>
+              }
+            </span>
+            <span class="nombre">{{ nombre(j) }}</span>
+          </button>
+          } @else {
+          <button type="button" [class]="'hueco vacio-hueco ' + slot.rol.toLowerCase()" [disabled]="esVista"
+            (click)="pulsarHueco(slot)" [attr.aria-label]="'Elegir ' + slot.rol">
+            <span class="mas" aria-hidden="true"><ion-icon name="add"></ion-icon></span>
+            <span [class]="'pf-chip-pos ' + slot.rol.toLowerCase()" aria-hidden="true">{{ slot.rol }}</span>
+          </button>
+          }
+          }
         </div>
         }
       </div>
-    </ng-template>
+    </section>
+    } @else if (!esVista) {
+    <p class="sin-datos centrado">Elige la formación para empezar a colocar jugadores.</p>
+    }
   </div>
-</ion-content>
-} @else {
-<ion-header class="ion-no-border once-ideal-header">
-  <div class="header-banner">
-    <!-- Botón de cerrar modal flotante -->
-    <ion-button fill="clear" class="close-btn" (click)="cerrarModal()">
-      <ion-icon name="close-outline"></ion-icon>
-    </ion-button>
 
-    <!-- Fondo de brochazo neón (efecto gráfico) -->
-    <div class="brush-bg"></div>
-
-    <!-- Logos Solapados -->
-    <div class="logos-container">
-      <img src="assets/images/pf-logo-v2.svg" alt="Preferente Fantasy" class="logo-pf" />
-      <img src="assets/images/albero-y-mikasa.png" alt="Albero y Mikasa" class="logo-aym" />
-    </div>
-
-    <!-- Título Tipográfico Dinámico -->
-    <div class="title-container">
-      <div class="top-row">
-        <span class="txt-el">EL</span>
-        <span class="txt-11">11</span>
-        <span class="txt-ideal">IDEAL</span>
-      </div>
-      <div class="middle-row">
-        <span class="txt-de">DE</span>
-        <span class="txt-brand">PREFERENTE <span class="highlight">FANTASY</span></span>
-      </div>
-      <div class="bottom-row">
-        @if (jornadaFija) {
-        <span class="txt-jornada">JORNADA {{ jornadaFija.numero_jornada }}</span>
-        } @else {
-        <ion-item>
-          <ion-label>Jornada:</ion-label>
-          <ion-select mode="ios" interface="popover" placeholder="Elegir" [value]="jornadaSeleccionada()?.id"
-            (ionChange)="cambiarJornada($event)">
-            @for (j of jornadasDisponibles(); track j.id) {
-            <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
-            }
-          </ion-select>
-        </ion-item>
-        }
-      </div>
-      <div class="bottom-row">
-        <ion-item>
-          <ion-label>Formación:</ion-label>
-          <ion-select mode="ios" interface="popover" placeholder="Elegir" [value]="formacionSeleccionada()?.id"
-            (ionChange)="cambiarFormacion($event)">
-            @for (f of formaciones(); track f.id) {
-            <ion-select-option [value]="f.id">{{ f.formacion }}</ion-select-option>
-            }
-          </ion-select>
-        </ion-item>
-      </div>
-    </div>
-  </div>
-</ion-header>
-
-<ion-content fullscreen="true" class="once-ideal-content">
-  <div class="btn-div-guardar">
-    <ion-button class="btn-guardar" fill="clear" shape="round" (click)="guardarOnceIdeal()"
+  @if (!esVista) {
+  <!-- Guardar, siempre a mano abajo -->
+  <div class="barra-guardar">
+    <button type="button" class="btn-guardar" (click)="guardarOnceIdeal()"
       [disabled]="!jornadaSeleccionada() || !formacionSeleccionada() || colocados() !== 11">
-      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-      {{ modoEfectivo === 'editar' ? 'Guardar cambios' : 'Publicar 11 Ideal' }}
-      @if (formacionSeleccionada()) { · {{ colocados() }}/11 }
-    </ion-button>
+      <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+      {{ modoEfectivo === 'editar' ? 'Guardar cambios' : 'Publicar 11 ideal' }}
+      @if (formacionSeleccionada()) { <span class="contador">{{ colocados() }}/11</span> }
+    </button>
   </div>
-  <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
-  <div class="pitch-container">
-    <!-- Terreno de juego con las filas generadas dinámicamente -->
-    <div class="pitch-grass">
-      <!-- Líneas decorativas del campo -->
-      <div class="pitch-lines">
-        <div class="center-circle"></div>
-        <div class="center-line"></div>
-        <div class="penalty-box top"></div>
-        <div class="penalty-box bottom"></div>
-      </div>
-
-      <!-- Jugadores renderizados con Flexbox -->
-      <div class="players-grid">
-        <!-- Línea de Delanteros -->
-        <div class="pitch-row">
-          @for (slot of delanteros(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Línea de Mediocampistas -->
-        <div class="pitch-row">
-          @for (slot of medios(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Línea de Defensas -->
-        <div class="pitch-row">
-          @for (slot of defensas(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-
-        <!-- Portero -->
-        <div class="pitch-row">
-          @for (slot of portero(); track slot.index) {
-          <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-          }
-        </div>
-      </div>
-    </div>
-    <!-- Template reutilizable para cada slot de jugador -->
-    <ng-template #slotTemplate let-slot>
-      <div class="player-slot">
-        @if (slot.jugador) {
-        <div class="player-card" (click)="abrirSelectJugador(slot)">
-          <!-- Badge de Puntos sobre el jugador -->
-          <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
-            [class.neutral]="slot.jugador.puntos_jornada === 0">
-            {{ slot.jugador.puntos_jornada }}
-          </div>
-          <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
-          <!-- @if (slot.rol !== slot.jugador.posicion) {
-          <ion-icon class="warning-icon" name="warning"></ion-icon>
-          } -->
-          <span class="player-name">{{
-            slot.jugador.apodo || slot.jugador.nombre
-            }}</span>
-          <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
-        </div>
-        } @else {
-        <div class="empty-slot" (click)="abrirSelectJugador(slot)">
-          <img src="assets/images/default-player.png" class="empty-slot-img" />
-          <span class="rol-badge">{{ slot.rol }}</span>
-        </div>
-        }
-      </div>
-    </ng-template>
-  </div>
+  }
 </ion-content>
-}

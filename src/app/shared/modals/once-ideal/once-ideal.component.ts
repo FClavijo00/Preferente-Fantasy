@@ -6,22 +6,13 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { IonTitle } from '@ionic/angular/ion-title';
 import { IonHeader } from '@ionic/angular/ion-header';
-import { IonToolbar } from '@ionic/angular/ion-toolbar';
 import { IonContent } from '@ionic/angular/ion-content';
-import { IonLabel } from '@ionic/angular/ion-label';
-import { IonButton } from '@ionic/angular/ion-button';
 import { IonIcon } from '@ionic/angular/ion-icon';
 import { ModalController } from '@ionic/angular/modal-controller';
-import { IonItem } from '@ionic/angular/ion-item';
-import { IonList } from '@ionic/angular/ion-list';
-import { IonPopover } from '@ionic/angular/ion-popover';
-import { IonSelect } from '@ionic/angular/ion-select';
-import { IonSelectOption } from '@ionic/angular/ion-select-option';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, closeOutline, warning } from 'ionicons/icons';
-import { NgTemplateOutlet } from '@angular/common';
+import { add, checkmarkCircleOutline, closeOutline, warning } from 'ionicons/icons';
+import { AvatarJugadorComponent } from '../../components/avatar-jugador/avatar-jugador.component';
 import { LoadingService } from '../../../core/services/loading.service';
 import { AlineacionesService } from '../../../core/services/alineaciones.service';
 import { DetalleJugadorJornadaComponent } from '../detalle-jugador-jornada/detalle-jugador-jornada.component';
@@ -42,17 +33,7 @@ interface JugadorSlot {
   selector: 'app-once-ideal',
   templateUrl: './once-ideal.component.html',
   styleUrls: ['./once-ideal.component.scss'],
-  imports: [
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonButton,
-    IonContent,
-    IonHeader,
-    NgTemplateOutlet,
-    IonSelect,
-    IonSelectOption,
-  ],
+  imports: [IonIcon, IonContent, IonHeader, AvatarJugadorComponent],
 })
 export class OnceIdealComponent implements OnInit {
   /** Ver (usuarios): { jornada_id, numero_jornada }. Editar (panel): la jornada a editar. */
@@ -79,6 +60,16 @@ export class OnceIdealComponent implements OnInit {
   defensas = computed(() => this.slots().filter((s) => s.rol === 'DEF'));
   portero = computed(() => this.slots().filter((s) => s.rol === 'POR'));
 
+  /** Ver: la jornada no tiene 11 ideal publicado */
+  readonly vacio = signal(false);
+  /** Las cuatro líneas en el orden del campo (de arriba abajo) */
+  readonly lineas = computed(() => [
+    { rol: 'DEL', huecos: this.delanteros() },
+    { rol: 'MED', huecos: this.medios() },
+    { rol: 'DEF', huecos: this.defensas() },
+    { rol: 'POR', huecos: this.portero() },
+  ]);
+
   jornadasDisputadas = signal<any[]>([]);
   formaciones = signal<any[]>([]);
   jornadaSeleccionada = signal<any>(null);
@@ -102,11 +93,17 @@ export class OnceIdealComponent implements OnInit {
   colocados = computed(() => this.slots().filter((s) => s.jugador !== null).length);
 
   constructor() {
-    addIcons({ closeOutline, warning, checkmarkCircleOutline });
+    addIcons({ add, closeOutline, warning, checkmarkCircleOutline });
   }
 
   get modoEfectivo(): 'ver' | 'crear' | 'editar' {
     return this.modo ?? (this.jornada ? 'ver' : 'crear');
+  }
+
+  /** Número de jornada para el título (la que se ve, la fija o la elegida) */
+  get numeroJornada(): number | null {
+    if (this.esVista) return this.jornada?.numero_jornada ?? null;
+    return (this.jornadaFija ?? this.jornadaSeleccionada())?.numero_jornada ?? null;
   }
 
   get esVista(): boolean {
@@ -173,11 +170,12 @@ export class OnceIdealComponent implements OnInit {
         next: (res: any) => {
           if (res.existe) {
             this.reconstruirSlots(res.once_ideal_info.formacion, res.jugadores);
-            this._loadingService.hide();
+            this.formacionSeleccionada.set({ id: res.once_ideal_info.formacion_id, formacion: res.once_ideal_info.formacion });
           } else {
             this.slots.set([]);
-            this._loadingService.hide();
+            this.vacio.set(true);
           }
+          this._loadingService.hide();
         },
         error: (error: any) => {
           this._loadingService.hide();
@@ -187,6 +185,23 @@ export class OnceIdealComponent implements OnInit {
 
   cerrarModal() {
     this._modalCtrl.dismiss();
+  }
+
+  nombre(j: any): string {
+    return j.apodo?.trim() || `${j.nombre} ${j.apellidos ?? ''}`.trim();
+  }
+
+  signo(puntos: number): string {
+    return puntos > 0 ? `+${puntos}` : String(puntos);
+  }
+
+  /** Ver: desglose del jugador · Crear/editar: elegir el jugador del hueco */
+  pulsarHueco(slot: JugadorSlot) {
+    if (this.esVista) {
+      if (slot.jugador) this.abrirDetalleJugador(slot);
+    } else {
+      this.abrirSelectJugador(slot);
+    }
   }
 
   private reconstruirSlots(formacion: any, jugadores: any[] = []) {
@@ -283,17 +298,12 @@ export class OnceIdealComponent implements OnInit {
     });
   }
 
-  cambiarJornada(event: any) {
-    this.jornadasDisponibles().forEach((jornada) => {
-      if (jornada.id === Number(event.detail.value)) {
-        this.jornadaSeleccionada.set(jornada);
-      }
-    })
+  cambiarJornada(jornada: any) {
+    this.jornadaSeleccionada.set(jornada);
   }
 
-  cambiarFormacion(event: any) {
-    const formacion = this.formaciones().find((f) => f.id === Number(event.detail.value));
-    if (!formacion) return;
+  cambiarFormacion(formacion: any) {
+    if (!formacion || formacion.id === this.formacionSeleccionada()?.id) return;
     this.formacionSeleccionada.set(formacion);
     this.recolocarPorPosicion(formacion.formacion);
   }
