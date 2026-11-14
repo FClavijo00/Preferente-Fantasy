@@ -42,6 +42,7 @@ import { opcionesModalAuto } from '../../core/utils/modal-auto';
 export interface JugadorHueco {
   id: number;
   nombre: string;
+  apellidos: string | null;
   apodo: string | null;
   foto: string | null;
   posicion: RolHueco;
@@ -267,6 +268,7 @@ export class AlineacionPage {
     return {
       id: j.id,
       nombre: j.nombre,
+      apellidos: j.apellidos,
       apodo: j.apodo,
       foto: j.foto,
       posicion: j.posicion,
@@ -333,8 +335,9 @@ export class AlineacionPage {
     this.huecos.update((lista) => lista.map((h) => (h.index === index ? { ...h, jugador } : h)));
   }
 
+  /** Apodo si lo tiene; si no, nombre y apellidos */
   nombre(j: JugadorHueco): string {
-    return j.apodo?.trim() || j.nombre;
+    return j.apodo?.trim() || `${j.nombre} ${j.apellidos ?? ''}`.trim();
   }
 
   async guardar() {

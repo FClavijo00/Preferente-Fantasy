@@ -10,6 +10,7 @@ export interface JugadorPlantilla {
     posicion: RolHueco;
     id: number;
     nombre: string;
+    apellidos: string | null;
     apodo: string | null;
     foto: string | null;
     lesionado: boolean | null;
