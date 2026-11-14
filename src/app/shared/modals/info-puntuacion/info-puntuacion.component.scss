@@ -1,56 +1,207 @@
-.divider {
-  height: 1px;
-  background: linear-gradient(
-    90deg, 
-    rgba(0, 255, 102, 0) 0%, 
-    rgba(0, 255, 102, 0.3) 50%, 
-    rgba(0, 255, 102, 0) 100%
-  );
-  //margin: 16px 0;
+/* Cómo se puntúa. Tamaño y forma del modal (sheet / diálogo): src/theme/modal-auto.scss */
 
-  &.secondary {
-    background: rgba(255, 255, 255, 0.08);
-    margin: 12px 0 16px 0;
+.pf-modal {
+  color: #ffffff;
+}
+
+/* ---------- Cabecera ---------- */
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 26px 16px 10px 20px;
+}
+
+.cabecera-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
   }
 }
 
-.info-card {
-    margin: 0;
-    background-color: var(--ion-color-stadium);
+.sobretitulo {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ion-color-pitch);
+  text-shadow: 0 0 6px rgba(0, 230, 118, 0.35);
+}
 
-    ion-card-header {
-        text-align: center;
-        padding: 12px;
+.btn-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ion-color-slate-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
 
-        ion-card-title {
-            font-size: 1.7rem;
-            font-weight: 700;
-            color: var(--ion-color-pitch);
-        }
+.pf-modal-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 4px 16px 24px;
+}
 
-        ion-card-subtitle {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--ion-color-pitch);
-        }
+/* ---------- Notas ---------- */
+.nota {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  background: rgba(0, 230, 118, 0.06);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #c7d2cc;
 
-        p {
-            font-size: 0.7rem;
-            margin: 0;
-        }
+  strong {
+    color: #ffffff;
+  }
+}
+
+/* ---------- Secciones ---------- */
+.seccion {
+  padding: 10px 12px 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ion-color-slate-muted);
+
+  .icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background: rgba(0, 230, 118, 0.12);
+    color: var(--ion-color-pitch);
+    font-size: 0.85rem;
+  }
+}
+
+.reglas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.regla {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+.texto {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.posiciones {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+
+  .pf-chip-pos {
+    width: 32px;
+    height: 18px;
+    font-size: 0.55rem;
+    border-radius: 5px;
+  }
+}
+
+/* Puntos como pastilla, del color del signo */
+.puntos {
+  min-width: 38px;
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #c7d2cc;
+  font-size: 0.82rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+
+  &.positivo {
+    border-color: rgba(0, 230, 118, 0.55);
+    background: rgba(0, 230, 118, 0.12);
+    color: var(--ion-color-pitch);
+  }
+
+  &.negativo {
+    border-color: rgba(255, 82, 82, 0.55);
+    background: rgba(255, 82, 82, 0.12);
+    color: #ff8a80;
+  }
+}
+
+/* Tarjetas dibujadas (como en el acta) */
+.tarjeta {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+
+  &.amarilla {
+    background: #facc15;
+  }
+
+  &.roja {
+    background: var(--ion-color-red-card);
+  }
+
+  &.doble {
+    background: #facc15;
+    margin-right: 3px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 2px;
+      width: 10px;
+      height: 14px;
+      border-radius: 2px;
+      background: var(--ion-color-red-card);
+      box-shadow: -1px 0 0 #121d16;
     }
-
-    ion-card-content {
-        padding: 12px;
-        p {
-            font-size: 0.9rem;
-            margin: 0;
-        }
-        ul {
-            margin-bottom: 5px;
-            li {
-                font-size: 0.9rem;
-            }
-        }
-    }
+  }
 }

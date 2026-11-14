@@ -29,7 +29,7 @@ interface FilaJugador extends JugadorPlantillaEquipo {
 const TITULO_POSICION: Record<Posicion, string> = {
   POR: 'Porteros',
   DEF: 'Defensas',
-  MED: 'Centrocampistas',
+  MED: 'Mediocampistas',
   DEL: 'Delanteros',
 };
 

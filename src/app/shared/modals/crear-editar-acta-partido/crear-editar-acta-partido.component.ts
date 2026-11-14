@@ -77,7 +77,7 @@ const SUPLENTES = 7;
 const TITULO_POSICION: Record<Posicion, string> = {
   POR: 'Porteros',
   DEF: 'Defensas',
-  MED: 'Centrocampistas',
+  MED: 'Mediocampistas',
   DEL: 'Delanteros',
 };
 

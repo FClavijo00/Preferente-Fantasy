@@ -1,44 +1,45 @@
-<ion-card class="info-card" mode="ios">
-  <ion-card-header>
-    <p>
-      La puntuación de cada equipo se calcula SOLO en base al acta del partido,
-      ya que es imposible realizarlo por ahora de otra manera:
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      <span class="sobretitulo">Preferente Fantasy</span>
+      <h2>Cómo se puntúa</h2>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
+    <p class="nota">
+      Los puntos de cada jugador salen <strong>solo del acta del partido</strong>: alineación, goles, tarjetas,
+      resultado y jugador destacado. Tus puntos en la jornada son la suma de tus 11.
     </p>
-    <ion-card-subtitle>Jornadas en Preferente Fantasy</ion-card-subtitle>
-    <ion-card-title>Formato de Puntuación</ion-card-title>
-  </ion-card-header>
-  <div class="divider"></div>
-  <ion-card-content>
-    <p>Puntuación general por partido disputado:</p>
-    <ul>
-      <li>2 puntos por ser titular.</li>
-      <li>1 punto por ser suplente.</li>
-      <li>3 puntos por ser nominado a jugador destacado de la jornada por Albero y Mikasa.</li>
-    </ul>
 
-    <p>Puntuación general por goles:</p>
-    <ul>
-      <li>3 puntos por ser gol en posición de "DEL".</li>
-      <li>4 puntos por ser gol en posicion de "MED".</li>
-      <li>5 puntos por ser gol en posición de "DEF".</li>
-      <li>10 puntos por ser gol en posición de "POR".</li>
-      <li>-1 punto por ser gol en propia puerta.</li>
-    </ul>
-
-    <p>Puntuación general por tarjetas y sanciones:</p>
-    <ul>
-      <li>-1 punto al mostrar tarjeta amarilla.</li>
-      <li>-2 puntos al mostrar doble tarjeta amarilla.</li>
-      <li>-3 puntos al mostrar tarjeta roja directa.</li>
-    </ul>
-
-    <p>Puntuación general por resultado:</p>
-    <ul>
-      <li>3 puntos por victoria.</li>
-      <li>1 punto por empate.</li>
-      <li>0 puntos por derrota.</li>
-      <li>3 puntos por mantener portería a cero para "POR" y "DEF".</li>
-      <li>2 puntos por marcar más de 3 goles en el partido para "MED" y "DEL".</li>
-    </ul>
-  </ion-card-content>
-</ion-card>
+    @for (s of secciones; track s.titulo) {
+    <section class="seccion" [attr.aria-label]="s.titulo">
+      <h3 class="seccion-titulo">
+        <span class="icono" aria-hidden="true"><ion-icon [name]="s.icono"></ion-icon></span>
+        {{ s.titulo }}
+      </h3>
+      <ul class="reglas">
+        @for (r of s.reglas; track r.texto) {
+        <li class="regla">
+          @if (r.tarjeta) {
+          <span [class]="'tarjeta ' + r.tarjeta" aria-hidden="true"></span>
+          }
+          <span class="texto">{{ r.texto }}</span>
+          @if (r.posiciones) {
+          <span class="posiciones">
+            @for (p of r.posiciones; track p) {
+            <span [class]="'pf-chip-pos ' + p.toLowerCase()">{{ p }}</span>
+            }
+          </span>
+          }
+          <span class="puntos" [class.positivo]="r.puntos > 0" [class.negativo]="r.puntos < 0">{{ signo(r.puntos) }}</span>
+        </li>
+        }
+      </ul>
+    </section>
+    }
+  </div>
+</div>
