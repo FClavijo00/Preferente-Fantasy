@@ -55,19 +55,16 @@ import { Component, input, signal } from '@angular/core';
     .med .foto { border-color: var(--pf-pos-med); }
     .del .foto { border-color: var(--pf-pos-del); }
 
-    /* Escudo abajo a la derecha, con un aro del color del fondo para despegarlo de la foto */
+    /* Escudo abajo a la derecha, como imagen normal (sin círculo) */
     .escudo {
       position: absolute;
-      right: -3px;
-      bottom: -3px;
-      width: calc(var(--tamano) * 0.42);
-      height: calc(var(--tamano) * 0.42);
-      padding: 2px;
-      border-radius: 50%;
+      right: -6px;
+      bottom: -4px;
+      width: calc(var(--tamano) * 0.46);
+      height: calc(var(--tamano) * 0.46);
       object-fit: contain;
-      background: var(--ion-color-stadium);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
-      box-sizing: border-box;
+      /* Sin círculo: el escudo tal cual, con sombra para despegarlo de la foto */
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
     }
   `,
 })

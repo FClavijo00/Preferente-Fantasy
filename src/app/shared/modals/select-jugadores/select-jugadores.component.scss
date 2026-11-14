@@ -118,17 +118,18 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 46px;
+  height: 46px;
+  /* Cuadrado redondeado, como la barra de escudos de Plantillas (el escudo, sin círculo) */
+  border-radius: 12px;
+  border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
 
   img {
-    width: 28px;
-    height: 28px;
+    width: 34px;
+    height: 34px;
     object-fit: contain;
   }
 
