@@ -37,6 +37,7 @@ import {
 } from '../../shared/components/mini-calendario/mini-calendario.component';
 import { AvatarJugadorComponent } from '../../shared/components/avatar-jugador/avatar-jugador.component';
 import { opcionesModalAuto } from '../../core/utils/modal-auto';
+import { LINEAS, rolesFormacion } from '../../core/utils/formacion';
 
 /** Lo que se pinta en un hueco del campo */
 export interface JugadorHueco {
@@ -73,20 +74,7 @@ interface EquipoLimpio {
 
 const JUGADORES_ONCE = 11;
 const MAX_POR_EQUIPO = 2;
-/** Orden de las líneas en el campo (de arriba abajo) y de los huecos (index) */
-const LINEAS: RolHueco[] = ['DEL', 'MED', 'DEF', 'POR'];
 const FECHA_CIERRE = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-
-/** Rol de cada hueco de una formación "DEF-MED-DEL": delanteros, medios, defensas y portero. */
-const rolesFormacion = (formacion: string): RolHueco[] => {
-  const [def, med, del] = formacion.split('-').map(Number);
-  return [
-    ...Array<RolHueco>(del).fill('DEL'),
-    ...Array<RolHueco>(med).fill('MED'),
-    ...Array<RolHueco>(def).fill('DEF'),
-    'POR',
-  ];
-};
 
 @Component({
   selector: 'app-alineacion',
