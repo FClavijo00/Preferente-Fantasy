@@ -180,7 +180,14 @@ export class ActaPartidoComponent implements OnInit {
       component: DetalleJugadorJornadaComponent,
       cssClass: 'card-modal-center',
       backdropDismiss: true,
-      componentProps: { jugador, jornada: this.acta()?.numero_jornada },
+      componentProps: {
+        // Escudo del equipo con el que jugó este partido
+        jugador: {
+          ...jugador,
+          escudo: jugador.equipo_id === this.acta()?.equipo_local_id ? this.acta()?.escudo_local : this.acta()?.escudo_visitante,
+        },
+        jornada: this.acta()?.numero_jornada,
+      },
     });
     await modal.present();
   }
