@@ -29,6 +29,34 @@ export interface PlantillaUsuario {
     jugadores: JugadorPlantilla[];
 }
 
+/** Jugador de una alineación ya jugada, con sus puntos (cargarAlineacionesJornadas). */
+export interface JugadorAlineacionJornada {
+    hueco_index: number;
+    posicion: RolHueco;
+    jugador_id: number;
+    nombre: string;
+    apellidos: string | null;
+    apodo: string | null;
+    foto: string | null;
+    /** Equipo con el que jugó esa jornada */
+    equipo_id: number;
+    equipo_nombre: string;
+    equipo_escudo: string | null;
+    puntos_jornada: number;
+    /** false = no jugó esa jornada */
+    jugo: boolean;
+    desglose_puntos: unknown;
+}
+
+export interface AlineacionJornada {
+    plantilla_id: number;
+    jornada_id: number;
+    numero_jornada: number;
+    estado: string;
+    formacion: string;
+    jugadores: JugadorAlineacionJornada[];
+}
+
 export interface PayloadAlineacion {
     liga_id: number;
     jornada_id: number;
@@ -49,8 +77,9 @@ export class AlineacionesService {
         return this.http.post<PlantillaUsuario>(`${this.apiUrl}/cargarAlineacion`, data);
     }
 
-    cargarAlineacionesJornadas(data: any) {
-        return this.http.post(`${this.apiUrl}/cargarAlineacionesJornadas`, data);
+    /** Alineación de un usuario en una jornada ya empezada, con los puntos de cada jugador. */
+    cargarAlineacionesJornadas(data: { liga_id: number; usuario_id: number; jornada_id: number }) {
+        return this.http.post<{ ok: boolean; data: AlineacionJornada[] }>(`${this.apiUrl}/cargarAlineacionesJornadas`, data);
     }
 
     /** El backend valida la hora de cierre y el once (409 si la jornada ya empezó, 400 si no es válido). */

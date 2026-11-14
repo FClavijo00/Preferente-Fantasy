@@ -1,275 +1,207 @@
-import {
-  Component,
-  computed,
-  CUSTOM_ELEMENTS_SCHEMA,
-  inject,
-  Input,
-  OnInit,
-  signal,
-} from '@angular/core';
-import { ModalController } from '@ionic/angular/modal-controller';
-import { AlineacionesService } from '../../../core/services/alineaciones.service';
-import { AuthService } from '../../../core/services/auth-service.service';
-import { ClasificacionesService } from '../../../core/services/clasificaciones.service';
-import { LigasService } from '../../../core/services/ligas.service';
-import { LoadingService } from '../../../core/services/loading.service';
-import { IonIcon } from '@ionic/angular/ion-icon';
-import { IonPopover } from '@ionic/angular/ion-popover';
-import { IonButton } from '@ionic/angular/ion-button';
-import { IonContent } from '@ionic/angular/ion-content';
-import { IonList } from '@ionic/angular/ion-list';
-import { IonLabel } from '@ionic/angular/ion-label';
-import { IonItem } from '@ionic/angular/ion-item';
-import { DetalleJugadorJornadaComponent } from '../../modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
-import { JornadasService } from '../../../core/services/jornadas-service';
+import { Component, computed, inject, Input, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, starOutline } from 'ionicons/icons';
+import { closeOutline, refreshOutline, star } from 'ionicons/icons';
+import {
+  AlineacionJornada,
+  AlineacionesService,
+  JugadorAlineacionJornada,
+} from '../../../core/services/alineaciones.service';
+import { JornadasService, PuntuacionJornada } from '../../../core/services/jornadas-service';
+import { LINEAS, RolFormacion, rolesFormacion } from '../../../core/utils/formacion';
+import { AvatarJugadorComponent } from '../avatar-jugador/avatar-jugador.component';
+import { DetalleJugadorJornadaComponent } from '../../modals/detalle-jugador-jornada/detalle-jugador-jornada.component';
 import { OnceIdealComponent } from '../../modals/once-ideal/once-ideal.component';
+import { opcionesModalAlto } from '../../../core/utils/modal-auto';
 
-interface JugadorSlot {
+interface Hueco {
   index: number;
-  rol: 'POR' | 'DEF' | 'MED' | 'DEL';
-  jugador: any | null;
-  escudo: string | null;
-  puntos?: number;
+  rol: RolFormacion;
+  jugador: JugadorAlineacionJornada | null;
 }
 
+/** Datos del usuario para la cabecera cuando se abre como modal */
+export interface UsuarioCabecera {
+  nombre_club: string;
+  nombre_usuario: string;
+  image_url: string | null;
+}
+
+/**
+ * Alineación de un usuario jornada a jornada, con los puntos de cada jugador:
+ * fila de jornadas (puntos de cada una), resumen (puntos y puesto) y el campo.
+ *
+ * - En "Mi equipo" va dentro de la página: [miEquipo]="true" muestra el botón del 11 ideal.
+ * - Para ver a otro usuario se abre como modal (sheet) pasando "usuario": lleva cabecera y cerrar.
+ *
+ *   <app-plantilla-clasificacion [ligaId]="id" [usuarioId]="uid" [miEquipo]="true" />
+ *   modalCtrl.create({ component: PlantillaClasificacionComponent, ...opcionesModalAuto(),
+ *                      componentProps: { ligaId, usuarioId, usuario, jornadaInicialId } })
+ */
 @Component({
   selector: 'app-plantilla-clasificacion',
   templateUrl: './plantilla-clasificacion.component.html',
   styleUrls: ['./plantilla-clasificacion.component.scss'],
-  imports: [
-    IonItem,
-    IonLabel,
-    IonList,
-    IonContent,
-    IonButton,
-    IonPopover,
-    IonIcon,
-    NgTemplateOutlet,
-  ],
+  imports: [IonIcon, IonSkeletonText, NgTemplateOutlet, AvatarJugadorComponent],
 })
 export class PlantillaClasificacionComponent {
-  @Input({ required: true }) set user(user: any) {
-    if (user) {
-      this._usuario = user;
-      this.comprobarIniciar();
-    }
+  // @Input con setter (no input()): también llegan por componentProps al abrirlo como modal
+  @Input() set ligaId(v: number | null | undefined) {
+    this._ligaId = v ?? null;
+    this.programarCarga();
   }
-  get user() {
-    return this._usuario;
+  @Input() set usuarioId(v: number | null | undefined) {
+    this._usuarioId = v ?? null;
+    this.programarCarga();
   }
-
-  @Input({ required: true }) set liga(liga: any) {
-    if (liga) {
-      this._liga = liga;
-      this.comprobarIniciar();
-    }
-  }
-  get liga() {
-    return this._liga;
-  }
-
-  @Input() miEquipo: boolean = false;
-
-  /**
-   * Jornada que se abre al cargar (si el usuario la tiene); si no, la más reciente.
-   * Si cambia con las jornadas ya cargadas, se salta a ella.
-   */
+  /** Jornada con la que abrir; si no está (o no se pasa), la más reciente (la que está en juego si la hay). */
   @Input() set jornadaInicialId(id: number | null | undefined) {
     this._jornadaInicialId = id ?? null;
-    const jornada = this.jornadasDisponibles().find((j: any) => j.jornada_id === this._jornadaInicialId);
-    if (jornada && jornada.jornada_id !== this.jornadaSeleccionadaId()) this.seleccionarJornada(jornada);
+    const j = this.jornadas().find((x) => x.jornada_id === this._jornadaInicialId);
+    if (j && j.jornada_id !== this.seleccionada()?.jornada_id) this.seleccionar(j);
   }
+  /** Si llega, se pinta como modal: cabecera con el usuario y botón de cerrar */
+  @Input() usuario: UsuarioCabecera | null = null;
+  /** Mi equipo: botón flotante del 11 ideal */
+  @Input() miEquipo = false;
+
+  private _ligaId: number | null = null;
+  private _usuarioId: number | null = null;
   private _jornadaInicialId: number | null = null;
+  private _clave = '';
+  private _cargaProgramada = false;
+  private readonly _cache = new Map<number, AlineacionJornada | null>();
 
-  public _usuario: any;
-  private _liga: any;
-
-  private _loadingService = inject(LoadingService);
-  private _modalCtrl = inject(ModalController);
-  private _ligasService = inject(LigasService);
-  private _authService = inject(AuthService);
-  private _alineacionesService = inject(AlineacionesService);
-  private _clasificacionesService = inject(ClasificacionesService);
   private _jornadasService = inject(JornadasService);
+  private _alineacionesService = inject(AlineacionesService);
+  private _modalCtrl = inject(ModalController);
 
-  //public liga = this._ligasService.ligaSeleccionada();
+  readonly estado = signal<'cargando' | 'listo' | 'vacio' | 'error'>('cargando');
+  readonly jornadas = signal<PuntuacionJornada[]>([]);
+  readonly seleccionada = signal<PuntuacionJornada | null>(null);
+  readonly alineacion = signal<AlineacionJornada | null>(null);
+  readonly estadoAlineacion = signal<'cargando' | 'listo' | 'error'>('cargando');
 
-  jornadaSeleccionadaId = signal<number | null>(null);
-  jornadaSeleccionada = signal<any | null>(null);
-  jornadasDisponibles = signal<any[]>([]);
-
-  slots = signal<JugadorSlot[]>([]);
-  delanteros = computed(() => this.slots().filter((s) => s.rol === 'DEL'));
-  medios = computed(() => this.slots().filter((s) => s.rol === 'MED'));
-  defensas = computed(() => this.slots().filter((s) => s.rol === 'DEF'));
-  portero = computed(() => this.slots().filter((s) => s.rol === 'POR'));
+  readonly lineas = computed(() => {
+    const a = this.alineacion();
+    if (!a?.formacion) return [];
+    const porHueco = new Map(a.jugadores.map((j) => [j.hueco_index, j]));
+    const huecos: Hueco[] = rolesFormacion(a.formacion).map((rol, index) => ({
+      index,
+      rol,
+      jugador: porHueco.get(index) ?? null,
+    }));
+    return LINEAS.map((rol) => ({ rol, huecos: huecos.filter((h) => h.rol === rol) }));
+  });
 
   constructor() {
-    addIcons({
-      ellipsisVertical,
-      starOutline
+    addIcons({ closeOutline, refreshOutline, star });
+  }
+
+  /** Espera a tener liga y usuario (pueden llegar por separado) y carga una sola vez por pareja. */
+  private programarCarga() {
+    if (this._cargaProgramada) return;
+    this._cargaProgramada = true;
+    queueMicrotask(() => {
+      this._cargaProgramada = false;
+      const clave = `${this._ligaId}|${this._usuarioId}`;
+      if (this._ligaId === null || this._usuarioId === null || clave === this._clave) return;
+      this._clave = clave;
+      this._cache.clear();
+      this.cargar();
     });
   }
 
-  private comprobarIniciar() {
-    if (this._usuario && this._liga) {
-      this.getPuntuacionesJornadas();
+  async cargar() {
+    const liga = this._ligaId;
+    const usuario = this._usuarioId;
+    if (liga === null || usuario === null) return;
+    this.estado.set('cargando');
+    try {
+      const res = await firstValueFrom(this._jornadasService.getPuntuacionesJornadas(liga, usuario));
+      if (`${liga}|${usuario}` !== this._clave) return; // cambió mientras cargaba
+      const jornadas = res.data ?? [];
+      this.jornadas.set(jornadas);
+      if (jornadas.length === 0) {
+        this.estado.set('vacio');
+        return;
+      }
+      this.estado.set('listo');
+      this.seleccionar(jornadas.find((j) => j.jornada_id === this._jornadaInicialId) ?? jornadas[0]);
+    } catch {
+      this.estado.set('error');
     }
   }
 
-  async abrirDetalleJugador(jugador: any) {
-    const jornadaActual = this.jornadasDisponibles().find(
-      (j) => j.jornada_id === this.jornadaSeleccionadaId(),
-    );
-
-    const jornadaCerrada = jornadaActual && jornadaActual.estado === 'CERRADA';
-    const jornadaEnJuego = jornadaActual && jornadaActual.estado === 'EN_JUEGO';
-
-    if (jornadaCerrada || jornadaEnJuego) {
-      const modal = await this._modalCtrl.create({
-        component: DetalleJugadorJornadaComponent,
-        cssClass: 'card-modal-center', // Clase CSS para estilizar el modal
-        backdropDismiss: true,
-        componentProps: {
-          jugador: jugador.jugador,
-          jornada: jornadaActual.numero_jornada,
-        },
-      });
-
-      await modal.present();
-    } else {
+  async seleccionar(j: PuntuacionJornada) {
+    this.seleccionada.set(j);
+    if (this._cache.has(j.jornada_id)) {
+      this.alineacion.set(this._cache.get(j.jornada_id)!);
+      this.estadoAlineacion.set('listo');
       return;
     }
-  }
-
-  seleccionarJornada(jornada: any) {
-    this.jornadaSeleccionada.set(jornada);
-    this.jornadaSeleccionadaId.set(jornada.jornada_id);
-    this.cargarAlineacionJornada();
-  }
-
-  private reconstuirSlots(formacion: any, jugadores: any[] = []) {
-    const partes = formacion.split('-').map(Number);
-    const distribucion = [
-      { rol: 'DEL' as const, cantidad: partes[2] },
-      { rol: 'MED' as const, cantidad: partes[1] },
-      { rol: 'DEF' as const, cantidad: partes[0] },
-      { rol: 'POR' as const, cantidad: 1 },
-    ];
-
-    let idx = 0;
-    const slotsPrevios = this.slots();
-    const nuevosSlots: JugadorSlot[] = [];
-
-    distribucion.forEach((grupo) => {
-      for (let i = 0; i < grupo.cantidad; i++) {
-        // Mantiene el jugador si ya existía en el índice correspondiente
-        const jugadorPrevio = slotsPrevios[idx]?.jugador || null;
-        nuevosSlots.push({
-          index: idx,
-          rol: grupo.rol,
-          jugador: jugadorPrevio,
-          escudo: jugadorPrevio?.equipo_escudo || null,
-          puntos: 0,
-        });
-        idx++;
-      }
-    });
-
-    this.slots.set(nuevosSlots);
-
-    if (jugadores && jugadores.length > 0) {
-      this.slots.update((slots) => {
-        const copy = [...slots];
-        jugadores.forEach((jugador: any) => {
-          const slotIdx = copy.findIndex(
-            (s) => s.index === jugador.hueco_index,
-          );
-          if (slotIdx !== -1) {
-            copy[slotIdx].jugador = {
-              id: jugador.id || jugador.jugador_id,
-              nombre: jugador.nombre,
-              apellidos: jugador.apellidos,
-              apodo: jugador.apodo,
-              foto: jugador.foto,
-              equipo_id: jugador.equipo_id,
-              equipo_nombre: jugador.equipo_nombre,
-              equipo_escudo: jugador.equipo_escudo,
-              posicion: jugador.posicion,
-              puntos_jornada: jugador.puntos_jornada,
-              desglose: jugador.desglose_puntos,
-            };
-          }
-        });
-        return copy;
-      });
+    this.estadoAlineacion.set('cargando');
+    try {
+      const res = await firstValueFrom(
+        this._alineacionesService.cargarAlineacionesJornadas({
+          liga_id: this._ligaId!,
+          usuario_id: this._usuarioId!,
+          jornada_id: j.jornada_id,
+        }),
+      );
+      const alineacion = res.data?.[0] ?? null;
+      // La jornada en juego se vuelve a pedir cada vez (los puntos cambian); las cerradas se guardan
+      if (j.estado === 'CERRADA') this._cache.set(j.jornada_id, alineacion);
+      if (this.seleccionada()?.jornada_id !== j.jornada_id) return;
+      this.alineacion.set(alineacion);
+      this.estadoAlineacion.set('listo');
+    } catch {
+      if (this.seleccionada()?.jornada_id === j.jornada_id) this.estadoAlineacion.set('error');
     }
   }
 
-  getPuntuacionesJornadas() {
-    this._loadingService.show();
-    let data = {
-      liga_id: this.liga?.id,
-      usuario_id: this.user.id || this.user.usuario_id,
-    };
-    this._jornadasService.getPuntuacionesJornadas(data).subscribe({
-      next: (res: any) => {
-        if (res.ok) {
-          this.jornadasDisponibles.set(res.data || []);
-          if (res.data.length > 0) {
-            const inicial =
-              res.data.find((j: any) => j.jornada_id === this._jornadaInicialId) ?? res.data[0];
-            this.jornadaSeleccionada.set(inicial);
-            this.jornadaSeleccionadaId.set(inicial.jornada_id);
-            this.cargarAlineacionJornada();
-          }
-          this._loadingService.hide();
-        }
-      },
-      error: (error: any) => {
-        this._loadingService.hide();
-      },
-    });
+  nombre(j: JugadorAlineacionJornada): string {
+    return j.apodo?.trim() || `${j.nombre} ${j.apellidos ?? ''}`.trim();
   }
 
-  async cargarAlineacionJornada() {
-    this._loadingService.show();
-    let data = {
-      liga_id: this.liga?.id,
-      jornada_id: this.jornadaSeleccionadaId(),
-      usuario_id: this.user.usuario_id || this.user.id,
-    };
-    this._alineacionesService.cargarAlineacionesJornadas(data).subscribe({
-      next: (res: any) => {
-        if (res.ok && res.data.length > 0) {
-          this.reconstuirSlots(res.data[0].formacion, res.data[0].jugadores);
-          this._loadingService.hide();
-        } else {
-          this.slots.set([]);
-          this._loadingService.hide();
-        }
-      },
-      error: (error: any) => {
-        this._loadingService.hide();
-      },
-    });
+  signo(puntos: number): string {
+    return puntos > 0 ? `+${puntos}` : String(puntos);
   }
 
-  async abrir11Ideal() {
+  async verJugador(j: JugadorAlineacionJornada) {
+    if (!j.jugo) return; // no jugó: no hay desglose
+    const modal = await this._modalCtrl.create({
+      component: DetalleJugadorJornadaComponent,
+      cssClass: 'card-modal-center',
+      backdropDismiss: true,
+      componentProps: {
+        jugador: {
+          ...j,
+          id: j.jugador_id,
+          desglose: j.desglose_puntos,
+        },
+        jornada: this.seleccionada()?.numero_jornada,
+      },
+    });
+    await modal.present();
+  }
+
+  async verOnceIdeal() {
+    const j = this.seleccionada();
+    if (!j?.tiene_once_ideal) return;
     const modal = await this._modalCtrl.create({
       component: OnceIdealComponent,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.5, 0.75, 1],
-      handle: false,
-      mode: 'md',
-      componentProps: {
-        jornada: this.jornadaSeleccionada(),
-      },
+      ...opcionesModalAlto(),
+      componentProps: { jornada: { jornada_id: j.jornada_id, numero_jornada: j.numero_jornada } },
     });
-
     await modal.present();
+  }
+
+  cerrar() {
+    this._modalCtrl.dismiss();
   }
 }

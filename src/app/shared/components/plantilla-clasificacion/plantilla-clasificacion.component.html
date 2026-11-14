@@ -1,134 +1,147 @@
-<div class="plantilla-clasificacion-container">
-  @if (miEquipo === false) {
-  <div class="team-header-container">
-    <div class="team-badge">
-      <img [src]="user?.image_url || 'assets/images/default-avatar.png'" [alt]="user?.nombre_club || 'Escudo club'"
-        loading="lazy" />
+@if (usuario; as u) {
+<!-- ===== Como modal: cabecera con el usuario ===== -->
+<div class="pf-modal">
+  <header class="cabecera-modal">
+    <img class="avatar-usuario" [src]="u.image_url || 'assets/images/default-player.png'" alt="" width="44" height="44" />
+    <div class="cabecera-textos">
+      <h2>{{ u.nombre_club }}</h2>
+      <span>{{ u.nombre_usuario }}</span>
     </div>
-
-    <div class="team-info">
-      <span class="user-name">{{ user?.nombre_usuario }}</span>
-      <h2 class="club-name">{{ user?.nombre_club }}</h2>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-  }
-
-  <div class="plantilla-clasificacion-container">
-    <div class="jornadas-scroll-container">
-      <div class="jornadas-track">
-        @if (jornadasDisponibles().length > 0) {
-        @for (jornada of jornadasDisponibles(); track jornada.jornada_id) {
-        <div class="jornada-card" [class.active]="jornadaSeleccionadaId() === jornada.jornada_id"
-          (click)="seleccionarJornada(jornada)">
-          <span class="jornada-title">
-            {{
-            jornadaSeleccionadaId() === jornada.jornada_id
-            ? "Jornada " + jornada.numero_jornada
-            : "J" + jornada.numero_jornada
-            }}
-          </span>
-
-          <span class="jornada-puntos">
-            {{ jornada.puntos_totales ?? 0 }} <small>PTS</small>
-          </span>
-        </div>
-        }
-        }
-      </div>
-    </div>
-
-    <!-- Campo de Fútbol con la Alineación y Puntos por Jugador -->
-    <div class="pitch-container">
-      <!-- Terreno de juego con las filas generadas dinámicamente -->
-      <div class="pitch-grass">
-        <!-- Líneas decorativas del campo -->
-        <div class="pitch-lines">
-          <div class="center-circle"></div>
-          <div class="center-line"></div>
-          <div class="penalty-box top"></div>
-          <div class="penalty-box bottom"></div>
-        </div>
-
-        <!-- Jugadores renderizados con Flexbox -->
-        <div class="players-grid">
-          <!-- Línea de Delanteros -->
-          <div class="pitch-row">
-            @for (slot of delanteros(); track slot.index) {
-            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-            }
-          </div>
-
-          <!-- Línea de Mediocampistas -->
-          <div class="pitch-row">
-            @for (slot of medios(); track slot.index) {
-            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-            }
-          </div>
-
-          <!-- Línea de Defensas -->
-          <div class="pitch-row">
-            @for (slot of defensas(); track slot.index) {
-            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-            }
-          </div>
-
-          <!-- Portero -->
-          <div class="pitch-row">
-            @for (slot of portero(); track slot.index) {
-            <ng-container *ngTemplateOutlet="slotTemplate; context: { $implicit: slot }"></ng-container>
-            }
-          </div>
-        </div>
-      </div>
-      <!-- Template reutilizable para cada slot de jugador -->
-      <ng-template #slotTemplate let-slot>
-        <div class="player-slot">
-          @if (slot.jugador) {
-          <div class="player-card" [class]="slot.rol !== slot.jugador.posicion ? 'out-position' : ''"
-            (click)="abrirDetalleJugador(slot)">
-            <!-- Badge de Puntos sobre el jugador -->
-            <div class="puntos-badge" [class.negative]="slot.jugador.puntos_jornada < 0"
-              [class.neutral]="slot.jugador.puntos_jornada === 0">
-              {{ slot.jugador.puntos_jornada }}
-            </div>
-            <img [src]="slot.jugador.foto || 'assets/images/default-player.png'" class="player-img" />
-            @if (slot.rol !== slot.jugador.posicion) {
-            <ion-icon class="warning-icon" name="warning"></ion-icon>
-            }
-            <span class="player-name">{{
-              slot.jugador.apodo || slot.jugador.nombre
-              }}</span>
-            <img [src]="slot.jugador.equipo_escudo" [alt]="slot.jugador.equipo_nombre" class="player-equipo-img" />
-          </div>
-          } @else {
-          <div class="empty-slot">
-            <img src="assets/images/default-player.png" class="empty-slot-img" />
-            <span class="rol-badge">{{ slot.rol }}</span>
-          </div>
-          }
-        </div>
-      </ng-template>
-
-      @if (jornadaSeleccionada() && jornadaSeleccionada().estado === 'CERRADA') {
-      <ion-button mode="ios" class="popover-button" id="popover-button">
-        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
-      </ion-button>
-      <ion-popover class="ideal-popover" trigger="popover-button" animated="true" [dismissOnSelect]="true">
-        <ng-template>
-          <ion-content>
-            <ion-list class="ideal-list" lines="none" mode="ios">
-              <ion-item mode="ios" class="ideal-item" (click)="abrir11Ideal()">
-                <ion-icon slot="start" name="star-outline"></ion-icon>
-                <ion-label>11 Ideal de la Jornada</ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-content>
-        </ng-template>
-      </ion-popover>
-      }
-
-    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
+    <ng-container *ngTemplateOutlet="contenido" />
   </div>
 </div>
+} @else {
+<ng-container *ngTemplateOutlet="contenido" />
+}
+
+<ng-template #contenido>
+  @switch (estado()) {
+  @case ('cargando') {
+  <div class="chips">
+    @for (i of [1, 2, 3, 4, 5]; track i) {
+    <ion-skeleton-text animated class="sk-chip"></ion-skeleton-text>
+    }
+  </div>
+  <ion-skeleton-text animated class="sk-campo"></ion-skeleton-text>
+  }
+
+  @case ('error') {
+  <div class="vacio">
+    <p>No se ha podido cargar la alineación.</p>
+    <button type="button" class="btn-reintentar" (click)="cargar()">
+      <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+      Reintentar
+    </button>
+  </div>
+  }
+
+  @case ('vacio') {
+  <div class="vacio">
+    <p>{{ miEquipo ? 'Aún no tienes alineaciones en jornadas empezadas.' : 'No tiene alineaciones en jornadas empezadas.' }}</p>
+  </div>
+  }
+
+  @default {
+  <!-- ===== Jornadas con sus puntos ===== -->
+  <div class="chips" role="tablist" aria-label="Jornadas">
+    @for (j of jornadas(); track j.jornada_id) {
+    <button type="button" role="tab" class="chip" [class.activo]="seleccionada()?.jornada_id === j.jornada_id"
+      [attr.aria-selected]="seleccionada()?.jornada_id === j.jornada_id"
+      [attr.aria-label]="'Jornada ' + j.numero_jornada + ', ' + j.puntos_totales + ' puntos' + (j.estado === 'EN_JUEGO' ? ', en juego' : '')"
+      (click)="seleccionar(j)">
+      <span class="chip-jornada">
+        @if (j.estado === 'EN_JUEGO') { <span class="vivo" aria-hidden="true"></span> }
+        J{{ j.numero_jornada }}
+      </span>
+      <span class="chip-puntos" [class.negativo]="j.puntos_totales < 0">{{ j.puntos_totales }}</span>
+    </button>
+    }
+  </div>
+
+  @if (seleccionada(); as s) {
+  <!-- ===== Resumen de la jornada ===== -->
+  <div class="resumen">
+    <div class="resumen-jornada">
+      <span class="resumen-titulo">Jornada {{ s.numero_jornada }}</span>
+      @if (s.estado === 'EN_JUEGO') {
+      <span class="en-juego"><span class="vivo" aria-hidden="true"></span>En juego</span>
+      }
+    </div>
+    <div class="resumen-datos">
+      <span class="resumen-puntos" [class.negativo]="s.puntos_totales < 0">{{ s.puntos_totales }} <small>pts</small></span>
+      <span class="resumen-puesto">{{ s.posicion }}º de {{ s.participantes }}</span>
+    </div>
+  </div>
+
+  <!-- ===== Campo ===== -->
+  <div class="campo-envoltorio">
+    @switch (estadoAlineacion()) {
+    @case ('cargando') {
+    <ion-skeleton-text animated class="sk-campo"></ion-skeleton-text>
+    }
+    @case ('error') {
+    <div class="vacio">
+      <p>No se ha podido cargar la alineación de esta jornada.</p>
+      <button type="button" class="btn-reintentar" (click)="seleccionar(s)">
+        <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+        Reintentar
+      </button>
+    </div>
+    }
+    @default {
+    <section class="campo" [attr.aria-label]="'Alineación de la jornada ' + s.numero_jornada">
+      <div class="lineas-campo" aria-hidden="true">
+        <span class="area arriba"></span>
+        <span class="medio-campo"></span>
+        <span class="circulo"></span>
+        <span class="area abajo"></span>
+      </div>
+
+      <div class="filas">
+        @for (linea of lineas(); track linea.rol) {
+        <div class="fila">
+          @for (h of linea.huecos; track h.index) {
+          @if (h.jugador; as j) {
+          <button type="button" class="hueco" [class.no-jugo]="!j.jugo" [disabled]="!j.jugo" (click)="verJugador(j)"
+            [attr.aria-label]="nombre(j) + ', ' + (j.jugo ? j.puntos_jornada + ' puntos. Ver desglose' : 'no jugó')">
+            <span class="foto">
+              <app-avatar-jugador [foto]="j.foto" [escudo]="j.equipo_escudo" [posicion]="j.posicion" [tamano]="48" />
+              <span class="puntos" [class.positivo]="j.jugo && j.puntos_jornada > 0"
+                [class.negativo]="j.jugo && j.puntos_jornada < 0" aria-hidden="true">
+                {{ j.jugo ? signo(j.puntos_jornada) : '–' }}
+              </span>
+            </span>
+            <span class="nombre">{{ nombre(j) }}</span>
+          </button>
+          } @else {
+          <span class="hueco hueco-vacio" aria-hidden="true">
+            <span class="sin-jugador"></span>
+            <span [class]="'pf-chip-pos ' + h.rol.toLowerCase()">{{ h.rol }}</span>
+          </span>
+          }
+          }
+        </div>
+        }
+      </div>
+
+      @if (miEquipo && s.tiene_once_ideal) {
+      <!-- 11 ideal de la jornada seleccionada -->
+      <button type="button" class="btn-once-ideal" (click)="verOnceIdeal()"
+        [attr.aria-label]="'Ver el 11 ideal de la jornada ' + s.numero_jornada">
+        <ion-icon name="star" aria-hidden="true"></ion-icon>
+        11 ideal
+      </button>
+      }
+    </section>
+    }
+    }
+  </div>
+  }
+  }
+  }
+</ng-template>

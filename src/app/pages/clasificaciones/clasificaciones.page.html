@@ -5,100 +5,127 @@
   </button>
 </app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-segment mode="ios" [value]="tabActivo()" (ionChange)="cambiarTab($event)" class="custom-segment">
-    <ion-segment-button value="jornada_mi_equipo">
-      <ion-label>Mi Equipo</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="clasificacion_jornadas">
-      <ion-label>Jornadas</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="clasificacion_general">
-      <ion-label>General</ion-label>
-    </ion-segment-button>
-  </ion-segment>
-
-  <!-- TAB 1: Mi Alineación en la Jornada + Puntos obtenidos -->
-  @if (tabActivo() === 'jornada_mi_equipo') {
-  <app-plantilla-clasificacion [user]="user" [liga]="liga" [miEquipo]="true"
-    [jornadaInicialId]="jornadaInicialMiEquipo()"></app-plantilla-clasificacion>
-  }
-
-  @if (tabActivo() === 'clasificacion_jornadas') {
-  <div class="jornada-selector-row">
-    <div class="jornada-selector-bar">
-      <ion-select mode="ios" [value]="jornadaSeleccionadaId()" (ionChange)="cambiarJornadaFiltro($event)"
-        interface="popover" class="custom-jornada-select">
-        @for (j of jornadasDisponibles(); track j.id) {
-        <ion-select-option [value]="j.id">Jornada {{ j.numero_jornada }}</ion-select-option>
-        }
-      </ion-select>
+<ion-content [fullscreen]="true" class="clasificacion-content">
+  <div class="pagina">
+    <!-- ===== Pestañas ===== -->
+    <div class="pestanas" role="tablist" aria-label="Clasificación">
+      @for (p of pestanas; track p.valor) {
+      <button type="button" role="tab" [class.activa]="pestana() === p.valor" [attr.aria-selected]="pestana() === p.valor"
+        (click)="cambiarPestana(p.valor)">{{ p.texto }}</button>
+      }
     </div>
+
+    @switch (pestana()) {
+    <!-- ===== Mi equipo ===== -->
+    @case ('mi-equipo') {
+    @for (k of [claveMiEquipo()]; track k) {
+    <app-plantilla-clasificacion [ligaId]="ligaId()" [usuarioId]="usuarioId()" [miEquipo]="true"
+      [jornadaInicialId]="jornadaInicialMiEquipo()" />
+    }
+    }
+
+    <!-- ===== Jornadas ===== -->
+    @case ('jornadas') {
+    @switch (estadoJornadas()) {
+    @case ('cargando') {
+    <ng-container *ngTemplateOutlet="esqueletoLista" />
+    }
+    @case ('error') {
+    <ng-container *ngTemplateOutlet="errorTpl; context: { $implicit: 'jornadas' }" />
+    }
+    @default {
+    @if (jornadas().length) {
+    <div class="chips" role="tablist" aria-label="Jornadas">
+      @for (j of jornadas(); track j.id) {
+      <button type="button" role="tab" class="chip" [class.activo]="jornadaId() === j.id"
+        [attr.aria-selected]="jornadaId() === j.id"
+        [attr.aria-label]="'Jornada ' + j.numero_jornada + (j.estado === 'EN_JUEGO' ? ', en juego' : '')"
+        (click)="seleccionarJornada(j)">
+        @if (j.estado === 'EN_JUEGO') { <span class="vivo" aria-hidden="true"></span> }
+        J{{ j.numero_jornada }}
+      </button>
+      }
+    </div>
+
+    @if (jornada()?.estado === 'EN_JUEGO') {
+    <p class="aviso-vivo"><span class="vivo" aria-hidden="true"></span>Jornada en juego: los puntos pueden cambiar</p>
+    }
+
+    @switch (estadoRankingJornada()) {
+    @case ('cargando') { <ng-container *ngTemplateOutlet="esqueletoLista" /> }
+    @case ('error') { <ng-container *ngTemplateOutlet="errorTpl; context: { $implicit: 'ranking-jornada' }" /> }
+    @default {
+    <ng-container *ngTemplateOutlet="listaTpl; context: { $implicit: rankingJornada(), jornadaId: jornadaId() }" />
+    }
+    }
+    } @else {
+    <div class="vacio"><p>Todavía no hay jornadas empezadas en esta liga.</p></div>
+    }
+    }
+    }
+    }
+
+    <!-- ===== General ===== -->
+    @case ('general') {
+    @switch (estadoGeneral()) {
+    @case ('cargando') { <ng-container *ngTemplateOutlet="esqueletoLista" /> }
+    @case ('error') { <ng-container *ngTemplateOutlet="errorTpl; context: { $implicit: 'general' }" /> }
+    @default {
+    <ng-container *ngTemplateOutlet="listaTpl; context: { $implicit: rankingGeneral(), jornadaId: null, general: true }" />
+    }
+    }
+    }
+    }
   </div>
-
-  <ion-list class="ranking-list">
-    @for (user of rankingJornada(); track user.usuario_id) {
-    <ion-item mode="ios" lines="none" button (click)="verAlineacionUsuario(user)" detail="false">
-      <!-- Posición en la tabla -->
-      <div slot="start" class="posicion-badge" [class.top3]="user.posicion <= 3">
-        {{ user.posicion }}
-      </div>
-
-      <!-- Avatar del usuario -->
-      <ion-avatar slot="start">
-        <img [src]="user.image_url || 'assets/images/default-player.png'" alt="Avatar" />
-      </ion-avatar>
-
-      <!-- Nombre y puntos -->
-      <ion-label class="nombre-usuario-club">
-        <h2>{{ user.nombre_club }}</h2>
-        <span>{{ user.nombre_usuario }}</span>
-      </ion-label>
-
-      <div slot="end" class="puntos-container">
-        <span class="puntos-val">{{ user.puntos_totales }}</span>
-        <span class="puntos-lbl">PTS</span>
-      </div>
-    </ion-item>
-    } @empty {
-    <div class="empty-state">
-      <p>No se encontraron datos en la clasificación.</p>
-    </div>
-    }
-  </ion-list>
-
-  }
-
-  @if (tabActivo() === 'clasificacion_general') {
-  <ion-list class="ranking-list">
-    @for (user of rankingGeneral(); track user.usuario_id) {
-    <ion-item mode="ios" lines="none" button (click)="verAlineacionUsuario(user)" detail="false">
-      <!-- Posición en la tabla -->
-      <div slot="start" class="posicion-badge" [class.top3]="user.posicion <= 3">
-        {{ user.posicion }}
-      </div>
-
-      <!-- Avatar del usuario -->
-      <ion-avatar slot="start">
-        <img [src]="user.image_url || 'assets/images/default-player.png'" alt="Avatar" />
-      </ion-avatar>
-
-      <!-- Nombre y puntos -->
-      <ion-label class="nombre-usuario-club">
-        <h2>{{ user.nombre_club }}</h2>
-        <span>{{ user.nombre_usuario }}</span>
-      </ion-label>
-
-      <div slot="end" class="puntos-container">
-        <span class="puntos-val">{{ user.puntos_totales }}</span>
-        <span class="puntos-lbl">PTS</span>
-      </div>
-    </ion-item>
-    } @empty {
-    <div class="empty-state">
-      <p>No se encontraron datos en la clasificación.</p>
-    </div>
-    }
-  </ion-list>
-  }
 </ion-content>
+
+<!-- Lista de una clasificación (jornada o general) -->
+<ng-template #listaTpl let-filas let-jornadaId="jornadaId" let-general="general">
+  <ol class="lista">
+    @for (f of filas; track f.usuario_id) {
+    @let soyYo = f.usuario_id === usuarioId();
+    <li>
+      <button type="button" class="fila" [class.yo]="soyYo" (click)="verUsuario(f, jornadaId)"
+        [attr.aria-label]="f.posicion + 'º, ' + f.nombre_club + (soyYo ? ' (tú)' : '') + ', ' + f.puntos_totales + ' puntos' + (general && f.movimiento ? ', ' + textoMovimiento(f.movimiento) : '') + '. Ver alineación'">
+        <span [class]="'puesto puesto-' + f.posicion">{{ f.posicion }}</span>
+        <img class="avatar" [src]="f.image_url || 'assets/images/default-player.png'" alt="" width="42" height="42" loading="lazy" />
+        <span class="textos">
+          <span class="club">{{ f.nombre_club }}</span>
+          <span class="usuario">{{ f.nombre_usuario }}@if (soyYo) { <span class="tu">· Tú</span> }</span>
+        </span>
+        @if (general) {
+        <span class="movimiento" aria-hidden="true">
+          @if (f.movimiento > 0) {
+          <span class="sube"><ion-icon name="caret-up"></ion-icon>{{ f.movimiento }}</span>
+          } @else if (f.movimiento < 0) {
+          <span class="baja"><ion-icon name="caret-down"></ion-icon>{{ -f.movimiento }}</span>
+          }
+        </span>
+        }
+        <span class="puntos" [class.negativo]="f.puntos_totales < 0">{{ f.puntos_totales }}<small>PTS</small></span>
+      </button>
+    </li>
+    } @empty {
+    <li class="vacio"><p>Nadie ha alineado todavía.</p></li>
+    }
+  </ol>
+</ng-template>
+
+<ng-template #esqueletoLista>
+  <div class="lista" aria-busy="true">
+    @for (_ of esqueletos; track $index) {
+    <ion-skeleton-text animated class="sk-fila"></ion-skeleton-text>
+    }
+  </div>
+</ng-template>
+
+<ng-template #errorTpl let-que>
+  <div class="vacio">
+    <p>No se ha podido cargar la clasificación.</p>
+    <button type="button" class="btn-reintentar"
+      (click)="que === 'general' ? cargarGeneral() : que === 'jornadas' ? cargarJornadas() : seleccionarJornada(jornada()!, true)">
+      <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon>
+      Reintentar
+    </button>
+  </div>
+</ng-template>

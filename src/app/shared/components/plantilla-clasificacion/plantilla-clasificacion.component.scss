@@ -1,444 +1,482 @@
-.plantilla-clasificacion-container {
-    background: var(--ion-color-stadium);
+/* Alineación con puntos jornada a jornada. Como modal: tamaño y forma en src/theme/modal-auto.scss */
+
+:host {
+  display: block;
+  color: #ffffff;
 }
 
-.jornadas-scroll-container {
-  width: 100%;
+/* ---------- Cabecera (solo como modal) ---------- */
+.cabecera-modal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 26px 16px 10px 20px;
+}
+
+.avatar-usuario {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 230, 118, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cabecera-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span {
+    font-size: 0.78rem;
+    color: var(--ion-color-slate-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.btn-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ion-color-slate-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.pf-modal-cuerpo {
+  overflow-y: auto;
+  padding: 4px 16px 24px;
+}
+
+/* ---------- Jornadas ---------- */
+.chips {
+  display: flex;
+  gap: 6px;
   overflow-x: auto;
-  padding: 12px 16px;
-  box-sizing: border-box;
+  padding: 2px 0 4px;
   scrollbar-width: none;
-  /* Firefox */
 
   &::-webkit-scrollbar {
     display: none;
-    /* Chrome/Safari */
-  }
-
-  .jornadas-track {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-
-    .jornada-card {
-      flex: 0 0 auto;
-      min-width: 65px;
-      padding: 8px 12px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-      .jornada-title {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #8e8e93;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-      }
-
-      .jornada-puntos {
-        font-size: 0.9rem;
-        font-weight: 800;
-        color: #ffffff;
-        margin-top: 2px;
-
-        small {
-          font-size: 0.6rem;
-          color: #8e8e93;
-        }
-      }
-
-      /* Estado Activo con Iluminación Neón */
-      &.active {
-        background: rgba(0, 255, 102, 0.08);
-        border-color: #00ff66;
-        box-shadow: 0 0 12px rgba(0, 255, 102, 0.35),
-          inset 0 0 6px rgba(0, 255, 102, 0.2);
-        transform: translateY(-2px);
-
-        .jornada-title {
-          color: #00ff66;
-          font-size: 0.8rem;
-          font-weight: 900;
-          letter-spacing: 0.5px;
-        }
-
-        .jornada-puntos {
-          color: #ffffff;
-          text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
-
-          small {
-            color: #00ff66;
-          }
-        }
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
-    }
   }
 }
 
-.pitch-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding: 0 16px;
+.chip {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.pitch-grass {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  height: 100%;
-  min-height: 600px;
-  //margin-top: 10px;
-  background: linear-gradient(180deg, #0d1f14 0%, #08120b 100%);
-  border: 2px solid rgba(0, 255, 102, 0.3);
+  gap: 1px;
+  flex-shrink: 0;
+  min-width: 52px;
+  padding: 6px 8px;
   border-radius: 12px;
-  overflow: hidden;
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
-}
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ion-color-slate-muted);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 
-/* Dibujo de las líneas del campo */
-.pitch-lines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  /* Que no interfiera con los clics */
+  &.activo {
+    border-color: rgba(0, 230, 118, 0.55);
+    background: rgba(0, 230, 118, 0.14);
+    box-shadow: 0 0 12px rgba(0, 230, 118, 0.2);
 
-  .center-line {
-    position: absolute;
-    top: 50%;
-    width: 100%;
-    height: 2px;
-    background: rgba(0, 255, 102, 0.15);
+    .chip-jornada {
+      color: #ffffff;
+    }
   }
 
-  .center-circle {
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+.chip-jornada {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.chip-puntos {
+  font-size: 0.95rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--ion-color-pitch);
+
+  &.negativo {
+    color: #ff8a80;
+  }
+}
+
+/* Punto "en vivo" de la jornada en juego */
+.vivo {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff5252;
+  box-shadow: 0 0 6px rgba(255, 82, 82, 0.8);
+  animation: latido 1.6s ease-in-out infinite;
+}
+
+@keyframes latido {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vivo {
+    animation: none;
+  }
+}
+
+/* ---------- Resumen ---------- */
+.resumen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.resumen-jornada {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.resumen-titulo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.en-juego {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 82, 82, 0.45);
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff8a80;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.resumen-datos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.resumen-puntos {
+  font-size: 1.3rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ion-color-pitch);
+  text-shadow: 0 0 10px rgba(0, 230, 118, 0.35);
+
+  small {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--ion-color-slate-muted);
+    text-shadow: none;
+  }
+
+  &.negativo {
+    color: #ff8a80;
+    text-shadow: none;
+  }
+}
+
+.resumen-puesto {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ion-color-slate-muted);
+}
+
+/* ---------- Campo (mismo dibujo que la pantalla de alineación) ---------- */
+.campo-envoltorio {
+  position: relative;
+}
+
+.campo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  border: 2px solid rgba(0, 230, 118, 0.3);
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0 12.5%, transparent 12.5% 25%),
+    linear-gradient(180deg, #0d1f14 0%, #08120b 100%);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.lineas-campo {
+  --linea: rgba(0, 230, 118, 0.15);
+
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  .medio-campo {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--linea);
+  }
+
+  .circulo {
     position: absolute;
     top: 50%;
     left: 50%;
+    width: 22%;
+    aspect-ratio: 1;
     transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
-    border: 2px solid rgba(0, 255, 102, 0.15);
+    border: 2px solid var(--linea);
     border-radius: 50%;
   }
 
-  .penalty-box {
+  .area {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
     width: 50%;
-    height: 15%;
-    border: 2px solid rgba(0, 255, 102, 0.15);
+    height: 14%;
+    transform: translateX(-50%);
+    border: 2px solid var(--linea);
 
-    &.top {
-      top: 0;
-      border-top: none;
+    &.arriba {
+      top: -2px;
     }
 
-    &.bottom {
-      bottom: 0;
-      border-bottom: none;
+    &.abajo {
+      bottom: -2px;
     }
   }
 }
 
-/* Grid de Jugadores (Flexbox) */
-.players-grid {
+.filas {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  padding: 60px 10px 20px 10px;
-  /* Espacio arriba para el select */
-  z-index: 2;
-}
-
-.pitch-row {
-  display: flex;
   justify-content: space-around;
-  align-items: center;
-  width: 100%;
+  padding: 12px 4px 14px;
 }
 
-/* Huecos de los jugadores */
-.player-slot {
-  width: 60px;
-  height: 60px;
+.fila {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
 
-  &:active {
+.hueco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 64px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &:active:not(:disabled) {
     transform: scale(0.95);
   }
 
-  /* Botón "+" vacío neón */
-  .empty-slot {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px dashed rgba(0, 255, 102, 0.6);
-    background: rgba(0, 255, 102, 0.05);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 10px rgba(0, 255, 102, 0.1);
-    position: relative;
-
-    ion-icon {
-      font-size: 1.5rem;
-      color: #00ff66;
-    }
-
-    .rol-badge {
-      position: absolute;
-      bottom: -14px;
-      background: #121212;
-      color: #00ff66;
-      font-size: 0.55rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 6px;
-      border: 1px solid rgba(0, 255, 102, 0.4);
-      letter-spacing: 0.5px;
-    }
+  &:disabled {
+    cursor: default;
   }
 
-  /* Estilos para cuando haya un jugador ocupando el slot */
-  .player-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    &.out-position {
-      .player-img {
-        border: 2px solid var(--ion-color-red-card) !important;
-      }
-    }
-
-    .player-img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: 2px solid #00ff66;
-      background: #121212;
-      object-fit: cover;
-    }
-
-    .player-equipo-img {
-      position: absolute;
-      left: 35px;
-      width: 25px;
-      height: 25px;
-      bottom: 0;
-    }
-
-    .player-name {
-      position: absolute;
-      bottom: -14px;
-      background: rgba(18, 18, 18, 0.9);
-      color: #fff;
-      font-size: 0.6rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-  }
-}
-
-.divider {
-  height: 1px;
-  background: linear-gradient(
-    90deg, 
-    rgba(0, 255, 102, 0) 0%, 
-    rgba(0, 255, 102, 0.3) 50%, 
-    rgba(0, 255, 102, 0) 100%
-  );
-  margin: 16px 0;
-
-  &.secondary {
-    background: rgba(255, 255, 255, 0.08);
-    margin: 12px 0 16px 0;
-  }
-}
-
-// Contenedor principal del Header
-.team-header-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  //padding: 16px 20px;
-  //background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-  //border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  margin: 16px 16px 0 16px;
-  //box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-
-  // Escudo / Badge del equipo
-  .team-badge {
-    position: relative;
-    width: 56px;
-    height: 56px;
-    min-width: 56px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 3px;
-    border: 2px solid var(--ion-color-pitch);
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.3); // Efecto Glow/Neón
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+    border-radius: 12px;
   }
 
-  // Información textual
-  .team-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  .nombre {
+    max-width: 66px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(10, 18, 13, 0.9);
+    font-size: 0.6rem;
+    font-weight: 700;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .user-name {
-      font-size: 0.8rem;
-      font-weight: 600;
-      //text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: rgba(255, 255, 255, 0.6);
-      margin-bottom: 2px;
-    }
-
-    .club-name {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      letter-spacing: -0.3px;
-    }
+  /* No jugó: apagado y con "–" */
+  &.no-jugo app-avatar-jugador {
+    opacity: 0.45;
+    filter: grayscale(0.6);
   }
 }
 
-// Separador con degradado suave
-.header-divider {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.15) 30%, 
-    rgba(255, 255, 255, 0.15) 70%, 
-    transparent 100%
-  );
-  margin: 16px 0 20px 0;
+.foto {
+  position: relative;
+  display: inline-flex;
 }
 
-.puntos-badge {
+/* Pastilla de puntos arriba a la derecha (el escudo va abajo a la derecha) */
+.puntos {
   position: absolute;
-  top: -9px;
-  right: -9px;
-  background: rgba(18, 18, 18, 0.9);
-  color: var(--ion-color-pitch);
-  font-size: 0.75rem;
+  top: -6px;
+  right: -10px;
+  min-width: 24px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #1b2a20;
+  color: #c7d2cc;
+  font-size: 0.66rem;
   font-weight: 900;
-  padding: 2px 6px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  z-index: 3;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  line-height: 1.5;
 
-  &.negative {
-    color: var(--ion-color-red-card) !important; 
+  &.positivo {
+    border-color: rgba(0, 230, 118, 0.7);
+    background: #0f3b22;
+    color: var(--ion-color-pitch);
   }
 
-  &.neutral {
-    color: var(--ion-color-muted) !important;
+  &.negativo {
+    border-color: rgba(255, 82, 82, 0.7);
+    background: #3b1414;
+    color: #ff8a80;
   }
 }
 
-ion-button.popover-button {
+.hueco-vacio {
+  cursor: default;
+
+  .sin-jugador {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+  }
+
+  .pf-chip-pos {
+    width: 34px;
+    height: 18px;
+    font-size: 0.56rem;
+  }
+}
+
+/* 11 ideal: flotante abajo a la derecha del campo */
+.btn-once-ideal {
   position: absolute;
-  top: 10px;
-  right: 30px;
-  z-index: 2;
-  height: 40px;
-  width: 40px;
-  --padding-start: 0;
-  --padding-end: 0;
-  --padding-top: 0;
-  --padding-bottom: 0;
-
-  --background:  rgba(255, 255, 255, 0.03);
-  --border-radius: 12px;
-  --border-width: 1px;
-  --border-style: solid;
-  --border-color: #00ff66;;
-  --box-shadow: 0 0 12px rgba(0, 255, 102, 0.35),
-          inset 0 0 6px rgba(0, 255, 102, 0.2);
-  --color: #00ff66;
-  --ripple-color: rgba(255, 255, 255, 0.15);
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
-}
-
-.ideal-popover {
-  --offset-x: -15px;
-  --offset-y: -15px;
-}
-
-.ideal-list {
-  background: transparent !important;;
-}
-
-.ideal-item {
-  --background:  rgba(255, 255, 255, 0.03);
-  --border-radius: 12px;
-  /* --border-width: 1px;
-  --border-style: solid;
-  --border-color: #00ff66;; */
-  --box-shadow: 0 0 12px rgba(0, 255, 102, 0.35),
-          inset 0 0 6px rgba(0, 255, 102, 0.2);
-  --color: #00ff66;
-  --ripple-color: rgba(255, 255, 255, 0.15);
-  //text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 191, 36, 0.6);
+  background: rgba(30, 24, 6, 0.92);
+  color: #fbbf24;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px rgba(251, 191, 36, 0.25);
+  cursor: pointer;
 
   ion-icon {
-    color: #00ff66;
-    text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+    font-size: 0.95rem;
   }
+
+  &:active {
+    background: rgba(60, 48, 12, 0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Carga / error / vacío ---------- */
+.sk-chip {
+  width: 52px;
+  height: 48px;
+  margin: 0;
+  flex-shrink: 0;
+  border-radius: 12px;
+  --background: rgba(255, 255, 255, 0.07);
+}
+
+.sk-campo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  margin: 10px 0 0;
+  border-radius: 16px;
+  --background: rgba(255, 255, 255, 0.07);
+}
+
+.vacio {
+  padding: 32px 8px;
+  text-align: center;
+
+  p {
+    margin: 0 0 12px;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.btn-reintentar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 230, 118, 0.55);
+  background: transparent;
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }

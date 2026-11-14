@@ -13,6 +13,18 @@ interface ApiResponse<T> {
 export type EstadoJornada = 'PENDIENTE' | 'EN_JUEGO' | 'CERRADA';
 
 /** Jornada tal como la ve el panel de control. Fechas en hora de España: "YYYY-MM-DDTHH:mm". */
+/** Jornada empezada en la que un usuario alineó, con sus puntos y su puesto (getPuntuacionesJornadas). */
+export interface PuntuacionJornada {
+  jornada_id: number;
+  numero_jornada: number;
+  estado: 'EN_JUEGO' | 'CERRADA';
+  puntos_totales: number;
+  /** Puesto en esa jornada entre los que alinearon */
+  posicion: number;
+  participantes: number;
+  tiene_once_ideal: boolean;
+}
+
 /** Próxima jornada pendiente (jornadas/getSiguienteJornada). */
 export interface SiguienteJornada {
   id: number;
@@ -82,8 +94,12 @@ export class JornadasService {
       .pipe(map((res) => res.data));
   }
 
-  getPuntuacionesJornadas(data: any) {
-    return this.http.post(`${this.apiUrl}/getPuntuacionesJornadas`, data);
+  /** Jornadas empezadas en las que el usuario alineó, de la más reciente a la más antigua. */
+  getPuntuacionesJornadas(ligaId: number, usuarioId: number) {
+    return this.http.post<ApiResponse<PuntuacionJornada[]>>(`${this.apiUrl}/getPuntuacionesJornadas`, {
+      liga_id: ligaId,
+      usuario_id: usuarioId,
+    });
   }
 
   getJornadasDisputadas() {

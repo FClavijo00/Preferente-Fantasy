@@ -12,18 +12,51 @@ export interface ResumenUltimaJornada {
     mejor?: { nombre_club: string; puntos: number; soy_yo: boolean } | null;
 }
 
+/** Fila de una clasificación de la liga (general o de una jornada). */
+export interface FilaClasificacionLiga {
+    usuario_id: number;
+    nombre_usuario: string;
+    nombre_club: string;
+    image_url: string | null;
+    puntos_totales: number;
+    /** Con empates (RANK): dos primeros = 1, 1, 3 */
+    posicion: number;
+    /** Solo en la general: puestos subidos (+) o bajados (-) con la última jornada; null si no hay con qué comparar */
+    movimiento?: number | null;
+}
+
+/** Jornada en juego o cerrada en la que la liga tiene alineaciones. */
+export interface JornadaLiga {
+    id: number;
+    numero_jornada: number;
+    estado: 'EN_JUEGO' | 'CERRADA';
+    tiene_once_ideal: boolean;
+}
+
 @Service()
 export class ClasificacionesService {
 
     private http = inject(HttpClient)
     private apiUrl = `${environment.apiBaseURL}/clasificaciones`
 
-    getClasificacion(data: any) {
-        return this.http.post(`${this.apiUrl}/getClasificacionLiga`, data);
+    /** Clasificación general de la liga, con lo que ha subido o bajado cada uno. */
+    getClasificacion(ligaId: number) {
+        return this.http.post<{ ok: boolean; data: FilaClasificacionLiga[] }>(`${this.apiUrl}/getClasificacionLiga`, {
+            liga_id: ligaId,
+        });
     }
 
-    getClasificacionPorJornada(data: any) {
-        return this.http.post(`${this.apiUrl}/getClasificacionPorJornada`, data);
+    /** Clasificación de una jornada (solo quienes alinearon). */
+    getClasificacionPorJornada(ligaId: number, jornadaId: number) {
+        return this.http.post<{ ok: boolean; data: FilaClasificacionLiga[] }>(`${this.apiUrl}/getClasificacionPorJornada`, {
+            liga_id: ligaId,
+            jornada_id: jornadaId,
+        });
+    }
+
+    /** Jornadas en juego o cerradas con alineaciones en la liga (más reciente primero). */
+    getJornadasLiga(ligaId: number) {
+        return this.http.post<{ ok: boolean; data: JornadaLiga[] }>(`${this.apiUrl}/getJornadasLiga`, { liga_id: ligaId });
     }
 
     getResumenUltimaJornada(ligaId: number) {
