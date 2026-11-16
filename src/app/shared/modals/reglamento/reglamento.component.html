@@ -1,0 +1,33 @@
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      <span class="sobretitulo">Preferente Fantasy</span>
+      <h2>Reglamento</h2>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
+    @for (a of apartados; track a.titulo; let i = $index) {
+    <section class="seccion" [attr.aria-label]="a.titulo">
+      <h3 class="seccion-titulo">
+        <span class="icono" aria-hidden="true"><ion-icon [name]="a.icono"></ion-icon></span>
+        <span class="numero">{{ i + 1 }}.</span> {{ a.titulo }}
+      </h3>
+      <ul class="puntos">
+        @for (p of a.puntos; track p) {
+        <li>{{ p }}</li>
+        }
+      </ul>
+      @if (a.icono === 'calculator-outline') {
+      <button type="button" class="btn-enlace" (click)="verPuntuacion()">
+        Ver cómo se puntúa
+        <ion-icon name="chevron-forward" aria-hidden="true"></ion-icon>
+      </button>
+      }
+    </section>
+    }
+  </div>
+</div>
