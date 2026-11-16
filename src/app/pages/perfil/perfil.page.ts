@@ -15,6 +15,7 @@ import {
   chevronForward,
   copyOutline,
   createOutline,
+  downloadOutline,
   exitOutline,
   globeOutline,
   lockClosed,
@@ -40,6 +41,8 @@ import { EditarPerfilComponent } from '../../shared/modals/editar-perfil/editar-
 import { EditarLigaComponent } from '../../shared/modals/editar-liga/editar-liga.component';
 import { InfoPuntuacionComponent } from '../../shared/modals/info-puntuacion/info-puntuacion.component';
 import { ReglamentoComponent } from '../../shared/modals/reglamento/reglamento.component';
+import { InstalarAppComponent } from '../../shared/modals/instalar-app/instalar-app.component';
+import { estaInstalada } from '../../core/utils/instalar-app';
 
 /** Mis números en la liga actual (tarjeta "Liga actual") */
 interface MisDatosLiga {
@@ -67,6 +70,8 @@ export class PerfilPage {
   private _toastService = inject(ToastService);
 
   readonly version = APP_VERSION;
+  /** Abierta desde el icono de la pantalla de inicio: no hace falta ofrecer instalarla */
+  readonly instalada = estaInstalada();
 
   /** Usuario de la sesión: se actualiza solo al editar el perfil */
   readonly user = this._authService.currentUser;
@@ -92,6 +97,7 @@ export class PerfilPage {
       chevronForward,
       copyOutline,
       createOutline,
+      downloadOutline,
       exitOutline,
       globeOutline,
       lockClosed,
@@ -214,6 +220,14 @@ export class PerfilPage {
   async abrirCambiarPassword() {
     const modal = await this._modalCtrl.create({
       component: CambiarPasswordComponent,
+      ...opcionesModalAuto(),
+    });
+    await modal.present();
+  }
+
+  async abrirInstalarApp() {
+    const modal = await this._modalCtrl.create({
+      component: InstalarAppComponent,
       ...opcionesModalAuto(),
     });
     await modal.present();

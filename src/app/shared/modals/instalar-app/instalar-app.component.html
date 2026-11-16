@@ -1,0 +1,62 @@
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      <span class="sobretitulo">Preferente Fantasy</span>
+      <h2>Instalar la app</h2>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
+    @if (instalada) {
+    <p class="nota instalada">
+      <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
+      Ya estás usando la app instalada. ¡Todo listo!
+    </p>
+    } @else {
+    <p class="nota">
+      <ion-icon name="phone-portrait-outline" aria-hidden="true"></ion-icon>
+      Añádela a tu pantalla de inicio y ábrela como una app más: a pantalla completa, sin barra del navegador y sin
+      descargar nada de ninguna tienda.
+    </p>
+    }
+
+    <div class="chips" role="radiogroup" aria-label="Dispositivo">
+      <button type="button" class="chip" role="radio" [class.activo]="dispositivo() === 'ios'"
+        [attr.aria-checked]="dispositivo() === 'ios'" (click)="dispositivo.set('ios')">
+        <ion-icon name="logo-apple" aria-hidden="true"></ion-icon> iPhone / iPad
+      </button>
+      <button type="button" class="chip" role="radio" [class.activo]="dispositivo() === 'android'"
+        [attr.aria-checked]="dispositivo() === 'android'" (click)="dispositivo.set('android')">
+        <ion-icon name="logo-android" aria-hidden="true"></ion-icon> Android
+      </button>
+    </div>
+
+    @if (dispositivo() === 'android' && directo() && !instalada) {
+    <button type="button" class="btn-guardar" (click)="instalar()">
+      <ion-icon name="download-outline" aria-hidden="true"></ion-icon>
+      Instalar ahora
+    </button>
+    <p class="o-a-mano">o hazlo a mano:</p>
+    }
+
+    <ol class="pasos">
+      @for (p of pasos[dispositivo()]; track p.texto; let i = $index) {
+      <li class="paso">
+        <span class="numero" aria-hidden="true">{{ i + 1 }}</span>
+        <div class="paso-cuerpo">
+          <span class="paso-texto">{{ p.texto }}</span>
+          @if (p.boton; as b) {
+          <span class="boton-ejemplo" aria-hidden="true">
+            <ion-icon [name]="b.icono"></ion-icon>
+            @if (b.texto) { <span>{{ b.texto }}</span> }
+          </span>
+          }
+        </div>
+      </li>
+      }
+    </ol>
+  </div>
+</div>

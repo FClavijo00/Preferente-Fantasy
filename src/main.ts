@@ -18,9 +18,13 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { inject } from '@vercel/analytics';
 import { SeoTitleStrategy } from './app/core/seo/seo-title.strategy';
+import { escucharInstalacion } from './app/core/utils/instalar-app';
 
 // Initialize Vercel Web Analytics
 inject();
+
+// Guarda el aviso de "Instalar app" de Chrome/Edge para ofrecerlo desde el perfil
+escucharInstalacion();
 
 bootstrapApplication(AppComponent, {
   providers: [
