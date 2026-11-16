@@ -13,6 +13,7 @@ import { arrowBackOutline, lockClosedOutline, mailOutline } from 'ionicons/icons
 import { AuthService } from '../../../core/services/auth-service.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { LoadingService } from '../../../core/services/loading.service';
+import { APP_VERSION } from '../../../core/version';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +30,7 @@ export class LoginPage {
 
   readonly enviando = signal(false);
   readonly anioActual = new Date().getFullYear();
+  readonly version = APP_VERSION;
 
   readonly loginForm = this._fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
