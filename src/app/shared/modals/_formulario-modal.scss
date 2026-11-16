@@ -1,0 +1,294 @@
+/*
+ * Piezas comunes de los modales con formulario (editar perfil, editar liga, cambiar contraseña):
+ * cabecera con sobretítulo y cerrar, campos de texto, chips, botón de guardar y zona de peligro.
+ * Se usa con @use '../formulario-modal'; desde el .scss de cada modal.
+ */
+
+.pf-modal {
+  color: #ffffff;
+}
+
+/* ---------- Cabecera ---------- */
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* Arriba deja sitio al tirador del sheet */
+  padding: 26px 16px 10px 20px;
+  background: var(--ion-color-stadium);
+}
+
+.cabecera-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+}
+
+.sobretitulo {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ion-color-pitch);
+  text-shadow: 0 0 6px rgba(0, 230, 118, 0.35);
+}
+
+.btn-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ion-color-slate-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Contenido ---------- */
+.contenido {
+  --background: var(--ion-color-stadium);
+  color: #ffffff;
+}
+
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 6px 16px 24px;
+}
+
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.etiqueta {
+  margin: 0 0 0 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ion-color-slate-muted);
+}
+
+/* ---------- Campo de texto ---------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entrada {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.25);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  > ion-icon {
+    flex-shrink: 0;
+    font-size: 1.15rem;
+    color: var(--ion-color-pitch);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  &:focus-within {
+    border-color: rgba(0, 230, 118, 0.6);
+    box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.12);
+  }
+
+  &.invalida {
+    border-color: rgba(255, 82, 82, 0.7);
+  }
+
+  /* Botón de ver/ocultar contraseña */
+  .btn-ojo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-right: -6px;
+    border: 0;
+    background: transparent;
+    color: var(--ion-color-slate-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+}
+
+.ayuda,
+.error {
+  margin: 0 0 0 4px;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.ayuda {
+  color: var(--ion-color-slate-muted);
+}
+
+.error {
+  color: #ff8a80;
+}
+
+/* ---------- Chips (opción única) ---------- */
+.chips {
+  display: flex;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ion-color-slate-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  &.activo {
+    border-color: rgba(0, 230, 118, 0.55);
+    background: rgba(0, 230, 118, 0.16);
+    color: var(--ion-color-pitch);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Guardar ---------- */
+.barra-guardar {
+  position: sticky;
+  bottom: 0;
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent 0%, var(--ion-color-stadium) 35%);
+}
+
+.btn-guardar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 520px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 230, 118, 0.6);
+  background: rgba(0, 230, 118, 0.16);
+  color: var(--ion-color-pitch);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.25);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 1.15rem;
+  }
+
+  &:disabled {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--ion-color-slate-muted);
+    box-shadow: none;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Zona de peligro ---------- */
+.zona-peligro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 82, 82, 0.25);
+  background: rgba(255, 82, 82, 0.05);
+
+  p {
+    margin: 0;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.btn-peligro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 82, 82, 0.5);
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff8a80;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #ff8a80;
+    outline-offset: 2px;
+  }
+}

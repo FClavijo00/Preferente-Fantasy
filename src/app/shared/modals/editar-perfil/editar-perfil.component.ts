@@ -1,143 +1,120 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { ModalController } from '@ionic/angular/modal-controller';
-import { cameraOutline, shieldOutline, atOutline } from 'ionicons/icons';
-import { LoadingService } from '../../../core/services/loading.service';
-import { AuthService } from '../../../core/services/auth-service.service';
-import { IonContent } from '@ionic/angular/ion-content';
-import { IonItem } from '@ionic/angular/ion-item';
-import { IonInput } from '@ionic/angular/ion-input';
-import { IonIcon } from '@ionic/angular/ion-icon';
+import { Component, computed, inject, Input, signal } from '@angular/core';
 import { IonHeader } from '@ionic/angular/ion-header';
-import { IonButtons } from '@ionic/angular/ion-buttons';
-import { IonButton } from '@ionic/angular/ion-button';
-import { IonTitle } from '@ionic/angular/ion-title';
-import { IonToolbar } from '@ionic/angular/ion-toolbar';
+import { IonContent } from '@ionic/angular/ion-content';
+import { IonIcon } from '@ionic/angular/ion-icon';
+import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { CropModalComponent } from '../../components/crop-modal/crop-modal.component';
+import { atOutline, cameraOutline, checkmarkCircleOutline, closeOutline, shieldOutline } from 'ionicons/icons';
+import { AuthService, Usuario } from '../../../core/services/auth-service.service';
+import { LoadingService } from '../../../core/services/loading.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { CropModalComponent } from '../../components/crop-modal/crop-modal.component';
 
+/**
+ * Editar perfil: foto (con recorte), nombre del club y nombre de usuario.
+ * Al guardar deja el usuario nuevo en la sesión (AuthService) y cierra con role 'confirm'.
+ *
+ *   modalCtrl.create({ component: EditarPerfilComponent, ...opcionesModalAlto(),
+ *                      componentProps: { userData: usuario } })
+ */
 @Component({
   selector: 'app-editar-perfil',
   templateUrl: './editar-perfil.component.html',
   styleUrls: ['./editar-perfil.component.scss'],
-  imports: [
-    IonToolbar,
-    IonTitle,
-    IonButton,
-    IonButtons,
-    IonHeader,
-    IonIcon,
-    IonInput,
-    IonContent,
-    ReactiveFormsModule
-],
+  imports: [IonHeader, IonContent, IonIcon],
 })
-export class EditarPerfilComponent implements OnInit {
-  @Input({ required: true }) userData!: any;
+export class EditarPerfilComponent {
+  @Input({ required: true }) set userData(u: Usuario | null) {
+    this._original = u;
+    this.club.set(u?.nombre_club ?? '');
+    this.usuario.set(u?.nombre_usuario ?? '');
+    this.imagenPreview.set(u?.image_url || null);
+  }
 
-  private _fb = inject(FormBuilder);
+  private _original: Usuario | null = null;
   private _modalCtrl = inject(ModalController);
   private _authService = inject(AuthService);
   private _loadingService = inject(LoadingService);
   private _toastService = inject(ToastService);
 
-  perfilForm!: FormGroup;
-  imagenPreview = signal<string | null>(null);
-  archivoSeleccionado = signal<File | null>(null);
+  readonly club = signal('');
+  readonly usuario = signal('');
+  readonly imagenPreview = signal<string | null>(null);
+  readonly foto = signal<File | null>(null);
+  readonly enviando = signal(false);
+  /** Los errores se enseñan al salir del campo o al intentar guardar */
+  readonly tocado = signal({ club: false, usuario: false });
+
+  readonly clubValido = computed(() => this.club().trim().length >= 3);
+  readonly usuarioValido = computed(() => this.usuario().trim().length >= 3);
+  readonly hayCambios = computed(
+    () =>
+      !!this.foto() ||
+      this.club().trim() !== (this._original?.nombre_club ?? '') ||
+      this.usuario().trim() !== (this._original?.nombre_usuario ?? ''),
+  );
 
   constructor() {
-    addIcons({ cameraOutline, shieldOutline, atOutline });
+    addIcons({ atOutline, cameraOutline, checkmarkCircleOutline, closeOutline, shieldOutline });
   }
 
-  ngOnInit() {
-    this.imagenPreview.set(this.userData.image_url || null);
+  onTexto(campo: 'club' | 'usuario', event: Event) {
+    const valor = (event.target as HTMLInputElement).value;
+    (campo === 'club' ? this.club : this.usuario).set(valor);
+  }
 
-    this.perfilForm = this._fb.group({
-      nombre_club: [
-        this.userData?.nombre_club || '',
-        [Validators.required, Validators.minLength(3)],
-      ],
-      nombre_usuario: [
-        this.userData?.nombre_usuario || '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          /* Validators.pattern('^[a-zA-Z0-9_]+$'), */
-        ],
-      ],
-      foto: [null],
-    });
+  tocar(campo: 'club' | 'usuario') {
+    this.tocado.update((t) => ({ ...t, [campo]: true }));
   }
 
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-
     if (!input.files || input.files.length === 0) return;
 
     const modal = await this._modalCtrl.create({
       component: CropModalComponent,
-      componentProps: {
-        imageChangedEvent: event,
-      },
+      componentProps: { imageChangedEvent: event },
     });
-
     await modal.present();
 
     const { data, role } = await modal.onWillDismiss();
-
     if (role === 'confirm' && data) {
       this.imagenPreview.set(data.croppedImageBase64);
-
-      this.perfilForm.patchValue({ foto: data.croppedImageFile });
+      this.foto.set(data.croppedImageFile);
     }
-
     input.value = '';
   }
 
-  async guardarCambios() {
-    if (this.perfilForm.invalid) {
-      this.perfilForm.markAllAsTouched();
-      return;
-    }
-
-    this._loadingService.show('Guardando cambios...');
+  guardar() {
+    this.tocado.set({ club: true, usuario: true });
+    if (!this.clubValido() || !this.usuarioValido() || !this.hayCambios() || this.enviando()) return;
 
     const formData = new FormData();
-    const formValues = this.perfilForm.value;
-
-    formData.append('nombre_club', this.perfilForm.value.nombre_club);
-    formData.append('nombre_usuario', this.perfilForm.value.nombre_usuario);
+    formData.append('nombre_club', this.club().trim());
+    formData.append('nombre_usuario', this.usuario().trim());
     // El nombre del fichero lo pone el servidor (y el usuario sale del token, no del id)
-    if (formValues.foto !== null) {
-      formData.append('foto', formValues.foto, 'foto.webp');
-    }
+    const foto = this.foto();
+    if (foto) formData.append('foto', foto, 'foto.webp');
 
-    this._authService
-      .actualizarPerfil(formData)
-      .subscribe({
-        next: (resp: any) => {
-          this._loadingService.hide();
-          if (resp.ok) {
-            // Devolvemos el usuario actualizado al cerrar el modal
-            this._authService.setSession(resp.data);
-            this._modalCtrl.dismiss(resp.data, 'confirm');
-            this._toastService.showSuccessToast(resp.message);
-          }
-        },
-        error: (err) => {
-          console.error('Error al actualizar perfil:', err);
-          this._loadingService.hide();
-        },
-      });
+    this.enviando.set(true);
+    this._loadingService.show('Guardando cambios...');
+    this._authService.actualizarPerfil(formData).subscribe({
+      next: (resp) => {
+        this._loadingService.hide();
+        this.enviando.set(false);
+        this._authService.setSession(resp.data);
+        this._toastService.showSuccessToast(resp.message || 'Perfil actualizado');
+        this._modalCtrl.dismiss(resp.data, 'confirm');
+      },
+      error: (error) => {
+        this._loadingService.hide();
+        this.enviando.set(false);
+        this._toastService.showErrorToast(error.error?.message || 'No se ha podido guardar el perfil');
+      },
+    });
   }
 
-  cerrarModal() {
-    this._modalCtrl.dismiss();
+  cerrar() {
+    this._modalCtrl.dismiss(null, 'cancel');
   }
 }

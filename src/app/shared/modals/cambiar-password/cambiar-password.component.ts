@@ -1,12 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { IonCard } from '@ionic/angular/ion-card';
-import { IonCardContent } from '@ionic/angular/ion-card-content';
-import { IonInput } from '@ionic/angular/ion-input';
-import { IonInputPasswordToggle } from '@ionic/angular/ion-input-password-toggle';
+import { IonIcon } from '@ionic/angular/ion-icon';
 import { ModalController } from '@ionic/angular/modal-controller';
-import { IonButton } from '@ionic/angular/ion-button';
+import { addIcons } from 'ionicons';
+import { checkmarkCircleOutline, closeOutline, eyeOffOutline, eyeOutline, keyOutline, lockClosedOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth-service.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { LoadingService } from '../../../core/services/loading.service';
@@ -18,11 +16,18 @@ const passwordsCoinciden = (group: AbstractControl): ValidationErrors | null => 
   return nueva && confirmar && nueva !== confirmar ? { noCoinciden: true } : null;
 };
 
+type CampoPassword = 'passwordActual' | 'passwordNueva' | 'confirmarPassword';
+
+/**
+ * Cambiar contraseña. Sheet en el móvil / tarjeta en el escritorio.
+ *
+ *   modalCtrl.create({ component: CambiarPasswordComponent, ...opcionesModalAuto() })
+ */
 @Component({
   selector: 'app-cambiar-password',
   templateUrl: './cambiar-password.component.html',
   styleUrls: ['./cambiar-password.component.scss'],
-  imports: [IonButton, IonCard, IonInput, IonInputPasswordToggle, IonCardContent, ReactiveFormsModule],
+  imports: [IonIcon, ReactiveFormsModule],
 })
 export class CambiarPasswordComponent {
   private _modalCtrl = inject(ModalController);
@@ -31,9 +36,14 @@ export class CambiarPasswordComponent {
   private _toastService = inject(ToastService);
   private _loadingService = inject(LoadingService);
 
-  public enviando = signal(false);
+  readonly enviando = signal(false);
+  readonly visibles = signal<Record<CampoPassword, boolean>>({
+    passwordActual: false,
+    passwordNueva: false,
+    confirmarPassword: false,
+  });
 
-  public cambiarPasswordForm = this._fb.nonNullable.group(
+  readonly form = this._fb.nonNullable.group(
     {
       passwordActual: ['', [Validators.required]],
       passwordNueva: ['', [Validators.required, Validators.minLength(6)]],
@@ -42,26 +52,36 @@ export class CambiarPasswordComponent {
     { validators: passwordsCoinciden },
   );
 
+  constructor() {
+    addIcons({ checkmarkCircleOutline, closeOutline, eyeOffOutline, eyeOutline, keyOutline, lockClosedOutline });
+  }
+
+  alternarVisible(campo: CampoPassword) {
+    this.visibles.update((v) => ({ ...v, [campo]: !v[campo] }));
+  }
+
+  invalido(campo: CampoPassword): boolean {
+    const c = this.form.controls[campo];
+    return c.touched && c.invalid;
+  }
+
   cambiarPassword() {
-    if (this.cambiarPasswordForm.invalid) {
-      this.cambiarPasswordForm.markAllAsTouched();
-      if (this.cambiarPasswordForm.hasError('noCoinciden')) {
-        this._toastService.showErrorToast('Las contraseñas nuevas no coinciden.');
-      }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
     if (this.enviando()) return;
 
-    const { passwordActual, passwordNueva } = this.cambiarPasswordForm.getRawValue();
+    const { passwordActual, passwordNueva } = this.form.getRawValue();
     this.enviando.set(true);
     this._loadingService.show('Cambiando contraseña...');
 
     this._authService.cambiarPass({ passwordActual, passwordNueva }).subscribe({
-      next: (resp: any) => {
+      next: (resp) => {
         this._loadingService.hide();
         this.enviando.set(false);
         this._toastService.showSuccessToast(resp?.message || 'Contraseña cambiada.');
-        this._modalCtrl.dismiss();
+        this._modalCtrl.dismiss(null, 'confirm');
       },
       error: (error: HttpErrorResponse) => {
         this._loadingService.hide();
@@ -69,5 +89,9 @@ export class CambiarPasswordComponent {
         this._toastService.showErrorToast(error.error?.message || 'No se pudo cambiar la contraseña.');
       },
     });
+  }
+
+  cerrar() {
+    this._modalCtrl.dismiss(null, 'cancel');
   }
 }

@@ -1,64 +1,64 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar mode="md">
-    <ion-buttons slot="start">
-      <ion-button (click)="cerrarModal()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-title class="ion-text-center">Editar Perfil</ion-title>
-    <ion-buttons slot="end">
-      <ion-button color="success" class="save-btn" (click)="guardarCambios()" [disabled]="!perfilForm.valid">
-        Guardar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      <span class="sobretitulo">Cuenta</span>
+      <h2>Editar perfil</h2>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
 </ion-header>
 
-<ion-content class="edit-modal-container ion-padding">
-  <!-- SELECCIÓN DE FOTO DE PERFIL -->
-  <div class="avatar-upload-container ion-margin-bottom">
-    <label for="avatarInput" class="avatar-label">
-      <div class="avatar-preview" [style.background-image]="
-          imagenPreview() ? 'url(' + imagenPreview() + ')' : null
-        ">
-        @if (!imagenPreview()) {
-        <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
+<ion-content class="contenido">
+  <div class="cuerpo">
+    <!-- Foto -->
+    <label class="foto" for="avatarInput">
+      <span class="foto-circulo">
+        @if (imagenPreview(); as img) {
+        <img [src]="img" alt="" />
+        } @else {
+        <ion-icon name="camera-outline" class="foto-vacia" aria-hidden="true"></ion-icon>
         }
-      </div>
-      <span class="upload-hint">{{
-        imagenPreview() ? "Cambiar foto" : "Añadir foto"
-        }}</span>
+        <span class="foto-camara" aria-hidden="true"><ion-icon name="camera-outline"></ion-icon></span>
+      </span>
+      <span class="foto-texto">{{ imagenPreview() ? 'Cambiar foto' : 'Añadir foto' }}</span>
     </label>
     <input type="file" id="avatarInput" accept="image/*" (change)="onFileSelected($event)" hidden />
+
+    <!-- Club -->
+    <div class="campo">
+      <label class="etiqueta" for="perfil-club">Nombre del club</label>
+      <div class="entrada" [class.invalida]="tocado().club && !clubValido()">
+        <ion-icon name="shield-outline" aria-hidden="true"></ion-icon>
+        <input id="perfil-club" type="text" maxlength="40" autocomplete="off" [value]="club()"
+          (input)="onTexto('club', $event)" (blur)="tocar('club')" />
+      </div>
+      @if (tocado().club && !clubValido()) {
+      <p class="error" role="alert">El nombre del club es obligatorio (mínimo 3 caracteres).</p>
+      }
+    </div>
+
+    <!-- Usuario -->
+    <div class="campo">
+      <label class="etiqueta" for="perfil-usuario">Nombre de usuario</label>
+      <div class="entrada" [class.invalida]="tocado().usuario && !usuarioValido()">
+        <ion-icon name="at-outline" aria-hidden="true"></ion-icon>
+        <input id="perfil-usuario" type="text" maxlength="30" autocomplete="username" autocapitalize="off"
+          spellcheck="false" [value]="usuario()" (input)="onTexto('usuario', $event)" (blur)="tocar('usuario')" />
+      </div>
+      @if (tocado().usuario && !usuarioValido()) {
+      <p class="error" role="alert">El nombre de usuario es obligatorio (mínimo 3 caracteres).</p>
+      } @else {
+      <p class="ayuda">Es como te ven los demás en la clasificación. No puede repetirse.</p>
+      }
+    </div>
   </div>
 
-  <!-- FORMULARIO DE EDICIÓN -->
-  <form [formGroup]="perfilForm" class="edit-form">
-    <!-- Nombre de Club -->
-    <div class="input-group">
-      <ion-input class="outline-input" mode="md" label="Nombre del Club" label-placement="stacked" fill="outline"
-        type="text" formControlName="nombre_club">
-        <ion-icon name="shield-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
-      @if (
-      perfilForm.get("nombre_club")?.touched &&
-      perfilForm.get("nombre_club")?.invalid
-      ) {
-      <span class="error-msg">El nombre del club es obligatorio (mínimo 3 caracteres).</span>
-      }
-    </div>
-
-    <!-- Nombre de Usuario -->
-    <div class="input-group">
-      <ion-input class="outline-input" mode="md" label="Nombre de Usuario" label-placement="stacked" fill="outline"
-        type="text" formControlName="nombre_usuario">
-        <ion-icon name="at-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
-      @if (
-      perfilForm.get("nombre_usuario")?.touched &&
-      perfilForm.get("nombre_usuario")?.invalid
-      ) {
-      <span class="error-msg">El usuario solo puede contener letras, números y guiones bajos (mín.
-        3 caracteres).</span>
-      }
-    </div>
-  </form>
+  <div class="barra-guardar">
+    <button type="button" class="btn-guardar" (click)="guardar()" [disabled]="!hayCambios() || enviando()">
+      <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+      Guardar cambios
+    </button>
+  </div>
 </ion-content>
