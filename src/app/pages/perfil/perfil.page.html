@@ -1,94 +1,179 @@
 <app-header titulo="Perfil"></app-header>
 
-<ion-content class="perfil-container ion-padding">
-  <!-- CARD PRINCIPAL DEL USUARIO -->
-  <div class="profile-card">
-    <div class="avatar-container">
-      <img [src]="user()?.image_url || 'assets/images/default-player.png'"
-        [alt]="user()?.nombre_club || 'Foto perfil'" />
-    </div>
-    <div class="user-details">
-      <h2 class="club-name">{{ user()?.nombre_club || 'Mi Club' }}</h2>
-      <p class="user-name">&#64;{{ user()?.nombre_usuario || 'usuario' }}</p>
-    </div>
-  </div>
+<ion-content class="perfil-content">
+  <div class="pagina">
+    <!-- ---------- Usuario ---------- -->
+    <section class="usuario" aria-label="Tu perfil">
+      <button type="button" class="avatar-btn" (click)="abrirEditarPerfil()" aria-label="Editar perfil">
+        <img class="avatar" [src]="user()?.image_url || 'assets/images/default-player.png'" alt="" />
+        <span class="lapiz" aria-hidden="true"><ion-icon name="create-outline"></ion-icon></span>
+      </button>
+      <div class="usuario-textos">
+        <h2 class="club">{{ user()?.nombre_club }}</h2>
+        <span class="arroba">&#64;{{ user()?.nombre_usuario }}</span>
+      </div>
+    </section>
 
-  <!-- SECCIÓN: MI CUENTA -->
-  <div class="section-title">Mi Cuenta</div>
-  <ion-list class="options-list" lines="none">
-    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirEditarPerfil()">
-      <ion-icon name="create-outline" slot="start" class="icon-accent"></ion-icon>
-      <ion-label>
-        <h2>Editar Perfil</h2>
-        <p>Foto, usuario y nombre del club</p>
-      </ion-label>
-    </ion-item>
+    <!-- ---------- Liga actual ---------- -->
+    @if (liga(); as l) {
+    <section class="liga-card" aria-label="Liga actual">
+      <div class="liga-cabecera">
+        <span class="sobretitulo">Liga actual</span>
+        <h3 class="liga-nombre">{{ l.nombre_liga }}</h3>
+        <span class="liga-meta">
+          <ion-icon [name]="l.privada ? 'lock-closed' : 'globe-outline'" aria-hidden="true"></ion-icon>
+          {{ l.privada ? 'Privada' : 'Pública' }} · {{ numMiembros() }} {{ numMiembros() === 1 ? 'miembro' : 'miembros' }}
+          @if (soyCreador()) {
+          <span class="insignia">Creador</span>
+          }
+        </span>
+      </div>
 
-    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirCambiarPassword()">
-      <ion-icon name="lock-closed-outline" slot="start" class="icon-accent"></ion-icon>
-      <ion-label>
-        <h2>Cambiar Contraseña</h2>
-        <p>Actualiza tu clave de acceso</p>
-      </ion-label>
-    </ion-item>
+      <div class="stats">
+        @switch (estadoDatos()) {
+        @case ('cargando') {
+        @for (i of [1, 2, 3]; track i) {
+        <div class="stat"><ion-skeleton-text [animated]="true" class="esqueleto"></ion-skeleton-text></div>
+        }
+        }
+        @case ('error') {
+        <p class="sin-datos">No se han podido cargar tus datos de la liga.</p>
+        }
+        @default {
+        @if (misDatos(); as d) {
+        <div class="stat">
+          <span class="valor">
+            {{ d.posicion ? d.posicion + 'º' : '–' }}
+            @if (d.movimiento) {
+            <span class="movimiento" [class.sube]="d.movimiento > 0" [class.baja]="d.movimiento < 0"
+              [attr.aria-label]="(d.movimiento > 0 ? 'Sube ' : 'Baja ') + (d.movimiento > 0 ? d.movimiento : -d.movimiento)">
+              <ion-icon [name]="d.movimiento > 0 ? 'caret-up' : 'caret-down'" aria-hidden="true"></ion-icon>
+            </span>
+            }
+          </span>
+          <span class="etiqueta">Puesto</span>
+        </div>
+        <div class="stat">
+          <span class="valor">{{ d.puntos }}</span>
+          <span class="etiqueta">Puntos</span>
+        </div>
+        <div class="stat">
+          <span class="valor">{{ d.jornadas }}</span>
+          <span class="etiqueta">{{ d.jornadas === 1 ? 'Jornada' : 'Jornadas' }}</span>
+        </div>
+        }
+        }
+        }
+      </div>
 
-    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirEliminarCuenta()">
-      <ion-icon name="trash-outline" slot="start" color="danger" class="icon-accent"></ion-icon>
-      <ion-label>
-        <h2>Eliminar Cuenta</h2>
-        <p>Borra tu cuenta y todos tus datos</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+      @if (l.privada && l.codigo_acceso) {
+      <div class="codigo">
+        <div class="codigo-textos">
+          <span class="etiqueta">Código de acceso</span>
+          <span class="codigo-valor">{{ l.codigo_acceso }}</span>
+        </div>
+        <button type="button" class="btn-icono" (click)="copiarCodigo()" aria-label="Copiar código">
+          <ion-icon name="copy-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="btn-icono destacado" (click)="compartirCodigo()" aria-label="Compartir invitación">
+          <ion-icon name="share-social-outline" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+      }
+    </section>
 
-  <!-- SECCIÓN: COMUNIDAD Y SOPORTE -->
-  <div class="section-title">Comunidad</div>
-  <ion-list class="options-list" lines="none">
-    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirInstagram()">
-      <ion-icon name="logo-instagram" slot="start" class="icon-instagram"></ion-icon>
-      <ion-label>
-        <h2>Contacto</h2>
-        <p>&#64;preferentefantasy</p>
-      </ion-label>
-    </ion-item>
-
-    <ion-item disabled mode="ios" button detail="true" class="option-item" (click)="abrirBasesReglamento()">
-      <ion-icon name="document-text-outline" slot="start" class="icon-accent"></ion-icon>
-      <ion-label>
-        <h2>Reglamento de la Liga</h2>
-        <p>Sistema de puntos y normas</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-
-  <!-- SECCIÓN: LIGA -->
-  <div class="section-title">Liga</div>
-  <ion-list class="options-list" lines="none">
-    @if (user()?.id === liga?.creado_por) {
-    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirEditarLiga()">
-      <ion-icon name="trophy-outline" slot="start" class="icon-accent"></ion-icon>
-      <ion-label>
-        <h2>Editar Liga</h2>
-        <p>Nombre, eliminar equipos y eliminar liga</p>
-      </ion-label>
-    </ion-item>
+    <!-- ---------- Opciones de la liga ---------- -->
+    <section class="grupo" aria-labelledby="grupo-liga">
+      <h3 class="grupo-titulo" id="grupo-liga">Liga</h3>
+      <div class="opciones">
+        @if (soyCreador()) {
+        <button type="button" class="opcion" (click)="abrirEditarLiga()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="trophy-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Editar liga</span>
+            <span class="opcion-sub">Nombre, privacidad, código y miembros</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+        }
+        <button type="button" class="opcion peligro" (click)="abrirAbandonarLiga()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="exit-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Abandonar liga</span>
+            <span class="opcion-sub">Sacar a tu equipo de esta liga</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </section>
     }
-    <ion-item mode="ios" button detail="true" class="option-item" (click)="abrirAbandonarLiga()">
-      <ion-icon name="trophy-outline" slot="start" color="danger" class="icon-accent"></ion-icon>
-      <ion-label>
-        <h2>Abandonar Liga</h2>
-        <p>Eliminar a mi equipo de esta liga</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
 
-  <!-- BOTÓN CERRAR SESIÓN -->
-  <div class="logout-container">
-    <ion-button expand="block" fill="outline" color="danger" class="logout-btn" (click)="cerrarSesion()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-      Cerrar Sesión
-    </ion-button>
+    <!-- ---------- Cuenta ---------- -->
+    <section class="grupo" aria-labelledby="grupo-cuenta">
+      <h3 class="grupo-titulo" id="grupo-cuenta">Cuenta</h3>
+      <div class="opciones">
+        <button type="button" class="opcion" (click)="abrirEditarPerfil()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="create-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Editar perfil</span>
+            <span class="opcion-sub">Foto, nombre del club y usuario</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="opcion" (click)="abrirCambiarPassword()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="lock-closed-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Cambiar contraseña</span>
+            <span class="opcion-sub">Actualiza tu clave de acceso</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Ayuda ---------- -->
+    <section class="grupo" aria-labelledby="grupo-ayuda">
+      <h3 class="grupo-titulo" id="grupo-ayuda">Ayuda</h3>
+      <div class="opciones">
+        <button type="button" class="opcion" (click)="abrirReglamento()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="book-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Reglamento</span>
+            <span class="opcion-sub">Cómo funciona Preferente Fantasy</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="opcion" (click)="abrirPuntuacion()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="calculator-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Cómo se puntúa</span>
+            <span class="opcion-sub">Puntos por goles, tarjetas, resultado…</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+        <button type="button" class="opcion instagram" (click)="abrirInstagram()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="logo-instagram"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Contacto</span>
+            <span class="opcion-sub">&#64;preferentefantasy en Instagram</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Sesión y zona de peligro ---------- -->
+    <section class="grupo final" aria-label="Sesión">
+      <button type="button" class="btn-cerrar-sesion" (click)="cerrarSesion()">
+        <ion-icon name="log-out-outline" aria-hidden="true"></ion-icon>
+        Cerrar sesión
+      </button>
+      <button type="button" class="btn-eliminar-cuenta" (click)="abrirEliminarCuenta()">
+        <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        Eliminar mi cuenta
+      </button>
+    </section>
+
+    <p class="version">Preferente Fantasy v{{ version }}</p>
   </div>
-
-  <div class="app-version">Preferente Fantasy v2.0</div>
 </ion-content>

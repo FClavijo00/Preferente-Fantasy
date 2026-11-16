@@ -1,88 +1,113 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar mode="md">
-    <ion-buttons slot="start">
-      <ion-button (click)="cerrarModal()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-title class="ion-text-center">Editar Liga</ion-title>
-    <ion-buttons slot="end">
-      <ion-button color="success" class="save-btn" (click)="guardarCambios()" [disabled]="!ligaForm.valid">
-        Guardar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      <span class="sobretitulo">Liga</span>
+      <h2>Editar liga</h2>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
 </ion-header>
 
-<ion-content class="edit-modal-container ion-padding">
-  <form [formGroup]="ligaForm" class="edit-form">
-    <div class="input-group">
-      <ion-input class="outline-input" mode="md" label="Nombre de Liga" label-placement="stacked" fill="outline"
-        type="text" formControlName="nombre_liga">
-        <ion-icon name="trophy-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
-      @if (
-      ligaForm.get("nombre_liga")?.touched &&
-      ligaForm.get("nombre_liga")?.invalid
-      ) {
-      <span class="error-msg">El nombre de la liga es obligatorio (mínimo 3 caracteres).</span>
+<ion-content class="contenido">
+  <div class="cuerpo">
+    <!-- Nombre -->
+    <div class="campo">
+      <label class="etiqueta" for="liga-nombre">Nombre de la liga</label>
+      <div class="entrada" [class.invalida]="!nombreValido()">
+        <ion-icon name="trophy-outline" aria-hidden="true"></ion-icon>
+        <input id="liga-nombre" type="text" maxlength="40" autocomplete="off" [value]="nombre()" (input)="onNombre($event)" />
+      </div>
+      @if (!nombreValido()) {
+      <p class="error" role="alert">Mínimo 3 caracteres.</p>
       }
     </div>
 
-    <div class="input-group">
-      <ion-toggle formControlName="privada" helperText="Activa para hacer tu liga privada" justify="space-between"
-        (ionChange)="onChangePrivada($event)">
-        Liga Privada
-      </ion-toggle>
+    <!-- Privacidad -->
+    <div class="bloque">
+      <span class="etiqueta" id="liga-privacidad">Privacidad</span>
+      <div class="chips" role="radiogroup" aria-labelledby="liga-privacidad">
+        <button type="button" class="chip" role="radio" [class.activo]="!privada()" [attr.aria-checked]="!privada()"
+          (click)="cambiarPrivada(false)">
+          <ion-icon name="globe-outline" aria-hidden="true"></ion-icon> Pública
+        </button>
+        <button type="button" class="chip" role="radio" [class.activo]="privada()" [attr.aria-checked]="privada()"
+          (click)="cambiarPrivada(true)">
+          <ion-icon name="lock-closed" aria-hidden="true"></ion-icon> Privada
+        </button>
+      </div>
+      <p class="ayuda">
+        @if (privada()) {
+        Solo se puede entrar con el código de acceso.
+        } @else {
+        Aparece en «Ligas abiertas» y cualquiera puede unirse.
+        }
+      </p>
     </div>
 
-    @if (ligaForm.get("privada")?.value) {
-    <div class="input-group">
-      <ion-input class="outline-input" mode="md" label="Codigo de Acceso" label-placement="stacked" fill="outline"
-        type="text" formControlName="codigo_acceso">
-        <ion-icon name="key-outline" slot="start" class="input-icon"></ion-icon>
-      </ion-input>
-      @if (
-      ligaForm.get("codigo_acceso")?.touched &&
-      ligaForm.get("codigo_acceso")?.invalid
-      ) {
-      <span class="error-msg">El codigo de acceso es obligatorio y debe empezar por "PF-" + 4 números o caracteres en mayúsculas.</span>
+    <!-- Código (solo privada) -->
+    @if (privada()) {
+    <div class="bloque">
+      <span class="etiqueta">Código de acceso</span>
+      <div class="codigo">
+        @if (liga.privada && liga.codigo_acceso && !nuevoCodigo()) {
+        <span class="codigo-valor">{{ liga.codigo_acceso }}</span>
+        <button type="button" class="btn-secundario" (click)="nuevoCodigo.set(true)">
+          <ion-icon name="refresh-outline" aria-hidden="true"></ion-icon> Generar otro
+        </button>
+        } @else {
+        <span class="codigo-pendiente">Se generará un código nuevo al guardar.</span>
+        @if (liga.privada && liga.codigo_acceso) {
+        <button type="button" class="btn-secundario" (click)="nuevoCodigo.set(false)">Mantener el actual</button>
+        }
+        }
+      </div>
+      @if (nuevoCodigo()) {
+      <p class="ayuda">El código anterior dejará de funcionar. Los miembros actuales siguen en la liga.</p>
       }
     </div>
     }
-  </form>
 
-  <div class="usuarios-container">
-    <ion-list lines="full">
-      @for (usuario of listaUsuarios(); track usuario.usuario_id) {
-      <ion-item>
-        <!-- Avatar o icono opcional del usuario -->
-        <ion-avatar slot="start">
-          <img [src]="usuario.image_url" alt="Avatar" />
-        </ion-avatar>
-
-        <ion-label>
-          <h2>{{ usuario.nombre_club }}</h2>
-          <p>&#64;{{ usuario.nombre_usuario }}</p>
-          <p>
-            @if (usuario.usuario_id === creadorLigaId()) {
-            <ion-badge color="success">Creador</ion-badge>
-            } @else {
-            <ion-badge color="primary">Miembro</ion-badge>
-            }
-          </p>
-        </ion-label>
-
-        <!-- Botón para expulsar / eliminar usuario -->
-        @if (usuario.usuario_id !== creadorLigaId()) {
-        <ion-button slot="end" fill="clear" color="danger" mode="ios" (click)="confirmarEliminarUsuario(usuario)">
-          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-        </ion-button>
+    <!-- Miembros -->
+    <div class="bloque">
+      <span class="etiqueta">Miembros ({{ lista().length }})</span>
+      <ul class="miembros">
+        @for (m of miembrosOrdenados(); track m.usuario_id) {
+        <li class="miembro">
+          <img class="avatar" [src]="m.image_url || 'assets/images/default-player.png'" alt="" />
+          <span class="miembro-textos">
+            <span class="miembro-club">{{ m.nombre_club }}</span>
+            <span class="miembro-usuario">&#64;{{ m.nombre_usuario }}</span>
+          </span>
+          @if (esCreador(m)) {
+          <span class="insignia">Creador</span>
+          } @else {
+          <button type="button" class="btn-expulsar" (click)="confirmarExpulsar(m)"
+            [attr.aria-label]="'Expulsar a ' + m.nombre_usuario">
+            <ion-icon name="person-remove-outline" aria-hidden="true"></ion-icon>
+          </button>
+          }
+        </li>
+        } @empty {
+        <li class="sin-miembros">No se han podido cargar los miembros.</li>
         }
-      </ion-item>
-      } @empty {
-      <ion-item>
-        <ion-label class="ion-text-center text-muted">No hay usuarios en esta liga.</ion-label>
-      </ion-item>
-      }
-    </ion-list>
+      </ul>
+    </div>
+
+    <!-- Eliminar -->
+    <div class="zona-peligro">
+      <p>Eliminar la liga la borra para todos sus miembros, con sus alineaciones y sus puntos.</p>
+      <button type="button" class="btn-peligro" (click)="confirmarEliminarLiga()">
+        <ion-icon name="trash-outline" aria-hidden="true"></ion-icon> Eliminar liga
+      </button>
+    </div>
+  </div>
+
+  <div class="barra-guardar">
+    <button type="button" class="btn-guardar" (click)="guardar()" [disabled]="!nombreValido() || !hayCambios() || enviando()">
+      <ion-icon name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+      Guardar cambios
+    </button>
   </div>
 </ion-content>

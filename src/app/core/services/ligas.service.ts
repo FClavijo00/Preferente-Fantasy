@@ -24,6 +24,17 @@ export type LigaAbierta = Omit<Ligas, 'creado_por'>;
 /** Lo que devuelve crearLiga: lo justo para enseñar y compartir el código. */
 export type LigaCreada = Pick<Ligas, 'id' | 'nombre_liga' | 'privada' | 'codigo_acceso'>;
 
+/** Lo que devuelve editarLiga. */
+export type LigaEditada = LigaCreada;
+
+/** Miembro de una liga (sin email). */
+export interface MiembroLiga {
+  usuario_id: number;
+  nombre_usuario: string;
+  nombre_club: string;
+  image_url: string | null;
+}
+
 
 @Service()
 export class LigasService {
@@ -34,12 +45,14 @@ export class LigasService {
 
   public ligaSeleccionada = signal<Ligas | null>(this.obtenerLigaSeleccionada());
 
-  abandonarLiga(data: any) {
-    return this.http.post(`${this.apiUrl}/abandonarLiga`, data);
+  /** Sales tú (el usuario sale del token). Si eres el único, la liga se borra; si eras el creador, pasa al siguiente. */
+  abandonarLiga(ligaId: number) {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/abandonarLiga`, { liga_id: ligaId });
   }
 
-  eliminarLiga(data: any) {
-    return this.http.post(`${this.apiUrl}/eliminarLiga`, data);
+  /** Solo el creador. */
+  eliminarLiga(ligaId: number) {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/eliminarLiga`, { liga_id: ligaId });
   }
 
   crearLiga(data: { nombre_campeonato: string; privado: boolean }) {
@@ -59,16 +72,27 @@ export class LigasService {
     return this.http.post<ApiResponse<void>>(`${this.apiUrl}/unirseALiga`, data);
   }
 
-  cargarUsuariosLiga(data: any) {
-    return this.http.post(`${this.apiUrl}/cargarUsuariosLiga`, data);
+  cargarUsuariosLiga(ligaId: number) {
+    return this.http.post<ApiResponse<MiembroLiga[]>>(`${this.apiUrl}/cargarUsuariosLiga`, { liga_id: ligaId });
   }
 
-  eliminarUsuarioLiga(data: any) {
-    return this.http.post(`${this.apiUrl}/eliminarUsuarioLiga`, data);
+  /** Solo el creador: expulsa a otro miembro. */
+  eliminarUsuarioLiga(ligaId: number, usuarioId: number) {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/eliminarUsuarioLiga`, {
+      liga_id: ligaId,
+      user_id: usuarioId,
+    });
   }
 
-  editarLiga(data: any) {
-    return this.http.post(`${this.apiUrl}/editarLiga`, data);
+  /** Solo el creador. El código lo pone el servidor (nuevo_codigo: true genera otro). */
+  editarLiga(data: { liga_id: number; nombre_liga: string; privada: boolean; nuevo_codigo?: boolean }) {
+    return this.http.post<ApiResponse<LigaEditada>>(`${this.apiUrl}/editarLiga`, data);
+  }
+
+  /** Cambia datos de la liga seleccionada (p. ej. tras editarla) sin salir de ella. */
+  actualizarLigaSeleccionada(cambios: Partial<Ligas>) {
+    const actual = this.ligaSeleccionada();
+    if (actual) this.setLigaSeleccionada({ ...actual, ...cambios });
   }
 
   private obtenerLigaSeleccionada(): Ligas | null {
