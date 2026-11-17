@@ -85,9 +85,11 @@
   @if (racha().length) {
   <ol class="racha" aria-label="Racha de los últimos partidos, del más antiguo al más reciente">
     @for (p of racha(); track p.partido_id) {
-    <li [class]="'resultado-' + p.resultado"      [title]="'J' + p.numero_jornada + ': ' + (p.en_casa ? 'en casa vs ' : 'fuera vs ') + p.rival + ' ' + p.goles_favor + '-' + p.goles_contra">
-      <span aria-hidden="true">{{ p.resultado }}</span>
-      <span class="oculto">{{ textoResultado(p.resultado) }} en la jornada {{ p.numero_jornada }}</span>
+    <li [title]="'J' + p.numero_jornada + ': ' + (p.en_casa ? 'en casa vs ' : 'fuera vs ') + p.rival + ' ' + marcador(p)">
+      <span [class]="'letra resultado-' + p.resultado" aria-hidden="true">{{ p.resultado }}</span>
+      <img class="racha-escudo" [src]="p.rival_escudo || 'assets/escudos/default.png'" alt="" width="22" height="22"
+        loading="lazy" />
+      <span class="oculto">{{ textoResultado(p.resultado) }} en la jornada {{ p.numero_jornada }} contra {{ p.rival }}</span>
     </li>
     }
   </ol>
@@ -99,7 +101,13 @@
 
   <!-- ===== Partidos disputados (más reciente primero) ===== -->
   @if (e.partidos.length) {
-  <h3 class="titulo-lista">Partidos Disputados</h3>
+  <button type="button" class="titulo-lista" (click)="verPartidos.set(!verPartidos())"
+    [attr.aria-expanded]="verPartidos()" aria-controls="lista-partidos">
+    <h3>Partidos Disputados <span class="contador">{{ e.partidos.length }}</span></h3>
+    <ion-icon name="chevron-down" class="flecha" [class.abierta]="verPartidos()" aria-hidden="true"></ion-icon>
+  </button>
+  <!-- Siempre en el DOM para poder animar la apertura; plegada no se puede enfocar (inert) -->
+  <div class="desplegable" id="lista-partidos" [class.abierta]="verPartidos()" [inert]="!verPartidos()">
   <ul class="partidos">
     @for (p of e.partidos; track p.partido_id) {
     <li>
@@ -109,7 +117,7 @@
         [class.con-acta]="p.tiene_acta"
         [disabled]="!p.tiene_acta"
         (click)="abrirActa(p)"
-        [attr.aria-label]="'Jornada ' + p.numero_jornada + ', ' + (p.en_casa ? 'en casa contra ' : 'fuera contra ') + p.rival + ', ' + p.goles_favor + ' a ' + p.goles_contra + (p.tiene_acta ? '. Ver acta' : '')"
+        [attr.aria-label]="'Jornada ' + p.numero_jornada + ', ' + (p.en_casa ? 'en casa contra ' : 'fuera contra ') + p.rival + ', ' + textoResultado(p.resultado) + ' ' + marcador(p) + (p.tiene_acta ? '. Ver acta' : '')"
       >
         <span class="jornada">J{{ p.numero_jornada }}</span>
 
@@ -127,7 +135,7 @@
           </span>
         </span>
 
-        <span [class]="'marcador resultado-' + p.resultado">{{ p.goles_favor }}-{{ p.goles_contra }}</span>
+        <span [class]="'marcador resultado-' + p.resultado">{{ marcador(p) }}</span>
 
         <span class="acta" aria-hidden="true">
           @if (p.tiene_acta) {
@@ -138,6 +146,7 @@
     </li>
     }
   </ul>
+  </div>
   }
   }
   }

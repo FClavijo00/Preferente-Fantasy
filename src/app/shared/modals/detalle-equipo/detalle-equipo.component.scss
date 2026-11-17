@@ -235,13 +235,29 @@ h3 {
   padding: 0;
   list-style: none;
 
+  /* Letra arriba y escudo del rival debajo */
   li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .racha-escudo {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+  }
+
+  .letra {
     --c: var(--e);
     --c-rgb: var(--e-rgb);
 
     display: flex;
     align-items: center;
     justify-content: center;
+    align-self: stretch;
     height: 38px;
     border-radius: 8px;
     border: 1px solid rgba(var(--c-rgb), 0.5);
@@ -263,8 +279,87 @@ h3 {
 }
 
 /* ---------- Partidos disputados ---------- */
+/* Cabecera plegable de la lista */
 .titulo-lista {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .contador {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #8e8e93;
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .flecha {
+    font-size: 1rem;
+    color: #8e8e93;
+    transition: transform 0.2s ease;
+
+    &.abierta {
+      transform: rotate(180deg);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-pitch);
+    outline-offset: 2px;
+  }
+
+}
+
+/* Apertura y cierre suaves: la fila del grid pasa de 0fr a 1fr (anima la altura real de la lista) */
+.desplegable {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease;
+
+  > .partidos {
+    min-height: 0;
+    overflow: hidden;
+    /* Margen dentro de lo que se pliega, para que no quede un hueco con la lista cerrada */
+    padding-top: 10px;
+    transform: translateY(-6px);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &.abierta {
+    grid-template-rows: 1fr;
+    opacity: 1;
+
+    > .partidos {
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desplegable,
+  .desplegable > .partidos,
+  .titulo-lista .flecha {
+    transition: none;
+  }
 }
 
 .partidos {

@@ -5,7 +5,16 @@ import { IonIcon } from '@ionic/angular/ion-icon';
 import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
 import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { airplane, closeOutline, documentTextOutline, home, locationOutline, navigateOutline, refreshOutline } from 'ionicons/icons';
+import {
+  airplane,
+  chevronDown,
+  closeOutline,
+  documentTextOutline,
+  home,
+  locationOutline,
+  navigateOutline,
+  refreshOutline,
+} from 'ionicons/icons';
 import { DetalleEquipo, EquiposService, PartidoEquipo } from '../../../core/services/equipos-service';
 import { ActaPartidoComponent } from '../../components/acta-partido/acta-partido.component';
 import { opcionesModalAuto } from '../../../core/utils/modal-auto';
@@ -34,6 +43,8 @@ export class DetalleEquipoComponent implements OnInit {
 
   readonly equipo = signal<DetalleEquipo | null>(null);
   readonly estado = signal<'cargando' | 'listo' | 'error'>('cargando');
+  /** La lista de partidos disputados empieza plegada */
+  readonly verPartidos = signal(false);
 
   /** Colores de la equipación: dos mitades si son distintos, uno solo si no. */
   readonly colores = computed(() => {
@@ -51,7 +62,7 @@ export class DetalleEquipoComponent implements OnInit {
   readonly racha = computed(() => (this.equipo()?.partidos ?? []).slice(0, 5).reverse());
 
   constructor() {
-    addIcons({ airplane, closeOutline, documentTextOutline, home, locationOutline, navigateOutline, refreshOutline });
+    addIcons({ airplane, chevronDown, closeOutline, documentTextOutline, home, locationOutline, navigateOutline, refreshOutline });
   }
 
   ngOnInit() {
@@ -67,6 +78,11 @@ export class DetalleEquipoComponent implements OnInit {
     } catch {
       this.estado.set('error');
     }
+  }
+
+  /** Marcador como en el calendario: goles del local - goles del visitante (no "a favor - en contra") */
+  marcador(p: PartidoEquipo): string {
+    return p.en_casa ? `${p.goles_favor}-${p.goles_contra}` : `${p.goles_contra}-${p.goles_favor}`;
   }
 
   textoResultado(r: PartidoEquipo['resultado']): string {
