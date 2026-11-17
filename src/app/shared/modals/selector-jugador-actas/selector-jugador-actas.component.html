@@ -68,5 +68,17 @@
       {{ busqueda() ? 'Ningún jugador coincide con «' + busqueda() + '».' : mensajeSinJugadores }}
     </p>
     }
+
+    @if (permitirCrear) {
+    <button type="button" class="opcion crear" (click)="crear()">
+      <span class="chip-vacio" aria-hidden="true"><ion-icon name="person-add-outline"></ion-icon></span>
+      <span class="opcion-texto">
+        <span class="opcion-nombre">Crear jugador nuevo</span>
+        <span class="opcion-detalle">
+          {{ busqueda() ? '«' + busqueda() + '»' : '¿No está en la lista? Juvenil, fichaje…' }}
+        </span>
+      </span>
+    </button>
+    }
   </div>
 </div>

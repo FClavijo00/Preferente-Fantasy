@@ -12,7 +12,16 @@ import { IonSegmentButton } from '@ionic/angular/ion-segment-button';
 import { IonLabel } from '@ionic/angular/ion-label';
 import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { add, chevronDown, closeOutline, footballOutline, peopleOutline, starOutline, trashOutline } from 'ionicons/icons';
+import {
+  add,
+  chevronDown,
+  closeOutline,
+  footballOutline,
+  peopleOutline,
+  personAddOutline,
+  starOutline,
+  trashOutline,
+} from 'ionicons/icons';
 import {
   ActaPartido,
   EventoActa,
@@ -27,6 +36,8 @@ import { ToastService } from '../../../core/services/toast.service';
 import { LoadingService } from '../../../core/services/loading.service';
 import { opcionesModalAuto } from '../../../core/utils/modal-auto';
 import { SelectorJugadorActasComponent } from '../selector-jugador-actas/selector-jugador-actas.component';
+import { CrearEditarJugadorComponent } from '../crear-editar-jugador/crear-editar-jugador.component';
+import { Equipo } from '../../../core/services/equipos-service';
 
 /** Lo que llega desde Calendario. */
 export interface PartidoActa {
@@ -190,7 +201,7 @@ export class CrearEditarActaPartidoComponent implements OnInit {
   );
 
   constructor() {
-    addIcons({ add, chevronDown, closeOutline, footballOutline, peopleOutline, starOutline, trashOutline });
+    addIcons({ add, chevronDown, closeOutline, footballOutline, peopleOutline, personAddOutline, starOutline, trashOutline });
   }
 
   async ngOnInit() {
@@ -301,15 +312,65 @@ export class CrearEditarActaPartidoComponent implements OnInit {
     permitirVacio?: boolean;
     textoVacio?: string;
     mensajeSinJugadores?: string;
+    /** Si llega, el selector ofrece "Crear jugador nuevo" en ese equipo */
+    crearEn?: Lado;
   }): Promise<number | null | undefined> {
+    const { crearEn, ...props } = opciones;
     const modal = await this._modalCtrl.create({
       component: SelectorJugadorActasComponent,
-      componentProps: opciones,
+      componentProps: { ...props, permitirCrear: !!crearEn },
       ...opcionesModalAuto(),
     });
     await modal.present();
-    const { data, role } = await modal.onWillDismiss<number | null>();
-    return role === 'confirm' ? (data ?? null) : undefined;
+    const { data, role } = await modal.onWillDismiss<number | string | null>();
+    if (role === 'crear' && crearEn) {
+      const nuevo = await this.crearJugador(crearEn, typeof data === 'string' ? data : '');
+      return nuevo ?? undefined;
+    }
+    return role === 'confirm' ? ((data as number | null) ?? null) : undefined;
+  }
+
+  /**
+   * Crea un jugador en el equipo de ese lado (juveniles que suben, fichajes...) y recarga las plantillas
+   * sin tocar lo que ya hay rellenado en el acta. Devuelve su id, o null si se cancela.
+   */
+  async crearJugador(lado: Lado, nombreInicial = ''): Promise<number | null> {
+    const equipo: Equipo = {
+      id: lado === 'local' ? this.partido.equipo_local_id : this.partido.equipo_visitante_id,
+      nombre: this.nombreEquipo(lado),
+      escudo: (lado === 'local' ? this.partido.local_escudo : this.partido.visitante_escudo) ?? '',
+    };
+    const modal = await this._modalCtrl.create({
+      component: CrearEditarJugadorComponent,
+      // Solo su equipo en la lista: un jugador del acta no puede crearse en otro
+      componentProps: { modo: 'crear', equipo, equipos: [equipo], nombreInicial },
+      ...opcionesModalAuto(),
+    });
+    await modal.present();
+    const { data, role } = await modal.onWillDismiss<{ id?: number; equipo_id?: number; activo?: boolean }>();
+    if (role !== 'confirm' || !data?.id) return null;
+
+    try {
+      const res = await firstValueFrom(this._partidosService.getJugadoresActa(this.partido.partido_id));
+      this.jugadores.set(res.data);
+    } catch {
+      this._toastService.showErrorToast('Jugador creado, pero no se han podido recargar las plantillas');
+      return null;
+    }
+    // Solo se coloca si ha quedado en este equipo y en activo (si no, no sale en la plantilla del acta)
+    return this.jugadores()[lado].some((j) => j.id === data.id) ? data.id : null;
+  }
+
+  /** Botón "Crear jugador" de la convocatoria: lo crea y, si hay hueco libre, lo pone de suplente */
+  async crearJugadorConvocatoria(lado: Lado) {
+    const id = await this.crearJugador(lado);
+    if (id === null) return;
+    const suplentes = this.convocatoria()[lado].suplentes;
+    const libre = suplentes.indexOf(null);
+    if (libre >= 0) {
+      this.elegirConvocado(lado, 'suplentes', libre, String(id));
+      this._toastService.showSuccessToast('Añadido como suplente: muévelo a titular si hace falta');
+    }
   }
 
   private readonly sinConvocados = 'Primero elige la convocatoria en «Alineaciones».';
@@ -323,6 +384,7 @@ export class CrearEditarActaPartidoComponent implements OnInit {
       seleccionado: actual,
       ocupados: [...this.idsConvocados()[lado]],
       textoVacio: 'Dejar hueco vacío',
+      crearEn: lado,
     });
     if (id !== undefined) this.elegirConvocado(lado, grupo, indice, id === null ? '' : String(id));
   }

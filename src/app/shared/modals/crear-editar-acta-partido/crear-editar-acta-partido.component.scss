@@ -468,6 +468,15 @@ ion-content.acta {
   cursor: pointer;
 }
 
+/* Crear jugador: secundario, para no competir con "Añadir suplente" */
+.btn-crear-jugador {
+  margin-top: 8px;
+  border-color: rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: var(--ion-color-slate-muted);
+  font-size: 0.82rem;
+}
+
 .btn-texto {
   margin-top: 12px;
   padding: 6px 0;

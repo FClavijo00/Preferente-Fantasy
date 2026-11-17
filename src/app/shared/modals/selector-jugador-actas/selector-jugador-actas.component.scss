@@ -137,6 +137,21 @@
     cursor: not-allowed;
   }
 
+  /* Crear jugador nuevo: al final, punteado en verde */
+  &.crear {
+    margin-top: 10px;
+    border: 1px dashed rgba(0, 230, 118, 0.45);
+    background: rgba(0, 230, 118, 0.05);
+
+    .chip-vacio {
+      color: var(--ion-color-pitch);
+    }
+
+    .opcion-nombre {
+      color: var(--ion-color-pitch);
+    }
+  }
+
   &.vaciar {
     margin-top: 4px;
 

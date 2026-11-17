@@ -40,6 +40,8 @@ export class CrearEditarJugadorComponent implements OnInit {
   /** Equipo que se está viendo: es el que se propone al crear. */
   @Input() equipo: Equipo | null = null;
   @Input() equipos: Equipo[] = [];
+  /** Al crear: texto con el que rellenar nombre y apellidos (p. ej. lo que se buscaba en el acta). */
+  @Input() nombreInicial = '';
 
   private _modalCtrl = inject(ModalController);
   private _fb = inject(FormBuilder);
@@ -93,9 +95,11 @@ export class CrearEditarJugadorComponent implements OnInit {
 
   ngOnInit() {
     const j = this.jugador;
+    // "Juan Pérez López" -> nombre "Juan", apellidos "Pérez López"
+    const [nombreSugerido = '', ...apellidosSugeridos] = j ? [] : this.nombreInicial.trim().split(/\s+/);
     this.form.patchValue({
-      nombre: j?.nombre ?? '',
-      apellidos: j?.apellidos ?? '',
+      nombre: j?.nombre ?? nombreSugerido,
+      apellidos: j?.apellidos ?? apellidosSugeridos.join(' '),
       apodo: j?.apodo ?? '',
       posicion: j?.posicion ?? null,
       equipo_id: j?.equipo_id ?? this.equipo?.id ?? null,

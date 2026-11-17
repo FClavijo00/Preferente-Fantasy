@@ -2,7 +2,7 @@ import { Component, computed, inject, Input, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/ion-icon';
 import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { checkmarkCircle, closeOutline, removeCircleOutline, searchOutline } from 'ionicons/icons';
+import { checkmarkCircle, closeOutline, personAddOutline, removeCircleOutline, searchOutline } from 'ionicons/icons';
 import { JugadorActa, Posicion } from '../../../core/services/partidos.service';
 
 export interface GrupoJugadores {
@@ -45,6 +45,8 @@ export class SelectorJugadorActasComponent {
   @Input() permitirVacio = true;
   @Input() textoVacio = 'Dejar vacío';
   @Input() mensajeSinJugadores = 'No hay jugadores disponibles.';
+  /** Muestra "Crear jugador nuevo": cierra con role 'crear' y, como data, lo que se estaba buscando. */
+  @Input() permitirCrear = false;
 
   private _modalCtrl = inject(ModalController);
 
@@ -61,7 +63,7 @@ export class SelectorJugadorActasComponent {
   readonly total = computed(() => this.grupos.reduce((n, g) => n + g.jugadores.length, 0));
 
   constructor() {
-    addIcons({ checkmarkCircle, closeOutline, removeCircleOutline, searchOutline });
+    addIcons({ checkmarkCircle, closeOutline, personAddOutline, removeCircleOutline, searchOutline });
   }
 
   nombre(j: JugadorActa): string {
@@ -79,6 +81,10 @@ export class SelectorJugadorActasComponent {
 
   elegir(id: SeleccionJugador) {
     this._modalCtrl.dismiss(id, 'confirm');
+  }
+
+  crear() {
+    this._modalCtrl.dismiss(this.busqueda().trim(), 'crear');
   }
 
   cerrar() {
