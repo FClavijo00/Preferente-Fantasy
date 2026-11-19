@@ -61,6 +61,29 @@
   <!-- use-credentials: en la web de pruebas (protegida por Vercel) el móvil necesita la sesión para leer el manifest y sus iconos -->
   <link rel="manifest" href="assets/manifest.webmanifest" crossorigin="use-credentials" />
 
+  <!-- Pantalla de carga: tapa el contenido estático mientras arranca la app (la quita AppComponent).
+       Sin JavaScript (buscadores, AdSense) no se muestra y se ve el contenido de <app-root>. -->
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    #pf-splash { display: none; }
+    .js #pf-splash {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      background: radial-gradient(circle at 50% 42%, #0f2a1b 0%, #080f0b 62%);
+      transition: opacity .35s ease, visibility .35s;
+    }
+    #pf-splash.oculto { opacity: 0; visibility: hidden; }
+    #pf-splash img { width: 96px; height: 96px; animation: pf-latido 1.6s ease-in-out infinite; }
+    #pf-splash .barra { width: 72px; height: 3px; border-radius: 3px; overflow: hidden; background: rgba(255,255,255,.08); }
+    #pf-splash .barra::after {
+      content: ''; display: block; width: 40%; height: 100%; border-radius: 3px;
+      background: #00e676; animation: pf-barra 1.1s ease-in-out infinite;
+    }
+    @keyframes pf-latido { 50% { transform: scale(1.06); filter: drop-shadow(0 0 18px rgba(0,230,118,.35)); } }
+    @keyframes pf-barra { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+    @media (prefers-reduced-motion: reduce) { #pf-splash img, #pf-splash .barra::after { animation: none; } }
+  </style>
+
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8289024792996841"
     crossorigin="anonymous"></script>
     <meta name="google-adsense-account" content="ca-pub-8289024792996841">
@@ -96,6 +119,16 @@
       </p>
     </main>
   </app-root>
+
+  <!-- Fuera de <app-root> para que Angular no la borre al arrancar -->
+  <div id="pf-splash" role="status" aria-label="Cargando Preferente Fantasy">
+    <img src="assets/icon/favicon.svg" alt="" width="96" height="96" />
+    <div class="barra"></div>
+  </div>
+  <script>
+    // Red de seguridad: si la app no llega a arrancar, que al menos se vea el contenido
+    setTimeout(function () { var s = document.getElementById('pf-splash'); if (s) s.remove(); }, 15000);
+  </script>
 </body>
 
 </html>
