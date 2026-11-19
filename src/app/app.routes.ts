@@ -3,6 +3,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { rootRedirectGuard } from './core/guards/root-redirect.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { ligaGuard } from './core/guards/liga.guard';
 
 export const routes: Routes = [
 
@@ -75,7 +76,7 @@ export const routes: Routes = [
     path: 'tabs',
     data: { noindex: true },
     loadChildren: () => import('./pages/tabs/tabs.routes').then((m) => m.routes),
-    canActivate: [authGuard],
+    canActivate: [authGuard, ligaGuard],
   },
 
   // 3. Redirección por defecto: Si no hay ruta, va a la landing
