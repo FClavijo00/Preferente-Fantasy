@@ -58,7 +58,8 @@
   <meta name="apple-mobile-web-app-title" content="Preferente Fantasy" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-  <link rel="manifest" href="assets/manifest.webmanifest" />
+  <!-- use-credentials: en la web de pruebas (protegida por Vercel) el móvil necesita la sesión para leer el manifest y sus iconos -->
+  <link rel="manifest" href="assets/manifest.webmanifest" crossorigin="use-credentials" />
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8289024792996841"
     crossorigin="anonymous"></script>
