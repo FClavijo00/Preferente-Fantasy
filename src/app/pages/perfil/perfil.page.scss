@@ -386,6 +386,100 @@
   text-overflow: ellipsis;
 }
 
+/* ---------- Notificaciones ---------- */
+.opcion {
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  /* Fila informativa (sin acción) */
+  &.fija {
+    cursor: default;
+
+    &:active {
+      background: transparent;
+    }
+  }
+
+  /* Tipos de notificación, un poco metidos hacia dentro */
+  &.sub-opcion {
+    min-height: 54px;
+    padding-left: 22px;
+  }
+
+  /* "Enviarme una prueba" */
+  &.enlace {
+    justify-content: center;
+    gap: 6px;
+    min-height: 46px;
+    color: var(--ion-color-pitch);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+}
+
+.opcion-icono {
+  &.pequeno {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 0.95rem;
+  }
+
+  &.apagado {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ion-color-slate-muted);
+  }
+}
+
+.opcion-sub.ajustar {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+/* Interruptor propio (más ligero que ion-toggle y con nuestros colores) */
+.interruptor {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #c7d2cc;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  &.on {
+    border-color: rgba(0, 230, 118, 0.6);
+    background: rgba(0, 230, 118, 0.3);
+
+    &::after {
+      transform: translateX(18px);
+      background: var(--ion-color-pitch);
+      box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interruptor,
+  .interruptor::after {
+    transition: none;
+  }
+}
+
 .chevron {
   flex-shrink: 0;
   font-size: 1rem;

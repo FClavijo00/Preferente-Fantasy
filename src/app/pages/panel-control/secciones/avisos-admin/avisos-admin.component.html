@@ -1,0 +1,102 @@
+<section class="seccion">
+  <header class="seccion-cabecera">
+    <div>
+      <h2>Avisos</h2>
+      <p>
+        @if (estado() === 'listo') {
+        {{ usuarios() }} {{ usuarios() === 1 ? 'usuario' : 'usuarios' }} con notificaciones ·
+        {{ dispositivos() }} {{ dispositivos() === 1 ? 'dispositivo' : 'dispositivos' }}
+        } @else {
+        Notificación push a todos los usuarios
+        }
+      </p>
+    </div>
+  </header>
+
+  @if (estado() === 'listo' && !configurado()) {
+  <p class="aviso-config">
+    El servidor no tiene las claves de notificaciones (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY): no se enviará nada.
+  </p>
+  }
+
+  <!-- ===== Nuevo aviso ===== -->
+  <div class="formulario">
+    <label class="campo">
+      <span class="etiqueta">Título <span class="cuenta">{{ titulo().length }}/80</span></span>
+      <input type="text" maxlength="80" placeholder="Ej.: Cambio de horario" [value]="titulo()"
+        (input)="texto('titulo', $event)" />
+    </label>
+
+    <label class="campo">
+      <span class="etiqueta">Mensaje <span class="cuenta">{{ mensaje().length }}/250</span></span>
+      <textarea rows="3" maxlength="250" placeholder="Ej.: La jornada 13 cierra el sábado a las 12:00."
+        [value]="mensaje()" (input)="texto('mensaje', $event)"></textarea>
+    </label>
+
+    <div class="campo">
+      <span class="etiqueta" id="aviso-destino">Al pulsarla, abre</span>
+      <div class="chips" role="radiogroup" aria-labelledby="aviso-destino">
+        @for (d of destinos; track d.url) {
+        <button type="button" class="chip" role="radio" [class.activo]="destino() === d.url"
+          [attr.aria-checked]="destino() === d.url" (click)="destino.set(d.url)">{{ d.texto }}</button>
+        }
+      </div>
+    </div>
+
+    <!-- Vista previa -->
+    <div class="vista-previa" aria-label="Vista previa">
+      <img src="assets/icon/icon-192.png" alt="" width="36" height="36" />
+      <div class="vp-textos">
+        <span class="vp-app">Preferente Fantasy · ahora</span>
+        <span class="vp-titulo">{{ titulo() || 'Título del aviso' }}</span>
+        <span class="vp-cuerpo">{{ mensaje() || 'Aquí va el mensaje.' }}</span>
+      </div>
+    </div>
+
+    <ion-button mode="md" class="btn-principal" expand="block" [disabled]="!valido() || enviando()"
+      (click)="confirmarEnvio()">
+      <ion-icon slot="start" name="paper-plane-outline"></ion-icon>
+      Enviar aviso
+    </ion-button>
+  </div>
+
+  <!-- ===== Historial ===== -->
+  <h3 class="titulo-bloque">Enviadas</h3>
+  @switch (estado()) {
+  @case ('cargando') {
+  @for (i of [1, 2, 3]; track i) {
+  <ion-skeleton-text [animated]="true" class="sk-fila"></ion-skeleton-text>
+  }
+  }
+  @case ('error') {
+  <div class="estado-vacio">
+    <p>No se ha podido cargar el historial.</p>
+    <ion-button mode="md" fill="outline" class="btn-secundario" (click)="cargar()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+  }
+  @default {
+  <ul class="historial">
+    @for (a of historial(); track a.id) {
+    <li class="enviado">
+      <span class="tipo-icono" aria-hidden="true"><ion-icon [name]="tipo(a).icono"></ion-icon></span>
+      <div class="enviado-textos">
+        <span class="enviado-titulo">{{ a.titulo }}</span>
+        @if (a.cuerpo && a.cuerpo !== '(personalizado)') {
+        <span class="enviado-cuerpo">{{ a.cuerpo }}</span>
+        }
+        <span class="enviado-meta">{{ tipo(a).texto }} · {{ fecha(a) }}</span>
+      </div>
+      <span class="entregadas" [attr.aria-label]="'Entregada a ' + a.destinatarios + ' dispositivos'">
+        <ion-icon name="phone-portrait-outline" aria-hidden="true"></ion-icon>{{ a.destinatarios }}
+      </span>
+    </li>
+    } @empty {
+    <li class="vacio">Aún no se ha enviado ninguna notificación.</li>
+    }
+  </ul>
+  }
+  }
+</section>

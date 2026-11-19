@@ -108,6 +108,74 @@
     </section>
     }
 
+    <!-- ---------- Notificaciones ---------- -->
+    <section class="grupo" aria-labelledby="grupo-notificaciones">
+      <h3 class="grupo-titulo" id="grupo-notificaciones">Notificaciones</h3>
+      <div class="opciones">
+        @switch (soportePush) {
+        @case ('instalar') {
+        <button type="button" class="opcion" (click)="abrirInstalarApp()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="notifications-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Instala la app para recibirlas</span>
+            <span class="opcion-sub">En iPhone solo llegan con la app en la pantalla de inicio</span>
+          </span>
+          <ion-icon name="chevron-forward" class="chevron" aria-hidden="true"></ion-icon>
+        </button>
+        }
+        @case ('no') {
+        <div class="opcion fija">
+          <span class="opcion-icono apagado" aria-hidden="true"><ion-icon name="notifications-off-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">No disponibles</span>
+            <span class="opcion-sub ajustar">Este navegador no admite notificaciones. Prueba con Chrome o con la app instalada.</span>
+          </span>
+        </div>
+        }
+        @default {
+        @if (estadoPush() === 'bloqueadas') {
+        <div class="opcion fija">
+          <span class="opcion-icono apagado" aria-hidden="true"><ion-icon name="notifications-off-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Bloqueadas en este dispositivo</span>
+            <span class="opcion-sub ajustar">Permítelas en los ajustes del navegador (o de la app) para Preferente Fantasy.</span>
+          </span>
+        </div>
+        } @else {
+        <button type="button" class="opcion" role="switch" [attr.aria-checked]="estadoPush() === 'activadas'"
+          [disabled]="cambiandoPush()" (click)="alternarNotificaciones()">
+          <span class="opcion-icono" aria-hidden="true"><ion-icon name="notifications-outline"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">Recibir notificaciones</span>
+            <span class="opcion-sub">En este dispositivo</span>
+          </span>
+          <span class="interruptor" [class.on]="estadoPush() === 'activadas'" aria-hidden="true"></span>
+        </button>
+
+        @if (estadoPush() === 'activadas') {
+        @if (preferencias(); as p) {
+        @for (t of tiposPush; track t.id) {
+        <button type="button" class="opcion sub-opcion" role="switch" [attr.aria-checked]="p[t.id]" (click)="alternarTipo(t.id)">
+          <span class="opcion-icono pequeno" aria-hidden="true"><ion-icon [name]="t.icono"></ion-icon></span>
+          <span class="opcion-textos">
+            <span class="opcion-titulo">{{ t.titulo }}</span>
+            <span class="opcion-sub">{{ t.sub }}</span>
+          </span>
+          <span class="interruptor" [class.on]="p[t.id]" aria-hidden="true"></span>
+        </button>
+        }
+        }
+        <button type="button" class="opcion enlace" (click)="enviarPrueba()">
+          <ion-icon name="paper-plane-outline" aria-hidden="true"></ion-icon>
+          Enviarme una notificación de prueba
+        </button>
+        }
+        }
+        }
+        }
+      </div>
+    </section>
+
     <!-- ---------- Cuenta ---------- -->
     <section class="grupo" aria-labelledby="grupo-cuenta">
       <h3 class="grupo-titulo" id="grupo-cuenta">Cuenta</h3>

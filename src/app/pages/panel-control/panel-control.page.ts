@@ -15,6 +15,7 @@ import {
   arrowBackOutline,
   calendarNumberOutline,
   calendarOutline,
+  megaphoneOutline,
   personCircleOutline,
   starOutline,
   warningOutline,
@@ -24,6 +25,7 @@ import { CalendarioAdminComponent } from './secciones/calendario-admin/calendari
 import { JugadoresAdminComponent } from './secciones/jugadores-admin/jugadores-admin.component';
 import { OnceIdealAdminComponent } from './secciones/once-ideal-admin/once-ideal-admin.component';
 import { SancionesAdminComponent } from './secciones/sanciones-admin/sanciones-admin.component';
+import { AvisosAdminComponent } from './secciones/avisos-admin/avisos-admin.component';
 
 type Seccion =
   | 'jornadas'
@@ -31,6 +33,7 @@ type Seccion =
   | 'sanciones'
   | 'jugadores'
   | 'onceideal'
+  | 'avisos'
 ;
 
 const SECCIONES: { id: Seccion; titulo: string; icono: string }[] = [
@@ -39,6 +42,7 @@ const SECCIONES: { id: Seccion; titulo: string; icono: string }[] = [
   { id: 'sanciones', titulo: 'Sanciones', icono: 'warning-outline' },
   { id: 'jugadores', titulo: 'Jugadores', icono: 'person-circle-outline' },
   { id: 'onceideal', titulo: '11 Ideal', icono: 'star-outline' },
+  { id: 'avisos', titulo: 'Avisos', icono: 'megaphone-outline' },
 ];
 
 /**
@@ -65,6 +69,7 @@ const SECCIONES: { id: Seccion; titulo: string; icono: string }[] = [
     JugadoresAdminComponent,
     OnceIdealAdminComponent,
     SancionesAdminComponent,
+    AvisosAdminComponent,
   ],
 })
 export class PanelControlPage {
@@ -78,6 +83,7 @@ export class PanelControlPage {
       arrowBackOutline,
       calendarNumberOutline,
       calendarOutline,
+      megaphoneOutline,
       personCircleOutline,
       starOutline,
       warningOutline,

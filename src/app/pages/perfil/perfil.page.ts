@@ -8,8 +8,15 @@ import { AlertController } from '@ionic/angular/alert-controller';
 import { NavController } from '@ionic/angular/nav-controller';
 import { addIcons } from 'ionicons';
 import {
+  alarmOutline,
   bookOutline,
   calculatorOutline,
+  footballOutline,
+  megaphoneOutline,
+  notificationsOffOutline,
+  notificationsOutline,
+  paperPlaneOutline,
+  starOutline,
   caretDown,
   caretUp,
   chevronForward,
@@ -43,6 +50,7 @@ import { InfoPuntuacionComponent } from '../../shared/modals/info-puntuacion/inf
 import { ReglamentoComponent } from '../../shared/modals/reglamento/reglamento.component';
 import { InstalarAppComponent } from '../../shared/modals/instalar-app/instalar-app.component';
 import { estaInstalada } from '../../core/utils/instalar-app';
+import { NotificacionesService, PreferenciasNotificaciones } from '../../core/services/notificaciones.service';
 
 /** Mis números en la liga actual (tarjeta "Liga actual") */
 interface MisDatosLiga {
@@ -68,6 +76,7 @@ export class PerfilPage {
   private _navCtrl = inject(NavController);
   private _loadingService = inject(LoadingService);
   private _toastService = inject(ToastService);
+  private _notificaciones = inject(NotificacionesService);
 
   readonly version = APP_VERSION;
   /** Abierta desde el icono de la pantalla de inicio: no hace falta ofrecer instalarla */
@@ -90,8 +99,15 @@ export class PerfilPage {
 
   constructor() {
     addIcons({
+      alarmOutline,
       bookOutline,
       calculatorOutline,
+      footballOutline,
+      megaphoneOutline,
+      notificationsOffOutline,
+      notificationsOutline,
+      paperPlaneOutline,
+      starOutline,
       caretDown,
       caretUp,
       chevronForward,
@@ -113,6 +129,75 @@ export class PerfilPage {
   ionViewWillEnter() {
     this.cargarPerfil();
     this.cargarDatosLiga();
+    this.cargarNotificaciones();
+  }
+
+  // ---------- Notificaciones ----------
+
+  readonly soportePush = this._notificaciones.soporte();
+  readonly estadoPush = this._notificaciones.estado;
+  readonly preferencias = signal<PreferenciasNotificaciones | null>(null);
+  readonly cambiandoPush = signal(false);
+  readonly tiposPush: { id: keyof PreferenciasNotificaciones; titulo: string; sub: string; icono: string }[] = [
+    { id: 'actas', titulo: 'Resultados', sub: 'Al cerrarse el acta de cada partido', icono: 'football-outline' },
+    { id: 'recordatorios', titulo: 'Cierre de jornada', sub: '24 h y 3 h antes de la fecha límite', icono: 'alarm-outline' },
+    { id: 'once_ideal', titulo: '11 ideal', sub: 'Cuando se publica el de la jornada', icono: 'star-outline' },
+    { id: 'avisos', titulo: 'Avisos', sub: 'Novedades y cambios importantes', icono: 'megaphone-outline' },
+  ];
+
+  private async cargarNotificaciones() {
+    const estado = await this._notificaciones.comprobarEstado();
+    if (estado === 'activadas' && !this.preferencias()) {
+      this._notificaciones.getPreferencias().subscribe({
+        next: (resp) => this.preferencias.set(resp.data),
+        error: () => undefined,
+      });
+    }
+  }
+
+  async alternarNotificaciones() {
+    if (this.cambiandoPush()) return;
+    this.cambiandoPush.set(true);
+    try {
+      if (this.estadoPush() === 'activadas') {
+        await this._notificaciones.desactivar();
+        this._toastService.showSuccessToast('Notificaciones desactivadas en este dispositivo');
+      } else {
+        const estado = await this._notificaciones.activar();
+        if (estado === 'activadas') {
+          this._toastService.showSuccessToast('¡Notificaciones activadas!');
+          await this.cargarNotificaciones();
+        } else if (estado === 'bloqueadas') {
+          this._toastService.showErrorToast('Las has bloqueado: permítelas en los ajustes del navegador');
+        }
+      }
+    } catch (error) {
+      const err = error as { error?: { message?: string }; message?: string };
+      this._toastService.showErrorToast(err.error?.message || err.message || 'No se han podido cambiar las notificaciones');
+    } finally {
+      this.cambiandoPush.set(false);
+    }
+  }
+
+  alternarTipo(tipo: keyof PreferenciasNotificaciones) {
+    const actuales = this.preferencias();
+    if (!actuales) return;
+    const nuevas = { ...actuales, [tipo]: !actuales[tipo] };
+    this.preferencias.set(nuevas); // al momento; si falla, se deshace
+    this._notificaciones.guardarPreferencias(nuevas).subscribe({
+      next: (resp) => this.preferencias.set(resp.data),
+      error: () => {
+        this.preferencias.set(actuales);
+        this._toastService.showErrorToast('No se ha podido guardar');
+      },
+    });
+  }
+
+  enviarPrueba() {
+    this._notificaciones.enviarPrueba().subscribe({
+      next: (resp) => this._toastService.showSuccessToast(resp.message || 'Prueba enviada'),
+      error: (error) => this._toastService.showErrorToast(error.error?.message || 'No se ha podido enviar la prueba'),
+    });
   }
 
   /** Refresca el usuario de la sesión (por si cambió en otro dispositivo) */
@@ -305,7 +390,9 @@ export class PerfilPage {
 
   // ---------- Sesión y cuenta ----------
 
-  cerrarSesion() {
+  async cerrarSesion() {
+    // Antes de borrar el token: este dispositivo deja de recibir las notificaciones de esta cuenta
+    await this._notificaciones.desvincular();
     this._ligasService.clearLigaSeleccionada();
     this._authService.logout();
   }

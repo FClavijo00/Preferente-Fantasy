@@ -1,0 +1,41 @@
+<div class="pf-modal">
+  <header class="cabecera">
+    <div class="cabecera-textos">
+      <span class="sobretitulo">Novedad</span>
+      <h2>No te pierdas nada</h2>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar()" aria-label="Cerrar">
+      <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+    </button>
+  </header>
+
+  <div class="pf-modal-cuerpo ion-content-scroll-host">
+    <div class="campana" aria-hidden="true"><ion-icon name="notifications"></ion-icon></div>
+
+    <p class="intro">Activa las notificaciones y te avisamos de lo importante:</p>
+
+    <ul class="ventajas">
+      @for (v of ventajas; track v.icono) {
+      <li>
+        <span class="ventaja-icono" aria-hidden="true"><ion-icon [name]="v.icono"></ion-icon></span>
+        <span>{{ v.texto }}</span>
+      </li>
+      }
+    </ul>
+
+    @if (necesitaInstalar) {
+    <p class="aviso-ios">
+      En iPhone las notificaciones solo llegan si añades la app a la pantalla de inicio. Instálala, ábrela desde su
+      icono y actívalas en tu perfil.
+    </p>
+    <button type="button" class="btn-guardar" (click)="verComoInstalar()">Ver cómo instalarla</button>
+    } @else {
+    <button type="button" class="btn-guardar" (click)="activar()" [disabled]="activando()">
+      <ion-icon name="notifications" aria-hidden="true"></ion-icon>
+      Activar notificaciones
+    </button>
+    }
+    <button type="button" class="btn-ahora-no" (click)="cerrar()">Ahora no</button>
+    <p class="pie">Puedes cambiarlo cuando quieras en Perfil → Notificaciones.</p>
+  </div>
+</div>

@@ -1,0 +1,100 @@
+/* Activar notificaciones. Tamaño del modal: src/theme/modal-auto.scss. Cabecera y botón: ../_formulario-modal.scss */
+@use '../formulario-modal';
+
+.pf-modal-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding: 0 16px 20px;
+}
+
+.campana {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 230, 118, 0.45);
+  background: rgba(0, 230, 118, 0.12);
+  box-shadow: 0 0 22px rgba(0, 230, 118, 0.25);
+  color: var(--ion-color-pitch);
+  font-size: 1.8rem;
+}
+
+.intro {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ventajas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.22);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #c7d2cc;
+  }
+}
+
+.ventaja-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--ion-color-pitch);
+  font-size: 0.95rem;
+}
+
+.aviso-ios {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(77, 163, 255, 0.35);
+  background: rgba(77, 163, 255, 0.08);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #d6e6ff;
+}
+
+.btn-guardar {
+  margin-top: 4px;
+}
+
+.btn-ahora-no {
+  height: 38px;
+  border: 0;
+  background: transparent;
+  color: var(--ion-color-slate-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pie {
+  margin: -6px 0 0;
+  font-size: 0.7rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.35);
+}

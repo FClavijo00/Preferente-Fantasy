@@ -29,6 +29,10 @@ import { Ligas, LigasService } from '../../core/services/ligas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { compartirLiga } from '../../core/utils/compartir-liga';
 import { EstadoAlineacionService } from '../../core/services/estado-alineacion.service';
+import { NotificacionesService } from '../../core/services/notificaciones.service';
+import { opcionesModalAuto } from '../../core/utils/modal-auto';
+import { ActivarNotificacionesComponent } from '../../shared/modals/activar-notificaciones/activar-notificaciones.component';
+import { InstalarAppComponent } from '../../shared/modals/instalar-app/instalar-app.component';
 
 const ROL_ADMIN = 1;
 
@@ -47,6 +51,8 @@ export class RecepcionPage implements OnInit {
   private _ligasService = inject(LigasService);
   private _toastService = inject(ToastService);
   private _estadoAlineacion = inject(EstadoAlineacionService);
+  private _notificaciones = inject(NotificacionesService);
+  private _ofrecidoEnEstaVisita = false;
 
   readonly user = this._authService.currentUser;
   readonly esAdmin = computed(() => this.user()?.rol_id === ROL_ADMIN);
@@ -73,6 +79,30 @@ export class RecepcionPage implements OnInit {
 
   ngOnInit() {
     this.cargarMisLigas();
+  }
+
+  ionViewDidEnter() {
+    this.prepararNotificaciones();
+  }
+
+  /** Mantiene al día la suscripción de este dispositivo y, la primera vez, invita a activarlas. */
+  private async prepararNotificaciones() {
+    await this._notificaciones.sincronizar();
+    if (this._ofrecidoEnEstaVisita || !this._notificaciones.debeOfrecer()) return;
+    this._ofrecidoEnEstaVisita = true;
+
+    // Un respiro para que primero se vean las ligas
+    await new Promise((r) => setTimeout(r, 800));
+    const modal = await this._modalCtrl.create({
+      component: ActivarNotificacionesComponent,
+      ...opcionesModalAuto(),
+    });
+    await modal.present();
+    const { role } = await modal.onWillDismiss();
+    if (role === 'instalar') {
+      const instalar = await this._modalCtrl.create({ component: InstalarAppComponent, ...opcionesModalAuto() });
+      await instalar.present();
+    }
   }
 
   /** Badge de la alineación de la próxima jornada en cada liga. */
@@ -143,7 +173,9 @@ export class RecepcionPage implements OnInit {
     this._navCtrl.navigateRoot(['/panel-control'], { replaceUrl: true });
   }
 
-  logout() {
+  async logout() {
+    // Antes de borrar el token: este dispositivo deja de recibir las notificaciones de esta cuenta
+    await this._notificaciones.desvincular();
     this._authService.logout();
   }
 }
