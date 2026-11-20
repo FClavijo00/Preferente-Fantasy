@@ -26,6 +26,22 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/landing-page/landing-page.page').then( m => m.LandingPagePage),
   },
   {
+    // Resultados, clasificación y 11 ideal de la 1ª Andaluza (sin sesión). Sin número: la última jornada.
+    // El título y la descripción definitivos los pone la página al cargar los datos.
+    path: 'jornada',
+    title: 'Resultados y clasificación de la 1ª Andaluza de Jaén',
+    data: {
+      description:
+        'Resultados, clasificación y 11 ideal de la última jornada de la 1ª Andaluza de Jaén, con los jugadores que más puntos han sumado.',
+    },
+    loadComponent: () => import('./pages/jornada-publica/jornada-publica.page').then((m) => m.JornadaPublicaPage),
+  },
+  {
+    path: 'jornada/:numero',
+    title: 'Resultados y clasificación de la 1ª Andaluza de Jaén',
+    loadComponent: () => import('./pages/jornada-publica/jornada-publica.page').then((m) => m.JornadaPublicaPage),
+  },
+  {
     path: 'login',
     title: 'Iniciar sesión',
     data: { description: 'Accede a tu cuenta de Preferente Fantasy y gestiona tu plantilla y tu 11 ideal.' },

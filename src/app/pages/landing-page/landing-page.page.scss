@@ -639,3 +639,58 @@ summary:focus-visible {
     transition: none !important;
   }
 }
+
+/* ---------- Enlace a la última jornada (página pública) ---------- */
+.jornada-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  color: var(--lp-text);
+  text-decoration: none;
+  border-color: var(--lp-neon-border);
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--lp-neon-soft);
+  }
+
+  .icon-box {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--lp-neon-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 1.4rem;
+      color: var(--lp-neon);
+    }
+  }
+
+  .texto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    strong {
+      font-weight: 800;
+    }
+
+    span {
+      font-size: 0.85rem;
+      color: var(--lp-text-3);
+      line-height: 1.4;
+    }
+  }
+
+  .flecha {
+    flex-shrink: 0;
+    color: var(--lp-neon);
+    font-size: 1.2rem;
+  }
+}

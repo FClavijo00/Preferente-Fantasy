@@ -1,0 +1,265 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <div class="toolbar-inner">
+      <a routerLink="/landing-page" class="volver" aria-label="Volver a la página de inicio">
+        <ion-icon name="arrow-back-outline" aria-hidden="true"></ion-icon>
+      </a>
+      <a routerLink="/landing-page" class="brand" aria-label="Preferente Fantasy, inicio">
+        <img src="assets/images/pf-logo-v2.svg" alt="" class="brand-logo" width="28" height="28" />
+        <span class="brand-title">PREFERENTE <span class="highlight">FANTASY</span></span>
+      </a>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="jp-content">
+  <main class="jp-main">
+    @switch (estado()) {
+      @case ('cargando') {
+        <div class="jp-estado">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Cargando la jornada…</p>
+        </div>
+      }
+      @case ('no-existe') {
+        <div class="jp-estado">
+          <h1>Esta jornada aún no está disponible</h1>
+          <p>Publicamos cada jornada cuando están todas las actas y el 11 ideal.</p>
+          <a routerLink="/jornada" class="btn btn-primary">Ver la última jornada</a>
+        </div>
+      }
+      @case ('error') {
+        <div class="jp-estado">
+          <h1>No se ha podido cargar la jornada</h1>
+          <p>Comprueba tu conexión e inténtalo de nuevo.</p>
+          <button type="button" class="btn btn-ghost" (click)="cargar(numero() ? +numero()! : undefined)">Reintentar</button>
+        </div>
+      }
+      @case ('listo') {
+        @if (datos(); as d) {
+          <!-- CABECERA -->
+          <header class="jp-hero">
+            <span class="hero-badge">1ª Andaluza de Jaén · Temporada 2026/2027</span>
+            <h1>Jornada {{ d.jornada.numero }}: <span class="text-neon">resultados, clasificación y 11 ideal</span></h1>
+            @if (fechas()) {
+              <p class="jp-fechas">Disputada {{ fechas() }}</p>
+            }
+
+            <nav class="jp-nav" aria-label="Otras jornadas">
+              @if (anterior(); as a) {
+                <a [routerLink]="['/jornada', a]" class="jp-nav-btn izq">
+                  <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon> Jornada {{ a }}
+                </a>
+              }
+              @if (siguiente(); as s) {
+                <a [routerLink]="['/jornada', s]" class="jp-nav-btn der">
+                  Jornada {{ s }} <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+                </a>
+              }
+            </nav>
+          </header>
+
+          <!-- RESUMEN -->
+          <section class="jp-section" aria-labelledby="resumen-titulo">
+            <h2 id="resumen-titulo">Resumen de la jornada</h2>
+            <div class="lp-card jp-resumen">
+              @for (frase of resumen(); track $index) {
+                <p>{{ frase }}</p>
+              }
+            </div>
+          </section>
+
+          <!-- RESULTADOS -->
+          <section class="jp-section" aria-labelledby="resultados-titulo">
+            <h2 id="resultados-titulo">Resultados</h2>
+            <ul class="jp-partidos">
+              @for (p of d.partidos; track p.id) {
+                <li class="lp-card jp-partido" [class]="'gana-' + ganador(p)">
+                  <div class="equipo local">
+                    <span class="nombre">{{ p.local.nombre }}</span>
+                    @if (p.local.escudo) {
+                      <img [src]="p.local.escudo" alt="" width="32" height="32" loading="lazy" />
+                    }
+                  </div>
+                  <div class="marcador">
+                    @if (ganador(p) !== null) {
+                      <strong>{{ p.goles_local }}<span>-</span>{{ p.goles_visitante }}</strong>
+                    } @else {
+                      <strong class="pendiente">{{ hora(p) || 'vs' }}</strong>
+                    }
+                  </div>
+                  <div class="equipo visitante">
+                    @if (p.visitante.escudo) {
+                      <img [src]="p.visitante.escudo" alt="" width="32" height="32" loading="lazy" />
+                    }
+                    <span class="nombre">{{ p.visitante.nombre }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+
+          <!-- CLASIFICACIÓN -->
+          <section class="jp-section" aria-labelledby="clasificacion-titulo">
+            <h2 id="clasificacion-titulo">Clasificación tras la jornada {{ d.jornada.numero }}</h2>
+            <div class="lp-card jp-tabla-wrap">
+              <table class="jp-tabla">
+                <thead>
+                  <tr>
+                    <th scope="col" class="pos">#</th>
+                    <th scope="col" class="eq">Equipo</th>
+                    <th scope="col" title="Partidos jugados">PJ</th>
+                    <th scope="col" title="Ganados">G</th>
+                    <th scope="col" title="Empatados">E</th>
+                    <th scope="col" title="Perdidos">P</th>
+                    <th scope="col" class="ancho" title="Goles a favor">GF</th>
+                    <th scope="col" class="ancho" title="Goles en contra">GC</th>
+                    <th scope="col" title="Diferencia de goles">DG</th>
+                    <th scope="col" class="pts">Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of d.clasificacion; track f.equipo_id) {
+                    <tr>
+                      <td class="pos">
+                        <span class="num">{{ f.posicion }}</span>
+                        @switch (movimiento(f)) {
+                          @case ('sube') {
+                            <ion-icon name="caret-up-outline" class="mov sube" aria-label="Sube"></ion-icon>
+                          }
+                          @case ('baja') {
+                            <ion-icon name="caret-down-outline" class="mov baja" aria-label="Baja"></ion-icon>
+                          }
+                          @default {
+                            <ion-icon name="remove-outline" class="mov igual" aria-hidden="true"></ion-icon>
+                          }
+                        }
+                      </td>
+                      <td class="eq">
+                        @if (f.escudo) {
+                          <img [src]="f.escudo" alt="" width="22" height="22" loading="lazy" />
+                        }
+                        <span>{{ f.equipo }}</span>
+                        @if (f.san > 0) {
+                          <sup class="san" [title]="'Sanción de ' + f.san + ' puntos'">−{{ f.san }}</sup>
+                        }
+                      </td>
+                      <td>{{ f.pj }}</td>
+                      <td>{{ f.g }}</td>
+                      <td>{{ f.e }}</td>
+                      <td>{{ f.p }}</td>
+                      <td class="ancho">{{ f.gf }}</td>
+                      <td class="ancho">{{ f.gc }}</td>
+                      <td>{{ f.dg > 0 ? '+' + f.dg : f.dg }}</td>
+                      <td class="pts">{{ f.puntos }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <p class="jp-nota">Las sanciones de puntos impuestas por la federación ya están descontadas.</p>
+          </section>
+
+          <!-- 11 IDEAL -->
+          <section class="jp-section" aria-labelledby="once-titulo">
+            <h2 id="once-titulo">11 ideal de la jornada {{ d.jornada.numero }} <small>({{ d.once_ideal.formacion }})</small></h2>
+            <div class="jp-campo">
+              @for (linea of lineasOnce(); track $index) {
+                <ul class="linea">
+                  @for (j of linea; track j.id) {
+                    <li class="jugador">
+                      <div class="foto">
+                        @if (j.foto) {
+                          <img [src]="j.foto" [alt]="j.nombre" width="52" height="52" loading="lazy" />
+                        } @else {
+                          <span aria-hidden="true">{{ iniciales(j.nombre) }}</span>
+                        }
+                        <b class="puntos">{{ j.puntos }}</b>
+                      </div>
+                      <span class="nombre">{{ j.nombre }}</span>
+                      <span class="equipo">{{ j.equipo }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </section>
+
+          <!-- RANKINGS DE LA TEMPORADA (hasta esta jornada) -->
+          <section class="jp-section jp-rankings">
+            <div>
+              <h2>Jugadores con más puntos <small>hasta la jornada {{ d.jornada.numero }}</small></h2>
+              <ol class="lp-card jp-ranking">
+                @for (j of d.ranking_puntos; track j.id) {
+                  <li>
+                    @if (j.escudo) {
+                      <img [src]="j.escudo" alt="" width="22" height="22" loading="lazy" />
+                    }
+                    <span class="nombre">{{ j.nombre }} <small>{{ j.posicion }} · {{ j.equipo }}</small></span>
+                    <strong>{{ j.puntos }} pts</strong>
+                  </li>
+                }
+              </ol>
+            </div>
+            @if (d.ranking_goleadores.length > 0) {
+              <div>
+                <h2>Máximos goleadores <small>hasta la jornada {{ d.jornada.numero }}</small></h2>
+                <ol class="lp-card jp-ranking">
+                  @for (j of d.ranking_goleadores; track j.id) {
+                    <li>
+                      @if (j.escudo) {
+                        <img [src]="j.escudo" alt="" width="22" height="22" loading="lazy" />
+                      }
+                      <span class="nombre">{{ j.nombre }} <small>{{ j.equipo }}</small></span>
+                      <strong>{{ j.goles }} {{ j.goles === 1 ? 'gol' : 'goles' }}</strong>
+                    </li>
+                  }
+                </ol>
+              </div>
+            }
+          </section>
+
+          <!-- CÓMO SE PUNTÚA + CTA -->
+          <section class="jp-section jp-cta lp-card">
+            <h2>¿Habrías acertado este 11?</h2>
+            <p>
+              En Preferente Fantasy cada jugador suma puntos según el acta oficial de su partido: titularidad, goles
+              (más valiosos cuanto más atrasada es su posición), portería a cero, resultado del equipo y tarjetas.
+              Crea tu plantilla, alinea tu 11 cada jornada y compite con tus amigos. Es gratis.
+            </p>
+            <a routerLink="/register" class="btn btn-primary">
+              <ion-icon name="football-outline" aria-hidden="true"></ion-icon>
+              Crear cuenta gratis
+            </a>
+          </section>
+
+          <!-- TODAS LAS JORNADAS -->
+          @if (d.jornadas.length > 1) {
+            <nav class="jp-section" aria-labelledby="jornadas-titulo">
+              <h2 id="jornadas-titulo">Otras jornadas</h2>
+              <ul class="jp-chips">
+                @for (n of d.jornadas; track n) {
+                  <li>
+                    <a [routerLink]="['/jornada', n]" [class.activa]="n === d.jornada.numero"
+                      [attr.aria-current]="n === d.jornada.numero ? 'page' : null">Jornada {{ n }}</a>
+                  </li>
+                }
+              </ul>
+            </nav>
+          }
+        }
+      }
+    }
+  </main>
+
+  <footer class="footer">
+    <p class="footer-brand">PREFERENTE <span>FANTASY</span></p>
+    <nav class="footer-links" aria-label="Enlaces">
+      <a routerLink="/landing-page">Qué es Preferente Fantasy</a>
+      <a routerLink="/politica-privacidad">Política de privacidad</a>
+      <a routerLink="/terminos-servicio">Términos de servicio</a>
+      <a routerLink="/aviso-legal">Aviso legal</a>
+    </nav>
+    <p class="footer-copy">&copy; {{ anioActual }} Preferente Fantasy. Datos de las actas oficiales de la competición.</p>
+  </footer>
+</ion-content>

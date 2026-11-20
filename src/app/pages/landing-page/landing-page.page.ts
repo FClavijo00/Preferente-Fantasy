@@ -9,12 +9,14 @@ import {
   calendarOutline,
   checkmarkCircleOutline,
   chevronDownOutline,
+  chevronForwardOutline,
   footballOutline,
   logoInstagram,
   peopleOutline,
   statsChartOutline,
   trophyOutline,
 } from 'ionicons/icons';
+import { cargarAdsense } from '../../core/utils/adsense';
 
 @Component({
   selector: 'app-landing-page',
@@ -28,10 +30,13 @@ export class LandingPagePage {
   public readonly anioActual = new Date().getFullYear();
 
   constructor() {
+    // Página con contenido propio: aquí sí puede haber anuncios (ver core/utils/adsense.ts)
+    cargarAdsense();
     addIcons({
       calendarOutline,
       checkmarkCircleOutline,
       chevronDownOutline,
+      chevronForwardOutline,
       footballOutline,
       logoInstagram,
       peopleOutline,
