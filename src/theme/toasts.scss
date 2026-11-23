@@ -1,0 +1,43 @@
+/* ==========================================================================
+   Aviso con "Deshacer" (p. ej. quitar a todos los jugadores de la alineación):
+   cssClass "pf-toast-deshacer" (siempre con mode: 'ios')
+   Tarjeta oscura como el resto de la app, icono en rojo y la acción en verde.
+   ========================================================================== */
+ion-toast.pf-toast-deshacer {
+  --background: #121f17;
+  --color: #ffffff;
+  --border-radius: 16px;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(0, 230, 118, 0.25);
+  --box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --width: calc(100% - 32px);
+  --max-width: 488px;
+  --button-color: var(--ion-color-pitch);
+
+  &::part(container) {
+    padding: 4px 4px 4px 14px;
+  }
+
+  &::part(icon) {
+    color: var(--ion-color-red-card);
+    font-size: 1.25rem;
+  }
+
+  &::part(message) {
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  &::part(button) {
+    height: 34px;
+    margin-left: 8px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: rgba(0, 230, 118, 0.12);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    text-transform: none;
+  }
+}

@@ -93,6 +93,16 @@
       }
     </div>
 
+    <!-- ===== Vaciar el once (p. ej. tras cargar la de la jornada anterior) ===== -->
+    @if (abierta() && alineados() > 0) {
+    <div class="acciones-campo">
+      <button type="button" class="btn-vaciar" (click)="vaciar()">
+        <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+        Quitar todos
+      </button>
+    </div>
+    }
+
     <!-- ===== Campo ===== -->
     <section class="campo" [class.bloqueado]="!abierta()" aria-label="Tu once">
       <div class="lineas-campo" aria-hidden="true">

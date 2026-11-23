@@ -6,6 +6,7 @@ import { IonContent } from '@ionic/angular/ion-content';
 import { IonIcon } from '@ionic/angular/ion-icon';
 import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
 import { ModalController } from '@ionic/angular/modal-controller';
+import { ToastController } from '@ionic/angular/toast-controller';
 import { addIcons } from 'ionicons';
 import {
   add,
@@ -13,6 +14,7 @@ import {
   lockClosedOutline,
   medkit,
   refreshOutline,
+  trashOutline,
   warning,
 } from 'ionicons/icons';
 import { HeaderComponent } from '../../shared/components/header/header.component';
@@ -94,6 +96,7 @@ export class AlineacionPage {
   private _loadingService = inject(LoadingService);
   private _jornadasService = inject(JornadasService);
   private _modalCtrl = inject(ModalController);
+  private _toastCtrl = inject(ToastController);
   private _equiposService = inject(EquiposService);
   private _formacionesService = inject(FormacionesService);
   private _ligasService = inject(LigasService);
@@ -167,7 +170,7 @@ export class AlineacionPage {
   );
 
   constructor() {
-    addIcons({ add, checkmarkCircle, lockClosedOutline, medkit, refreshOutline, warning });
+    addIcons({ add, checkmarkCircle, lockClosedOutline, medkit, refreshOutline, trashOutline, warning });
     const reloj = setInterval(() => this.ahora.set(Date.now()), 15_000);
     inject(DestroyRef).onDestroy(() => clearInterval(reloj));
   }
@@ -321,6 +324,41 @@ export class AlineacionPage {
 
   private asignar(index: number, jugador: JugadorHueco | null) {
     this.huecos.update((lista) => lista.map((h) => (h.index === index ? { ...h, jugador } : h)));
+  }
+
+  /**
+   * Quita a todos los jugadores del campo (mantiene la formación). Sin confirmación previa:
+   * el aviso permite deshacerlo durante unos segundos.
+   */
+  async vaciar() {
+    if (!this.abierta() || this.alineados() === 0) return;
+    const antes = this.huecos();
+    const copiadaAntes = this.copiadaDe();
+
+    this.huecos.set(antes.map((h) => ({ ...h, jugador: null })));
+    // Ya no es "la alineación cargada de la jornada N": que no salga ese aviso sobre un campo vacío
+    this.copiadaDe.set(null);
+
+    await this._toastCtrl.getTop().then((t) => t?.dismiss()).catch(() => {});
+    const toast = await this._toastCtrl.create({
+      message: 'Has quitado a todos los jugadores',
+      duration: 5000,
+      position: 'bottom',
+      positionAnchor: 'pf-tab-bar', // justo encima de la barra de pestañas
+      mode: 'ios',
+      icon: 'trash-outline',
+      cssClass: 'pf-toast-deshacer', // estilos en src/theme/toasts.scss
+      buttons: [
+        {
+          text: 'Deshacer',
+          handler: () => {
+            this.huecos.set(antes);
+            this.copiadaDe.set(copiadaAntes);
+          },
+        },
+      ],
+    });
+    await toast.present();
   }
 
   /** Apodo si lo tiene; si no, nombre y apellidos */

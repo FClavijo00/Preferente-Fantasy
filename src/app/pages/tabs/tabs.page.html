@@ -1,5 +1,6 @@
 <ion-tabs (ionTabsDidChange)="setCurrentTab($event)">
-  <ion-tab-bar slot="bottom" mode="ios" class="pf-tab-bar">
+  <!-- id: los avisos (toasts) se anclan encima de la barra para no taparla -->
+  <ion-tab-bar slot="bottom" mode="ios" class="pf-tab-bar" id="pf-tab-bar">
     @for (p of pestanas; track p.tab) {
     @let activa = pestanaActual() === p.tab;
     <ion-tab-button
