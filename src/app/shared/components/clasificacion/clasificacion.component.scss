@@ -88,11 +88,35 @@
 
 /* Barrita de color de la zona a la izquierda de la fila */
 .posicion {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   min-width: 18px;
   font-weight: 800;
+  line-height: 1.1;
+}
+
+/* Flechita de sube/baja respecto a la jornada anterior, debajo del número */
+.mov {
+  display: block;
+  margin: 1px auto 0;
+  font-size: 0.6rem;
+
+  &.sube {
+    color: var(--ion-color-pitch);
+  }
+
+  &.baja {
+    color: var(--ion-color-red-card);
+  }
+
+  &.igual {
+    width: 6px;
+    height: 2px;
+    margin-top: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+  }
 }
 
 tr[class*='zona-'] td.col-pos {

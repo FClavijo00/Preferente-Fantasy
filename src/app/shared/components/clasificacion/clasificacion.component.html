@@ -49,6 +49,18 @@
       >
         <td class="col-pos">
           <span class="posicion">{{ f.posicion }}</span>
+          <!-- Respecto a la jornada anterior -->
+          @switch (f.movimiento) {
+          @case ('sube') {
+          <ion-icon name="caret-up" class="mov sube" [title]="textoMovimiento(f)" [attr.aria-label]="textoMovimiento(f)"></ion-icon>
+          }
+          @case ('baja') {
+          <ion-icon name="caret-down" class="mov baja" [title]="textoMovimiento(f)" [attr.aria-label]="textoMovimiento(f)"></ion-icon>
+          }
+          @case ('igual') {
+          <span class="mov igual" [title]="textoMovimiento(f)" aria-hidden="true"></span>
+          }
+          }
         </td>
         <th scope="row" class="col-equipo">
           <span class="equipo">

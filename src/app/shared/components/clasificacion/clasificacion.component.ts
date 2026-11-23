@@ -4,7 +4,7 @@ import { IonIcon } from '@ionic/angular/ion-icon';
 import { IonSkeletonText } from '@ionic/angular/ion-skeleton-text';
 import { ModalController } from '@ionic/angular/modal-controller';
 import { addIcons } from 'ionicons';
-import { chevronDown, chevronUp, refreshOutline, warning } from 'ionicons/icons';
+import { caretDown, caretUp, chevronDown, chevronUp, refreshOutline, warning } from 'ionicons/icons';
 import { EquiposService } from '../../../core/services/equipos-service';
 import { DetalleEquipoComponent } from '../../modals/detalle-equipo/detalle-equipo.component';
 
@@ -24,6 +24,8 @@ interface ClasificacionApi {
   /** Puntos restados por sanciones */
   san: number | string;
   sanciones?: { puntos: number; motivo: string | null }[];
+  /** Puesto antes de la última jornada con resultados (null si no hay jornada anterior) */
+  posicion_anterior?: number | null;
 }
 
 export interface FilaClasificacion {
@@ -42,7 +44,12 @@ export interface FilaClasificacion {
   pts: number;
   zona: Zona | null;
   sanciones: { puntos: number; motivo: string | null }[];
+  /** Respecto a la jornada anterior; null si no hay con qué comparar */
+  movimiento: Movimiento | null;
+  posicionAnterior: number | null;
 }
+
+type Movimiento = 'sube' | 'baja' | 'igual';
 
 type Zona = 'ascenso' | 'playoff' | 'copa' | 'descenso';
 
@@ -56,6 +63,9 @@ const ZONAS: { zona: Zona; desde: number; hasta: number; texto: string }[] = [
 
 const zonaDe = (posicion: number): Zona | null =>
   ZONAS.find((z) => posicion >= z.desde && posicion <= z.hasta)?.zona ?? null;
+
+const movimientoDe = (posicion: number, anterior: number | null): Movimiento | null =>
+  anterior === null ? null : posicion < anterior ? 'sube' : posicion > anterior ? 'baja' : 'igual';
 
 /**
  * Clasificación de la competición real (pestaña "Clasificación").
@@ -79,7 +89,7 @@ export class ClasificacionComponent implements OnInit {
   readonly zonas = ZONAS;
 
   constructor() {
-    addIcons({ chevronDown, chevronUp, refreshOutline, warning });
+    addIcons({ caretDown, caretUp, chevronDown, chevronUp, refreshOutline, warning });
   }
 
   ngOnInit() {
@@ -108,12 +118,22 @@ export class ClasificacionComponent implements OnInit {
           pts: Number(d.puntos),
           zona: zonaDe(i + 1),
           sanciones: d.sanciones ?? [],
+          posicionAnterior: d.posicion_anterior ?? null,
+          movimiento: movimientoDe(i + 1, d.posicion_anterior ?? null),
         })),
       );
       this.estado.set('listo');
     } catch {
       this.estado.set('error');
     }
+  }
+
+  /** "Sube 2 puestos (antes 10º)" para lectores de pantalla y al pasar el ratón */
+  textoMovimiento(f: FilaClasificacion): string {
+    if (f.posicionAnterior === null || f.movimiento === null) return '';
+    const n = Math.abs(f.posicionAnterior - f.posicion);
+    if (f.movimiento === 'igual') return `Mantiene el puesto respecto a la jornada anterior`;
+    return `${f.movimiento === 'sube' ? 'Sube' : 'Baja'} ${n} ${n === 1 ? 'puesto' : 'puestos'} (antes ${f.posicionAnterior}º)`;
   }
 
   dg(valor: number): string {
