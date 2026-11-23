@@ -1,0 +1,80 @@
+<section class="seccion">
+  <header class="seccion-cabecera">
+    <h2>Usuarios</h2>
+    <p>Busca a un usuario para restablecerle la contraseña si la ha olvidado.</p>
+  </header>
+
+  <!-- ===== Buscador ===== -->
+  <label class="buscador">
+    <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+    <input type="search" placeholder="Correo, nombre de usuario o club" autocomplete="off" [value]="texto()"
+      (input)="escribir($event)" (keydown.enter)="buscar()" aria-label="Buscar usuario" />
+    @if (estado() === 'buscando') {
+    <ion-spinner name="crescent" aria-label="Buscando"></ion-spinner>
+    }
+  </label>
+
+  @switch (estado()) {
+  @case ('inicio') {
+  <p class="vacio">
+    <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+    Escribe al menos 2 letras
+  </p>
+  }
+  @case ('error') {
+  <p class="vacio">No se ha podido buscar. <button type="button" class="enlace" (click)="buscar()">Reintentar</button></p>
+  }
+  @default {
+  @if (estado() === 'listo' && resultados().length === 0) {
+  <p class="vacio">Nadie coincide con «{{ texto().trim() }}»</p>
+  }
+
+  <ul class="usuarios">
+    @for (u of resultados(); track u.id) {
+    <li class="usuario">
+      <div class="datos">
+        <div class="nombre">
+          <strong>{{ u.nombre_usuario }}</strong>
+          @if (esAdmin(u)) {
+          <span class="chip-admin"><ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>Admin</span>
+          }
+        </div>
+        <span class="club">{{ u.nombre_club }}</span>
+        <span class="email">{{ u.email }}</span>
+        <span class="meta">Alta: {{ alta(u) }} · {{ u.ligas }} {{ u.ligas === 1 ? 'liga' : 'ligas' }}</span>
+      </div>
+
+      @if (u.id !== miId) {
+      <button type="button" class="btn-restablecer" [disabled]="restableciendo() === u.id" (click)="confirmarRestablecer(u)">
+        @if (restableciendo() === u.id) {
+        <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+        <ion-icon name="key-outline" aria-hidden="true"></ion-icon>
+        }
+        Restablecer
+      </button>
+      } @else {
+      <span class="tu-cuenta">Tu cuenta</span>
+      }
+
+      <!-- Contraseña temporal recién generada: solo se ve ahora -->
+      @if (temporales()[u.id]; as temporal) {
+      <div class="temporal">
+        <span class="temporal-etiqueta">Contraseña temporal</span>
+        <code>{{ temporal }}</code>
+        <button type="button" class="btn-copiar" (click)="copiar(u)">
+          <ion-icon [name]="copiado() === u.id ? 'checkmark-outline' : 'copy-outline'" aria-hidden="true"></ion-icon>
+          {{ copiado() === u.id ? 'Copiado' : 'Copiar mensaje' }}
+        </button>
+        <p class="temporal-ayuda">
+          Pásasela por privado. Entrará con su correo y esta contraseña, y luego la cambiará en
+          Perfil → Cambiar contraseña. Cuando salgas de esta pantalla ya no se podrá volver a ver.
+        </p>
+      </div>
+      }
+    </li>
+    }
+  </ul>
+  }
+  }
+</section>
